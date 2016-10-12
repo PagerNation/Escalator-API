@@ -1,9 +1,7 @@
-import Promise from 'bluebird';
 import mongoose from 'mongoose';
 import config from './config/env';
 import app from './config/express';
 
-// plugin bluebird promise in mongoose
 mongoose.Promise = Promise;
 
 // connect to mongo db
