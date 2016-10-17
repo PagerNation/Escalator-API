@@ -7,13 +7,12 @@ import mongoose from 'mongoose';
  * pagingInterval - interval between sending pages to next subscriber
  * subscribers - ordered list of users/devices to send alerts to
  */
-const EscalationPolicySchema = new mongoose.Schema({
+
+export default {
   rotationInterval: Number,
   pagingInterval: {
     type: Number,
     required: true
   },
   subscribers: [mongoose.Schema.Types.ObjectId]
-});
-
-export default mongoose.model('EscalationPolicy', EscalationPolicySchema);
+};
