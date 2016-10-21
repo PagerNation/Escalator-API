@@ -1,5 +1,7 @@
 # Escalator-API
 
+![](https://media.giphy.com/media/l4Ho9Eed9XDNQ94k0/giphy.gif)
+
 ## Set Up
 
 `npm install`
