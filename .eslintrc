@@ -30,7 +30,8 @@
     ],
     "no-underscore-dangle": [
       0
-    ]
+    ],
+    "consistent-return": "off"
   },
   "env": {
     "node": true,

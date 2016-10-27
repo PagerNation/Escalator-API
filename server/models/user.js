@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import httpStatus from 'http-status';
+import APIError from '../helpers/APIError';
 import EscalationPolicySchema from './escalationPolicy';
 
 const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/; // eslint-disable-line
@@ -16,7 +18,10 @@ const UserSchema = new mongoose.Schema({
     },
     required: true,
   },
-  auth: String,
+  auth: {
+    type: String,
+    default: null
+  },
   escalationPolicy: {
     type: EscalationPolicySchema,
     default: null
@@ -30,6 +35,7 @@ const UserSchema = new mongoose.Schema({
   }],
   role: {
     type: Number, // This can be an enum, should we make this an enum?
+    default: 0,
     required: true
   },
   createdAt: {
@@ -37,5 +43,41 @@ const UserSchema = new mongoose.Schema({
     default: Date.now
   }
 });
+
+UserSchema.statics = {
+  /**
+   * Get user
+   * @param {ObjectId} id - The objectId of user.
+   * @returns {Promise<User, APIError>}
+   */
+  get(id) {
+    return new Promise((resolve, reject) => {
+      this.findById(id, (err, user) => {
+        if (user) {
+          resolve(user);
+        }
+        const error = new APIError('No such user exists!', httpStatus.NOT_FOUND);
+        reject(error);
+      });
+    });
+  },
+
+  /**
+   * Delete user
+   * @param {ObjectId} id - The objectId of user.
+   * @returns {Promise<APIError>}
+   */
+  delete(id) {
+    return new Promise((resolve, reject) => {
+      this.findByIdAndRemove(id, (err, user) => {
+        if (user) {
+          resolve();
+        }
+        const error = new APIError('No such user exists!', httpStatus.NOT_FOUND);
+        reject(error);
+      });
+    });
+  }
+};
 
 export default mongoose.model('User', UserSchema);
