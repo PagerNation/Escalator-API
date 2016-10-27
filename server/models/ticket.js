@@ -17,7 +17,7 @@ TicketSchema.statics = {
   /**
    * List all tickets.
    * @param {number} skip - Number of tickets to be skipped.
-   * @param {number} limit - Limit number of tikets to be returned.
+   * @param {number} limit - Limit number of tickets to be returned.
    * @returns {Promise<Ticket[]>}
    */
   list({ skip = 0, limit = 50 } = {}) {
