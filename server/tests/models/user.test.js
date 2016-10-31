@@ -1,18 +1,11 @@
-import chai, { expect } from 'chai';
 import User from '../../models/user';
 import Device from '../../models/device';
-
-chai.config.includeStack = true;
 
 describe('# User Model', () => {
   describe('user creation', () => {
     let user = new User({
       name: 'Kaleb Davis',
       email: 'abc@google.com'
-    });
-
-    before(() =>{
-      User.remove({}, () => {});
     });
 
     it('creates a user', (done) => {
@@ -26,12 +19,12 @@ describe('# User Model', () => {
       });
     });
 
-    it("throws an error when the email is not valid", (done) => {
+    it('throws an error when the email is not valid', (done) => {
       const badEmail = 'hello';
       user.email = badEmail;
       User.create(user, (err, u) => {
         expect(err).to.exist;
-        expect(err.errors['email'].message).to.equal(badEmail + ' is not a valid email address');
+        expect(err.errors.email.message).to.equal(`${badEmail} is not a valid email address`);
         done();
       });
     });
@@ -78,7 +71,8 @@ describe('# User Model', () => {
               expect(receivedUser.devices[0]._id.toString()).to.equal(newDevice._id.toString());
               expect(receivedUser.devices[0].name).to.equal(newDevice.name);
               expect(receivedUser.devices[0].type).to.equal(newDevice.type);
-              expect(receivedUser.devices[0].contactInformation).to.equal(newDevice.contactInformation);
+              expect(receivedUser.devices[0].contactInformation).to
+                .equal(newDevice.contactInformation);
               done();
             });
         });

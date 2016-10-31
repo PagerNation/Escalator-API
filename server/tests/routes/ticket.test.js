@@ -1,13 +1,10 @@
 import request from 'supertest-as-promised';
 import httpStatus from 'http-status';
-import chai, { expect } from 'chai';
 import app from '../../../index';
 import ticketService from '../../services/ticket';
 
-chai.config.includeStack = true;
-
 describe('## Ticket APIs', () => {
-  let ticket = {
+  const ticket = {
     groupId: '551137c2f9e1fac808a5f572',
     metadata: {
       message: 'Something bad!',
@@ -29,7 +26,6 @@ describe('## Ticket APIs', () => {
         .then((res) => {
           expect(res.body.groupId).to.equal('551137c2f9e1fac808a5f572');
           expect(res.body.metadata.message).to.equal('Something bad!');
-          ticket = res.body;
           done();
         });
     });
@@ -47,9 +43,19 @@ describe('## Ticket APIs', () => {
   });
 
   describe('# GET /api/v1/ticket/:ticketId', () => {
+    let createdTicket;
+
+    before((done) => {
+      ticketService.createTicket(ticket)
+        .then((t) => {
+          createdTicket = t;
+          done();
+        });
+    });
+
     it('should get a ticket', (done) => {
       request(app)
-        .get(`/api/v1/ticket/${ticket._id}`)
+        .get(`/api/v1/ticket/${createdTicket._id}`)
         .expect(httpStatus.OK)
         .then((res) => {
           expect(res.body.groupId).to.equal(ticket.groupId);
@@ -70,13 +76,6 @@ describe('## Ticket APIs', () => {
   });
 
   describe('# PUT /api/v1/ticket/:ticketId', () => {
-    let ticket = {
-      groupId: '551137c2f9e1fac808a5f572',
-      metadata: {
-        message: 'Something bad!',
-      }
-    };
-
     const updateDetails = {
       groupId: '551137c2f9e1fac808a5f572',
       metadata: {
@@ -84,17 +83,18 @@ describe('## Ticket APIs', () => {
       }
     };
 
+    let createdTicket;
     before((done) => {
       ticketService.createTicket(ticket)
-        .then((createdTicket) => {
-          ticket = createdTicket;
+        .then((t) => {
+          createdTicket = t;
           done();
         });
     });
 
     it('should update ticket details', (done) => {
       request(app)
-        .put(`/api/v1/ticket/${ticket._id}`)
+        .put(`/api/v1/ticket/${createdTicket._id}`)
         .send(updateDetails)
         .expect(httpStatus.OK)
         .then((res) => {
@@ -105,7 +105,7 @@ describe('## Ticket APIs', () => {
 
     it('should report error with message for any invalid field', (done) => {
       request(app)
-        .put(`/api/v1/ticket/${ticket._id}`)
+        .put(`/api/v1/ticket/${createdTicket._id}`)
         .send({ fake: 0 })
         .expect(httpStatus.BAD_REQUEST)
         .then((res) => {
@@ -116,28 +116,22 @@ describe('## Ticket APIs', () => {
   });
 
   describe('# DELETE /api/v1/ticket/:ticketId', () => {
-    let ticket = {
-      groupId: '551137c2f9e1fac808a5f572',
-      metadata: {
-        message: 'Something bad!',
-      }
-    };
-
+    let createdTicket;
     before((done) => {
       ticketService.createTicket(ticket)
-        .then((createdTicket) => {
-          ticket = createdTicket;
+        .then((t) => {
+          createdTicket = t;
           done();
         });
     });
 
     it('deletes a ticket', (done) => {
       request(app)
-        .delete(`/api/v1/ticket/${ticket._id.toString()}`)
+        .delete(`/api/v1/ticket/${createdTicket._id.toString()}`)
         .expect(httpStatus.OK)
         .then(() => {
           request(app)
-            .get(`/api/v1/ticket/${ticket._id.toString()}`)
+            .get(`/api/v1/ticket/${createdTicket._id.toString()}`)
             .expect(httpStatus.NOT_FOUND)
             .then(() => done());
         });

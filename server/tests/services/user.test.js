@@ -1,8 +1,7 @@
-import { expect } from 'chai';
 import httpStatus from 'http-status';
 import userService from '../../services/user';
 
-describe('# User Service', () =>{
+describe('# User Service', () => {
   const userObject = {
     name: 'Jarryd',
     email: 'abc@google.com'
@@ -13,7 +12,7 @@ describe('# User Service', () =>{
     context('with valid user details', () => {
       it('creates a new user', (done) => {
         userService.createUser(userObject)
-          .then(createdUser => {
+          .then((createdUser) => {
             expect(createdUser).to.exist;
             expect(createdUser.name).to.equal('Jarryd');
             expect(createdUser.email).to.equal('abc@google.com');
@@ -40,7 +39,7 @@ describe('# User Service', () =>{
 
       it('should fail validation due to the user missing a name', (done) => {
         userService.createUser(missingNameUser)
-          .catch(err => {
+          .catch((err) => {
             expect(err.name).to.equal('ValidationError');
             expect(err.details[0].message).to.equal('"name" is required');
             done();
@@ -49,7 +48,7 @@ describe('# User Service', () =>{
 
       it('should fail validation due to the user missing an email', (done) => {
         userService.createUser(missingEmailUser)
-          .catch(err => {
+          .catch((err) => {
             expect(err.name).to.equal('ValidationError');
             expect(err.details[0].message).to.equal('"email" is required');
             done();
@@ -72,7 +71,7 @@ describe('# User Service', () =>{
 
       it('should fail validation with a field not in the user model', (done) => {
         userService.createUser(extraFakeFieldUser)
-        .catch(err => {
+        .catch((err) => {
           expect(err.name).to.equal('ValidationError');
           expect(err.details[0].message).to.equal('"notAField" is not allowed');
           done();
@@ -81,7 +80,7 @@ describe('# User Service', () =>{
 
       it('should fail validation with a field not allowed', (done) => {
         userService.createUser(extraFieldUser)
-        .catch(err => {
+        .catch((err) => {
           expect(err.name).to.equal('ValidationError');
           expect(err.details[0].message).to.equal('"role" is not allowed');
           done();
@@ -206,7 +205,5 @@ describe('# User Service', () =>{
           done();
         });
     });
-
   });
-
 });

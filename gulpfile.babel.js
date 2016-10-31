@@ -98,6 +98,7 @@ gulp.task('test', ['pre-test', 'set-env'], () => {
       reporter: plugins.util.env['mocha-reporter'] || 'spec',
       ui: 'bdd',
       timeout: 6000,
+      require: './server/tests/spec_helper',
       compilers: {
         js: babelCompiler
       }

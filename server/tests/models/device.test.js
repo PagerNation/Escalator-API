@@ -1,21 +1,8 @@
-import chai, { expect } from 'chai';
 import Device from '../../models/device';
 
-chai.config.includeStack = true;
-
 describe('# Device Model', () => {
-
-  before(() => {
-    Device.remove({}, () =>{});
-  });
-
-  after(() => {
-    Device.remove({}, () =>{});
-  });
-
   context('given a valid device', () => {
-
-    let device = new Device({
+    const device = new Device({
       name: 'My Phone',
       type: 'email',
       contactInformation: '555-555-5555'
@@ -33,8 +20,7 @@ describe('# Device Model', () => {
   });
 
   context('when the type is not an enum', () => {
-
-    let device = new Device({
+    const device = new Device({
       name: 'My Phone',
       type: 'pidgeon'
     });
@@ -42,22 +28,21 @@ describe('# Device Model', () => {
     it('throws a type error', (done) => {
       Device.create(device, (err, d) => {
         expect(err).to.exist;
-        expect(err.errors['type'].message).to.equal(`\`${device.type}\` is not a valid enum value for path \`type\`.`);
+        expect(err.errors.type.message).to.equal(`\`${device.type}\` is not a valid enum value for path \`type\`.`);
         done();
       });
     });
   });
 
   context('when the name is not set', () => {
-
-    let device = new Device({
+    const device = new Device({
       type: 'pidgeon'
     });
 
     it('throws a name error', (done) => {
       Device.create(device, (err, d) => {
         expect(err).to.exist;
-        expect(err.errors['name'].message).to.equal('Path `name` is required.');
+        expect(err.errors.name.message).to.equal('Path `name` is required.');
         done();
       });
     });

@@ -1,11 +1,8 @@
-import chai, { expect } from 'chai';
 import mongoose from 'mongoose';
 import EscalationPolicySchema from '../../models/escalationPolicy';
 
-chai.config.includeStack = true;
-
 describe('## EscalationPolicy: models', () => {
-  let EscalationPolicyModel = mongoose.model('EscalationPolicy', new mongoose.Schema(EscalationPolicySchema));
+  const EscalationPolicyModel = mongoose.model('EscalationPolicy', new mongoose.Schema(EscalationPolicySchema));
 
   it('should create a new EscalationPolicy', (done) => {
     const subscriberRotationInterval = 7;
