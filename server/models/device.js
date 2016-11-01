@@ -10,7 +10,7 @@ const DeviceSchema = new mongoose.Schema({
     required: true,
     enum: ['email', 'phone', 'sms']
   },
-  contact_information: {
+  contactInformation: {
     type: String
   },
   createdAt: {
