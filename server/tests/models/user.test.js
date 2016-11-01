@@ -19,7 +19,7 @@ describe('# User Model', () => {
       });
     });
 
-    it('throws an error when the email is not valid', (done) => {
+    it("throws an error when the email is not valid", (done) => {
       const badEmail = 'hello';
       user.email = badEmail;
       User.create(user, (err, u) => {
