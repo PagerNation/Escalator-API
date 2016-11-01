@@ -1,8 +1,7 @@
-import { expect } from 'chai';
 import httpStatus from 'http-status';
 import ticketService from '../../services/ticket';
 
-describe('# Ticket Service', () =>{
+describe('# Ticket Service', () => {
   const ticketObject = {
     groupId: '551137c2f9e1fac808a5f572',
     metadata: {
@@ -19,12 +18,13 @@ describe('# Ticket Service', () =>{
     context('with valid ticket details', () => {
       it('creates a new ticket', (done) => {
         ticketService.createTicket(ticketObject)
-          .then(createdTicket => {
+          .then((createdTicket) => {
             expect(createdTicket).to.exist;
             expect(createdTicket.groupId.toString()).to.equal(ticketObject.groupId);
             expect(createdTicket.metadata.message).to.equal(ticketObject.metadata.message);
             expect(createdTicket.metadata.metrics.foo).to.equal(ticketObject.metadata.metrics.foo);
-            expect(createdTicket.metadata.metrics.jiggawatts).to.equal(ticketObject.metadata.metrics.jiggawatts);
+            expect(createdTicket.metadata.metrics.jiggawatts).to
+              .equal(ticketObject.metadata.metrics.jiggawatts);
             done();
           })
           .catch(err => done(err));
@@ -48,7 +48,7 @@ describe('# Ticket Service', () =>{
 
       it('should fail validation due to the ticket missing a groupId', (done) => {
         ticketService.createTicket(missingGroupIdTicket)
-          .catch(err => {
+          .catch((err) => {
             expect(err.name).to.equal('ValidationError');
             expect(err.details[0].message).to.equal('"groupId" is required');
             done();
@@ -57,7 +57,7 @@ describe('# Ticket Service', () =>{
 
       it('should fail validation due to the ticket missing metadata', (done) => {
         ticketService.createTicket(missingMetadataTicket)
-          .catch(err => {
+          .catch((err) => {
             expect(err.name).to.equal('ValidationError');
             expect(err.details[0].message).to.equal('"metadata" is required');
             done();
@@ -80,13 +80,13 @@ describe('# Ticket Service', () =>{
 
     it('gets an existing ticket', (done) => {
       ticketService.getById(savedTicketId.toString()).then((ticket) => {
-          expect(ticket).to.exist;
-          expect(ticket.groupId.toString()).to.equal('551137c2f9e1fac808a5f572');
-          expect(ticket.metadata.message).to.equal('Something bad!');
-          expect(ticket.metadata.metrics.foo).to.equal('bar');
-          expect(ticket.metadata.metrics.jiggawatts).to.equal(420);
-          done();
-        });
+        expect(ticket).to.exist;
+        expect(ticket.groupId.toString()).to.equal('551137c2f9e1fac808a5f572');
+        expect(ticket.metadata.message).to.equal('Something bad!');
+        expect(ticket.metadata.metrics.foo).to.equal('bar');
+        expect(ticket.metadata.metrics.jiggawatts).to.equal(420);
+        done();
+      });
     });
 
     it('can\'t find ticket for a given ticketId', (done) => {
@@ -123,7 +123,7 @@ describe('# Ticket Service', () =>{
         .then((ticket) => {
           expect(ticket).to.exist;
           expect(ticket._id.toString()).to.equal(savedTicketId.toString());
-          expect(ticket.groupId.toString()).to.equal('551137c2f9e1fac808a5f573')
+          expect(ticket.groupId.toString()).to.equal('551137c2f9e1fac808a5f573');
           expect(ticket.metadata.foo).to.equal('baz');
           expect(ticket.metadata.jiggawatts).to.not.exist;
           done();

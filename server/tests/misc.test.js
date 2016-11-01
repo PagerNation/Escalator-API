@@ -1,9 +1,6 @@
 import request from 'supertest-as-promised';
 import httpStatus from 'http-status';
-import chai, { expect } from 'chai';
 import app from '../../index';
-
-chai.config.includeStack = true;
 
 describe('## Misc', () => {
   describe('# GET /api/health-check', () => {

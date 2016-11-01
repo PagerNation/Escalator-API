@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import Group from '../../models/group';
 import EscalationPolicy from '../../models/escalationPolicy';
 
@@ -14,20 +13,20 @@ describe('Groups', () => {
       rotationInterval: subscriberRotationInterval,
       pagingInterval: subscriberPagingInterval,
       subscribers: [subscriberObjectId]
-    }
+    };
 
     const groupData = {
       users: [userObjectId],
       escalationPolicy: escPolicy
-    }
+    };
 
     const group = new Group(groupData);
 
     it('should create a new group', (done) => {
-      group.save((err, group) => {
+      group.save((err, newGroup) => {
         expect(err).to.not.exist;
-        expect(group.users).to.be.a('array');
-        expect(group.escalationPolicy.subscribers).to.be.a('array');
+        expect(newGroup.users).to.be.a('array');
+        expect(newGroup.escalationPolicy.subscribers).to.be.a('array');
         done();
       });
     });
@@ -38,20 +37,20 @@ describe('Groups', () => {
       rotationInterval: null,
       pagingInterval: subscriberPagingInterval,
       subscribers: [subscriberObjectId]
-    }
+    };
 
     const groupData = {
       users: [userObjectId],
       escalationPolicy: escPolicy
-    }
+    };
 
     const group = new Group(groupData);
 
     it('should create a new group', (done) => {
-      group.save((err, group) => {
+      group.save((err, newGroup) => {
         expect(err).to.not.exist;
-        expect(group.users).to.be.a('array');
-        expect(group.escalationPolicy.subscribers).to.be.a('array');
+        expect(newGroup.users).to.be.a('array');
+        expect(newGroup.escalationPolicy.subscribers).to.be.a('array');
         done();
       });
     });
@@ -60,12 +59,12 @@ describe('Groups', () => {
   context('when escalation policy is not there', () => {
     const groupData = {
       users: [userObjectId],
-    }
+    };
 
     const group = new Group(groupData);
 
     it('should not create a new group', (done) => {
-      group.save((err, group) => {
+      group.save((err, newGroup) => {
         expect(err).to.exist;
         done();
       });
@@ -77,16 +76,16 @@ describe('Groups', () => {
       rotationInterval: subscriberRotationInterval,
       pagingInterval: subscriberPagingInterval,
       subscribers: [subscriberObjectId]
-    }
+    };
 
     const groupData = {
       escalationPolicy: escPolicy
-    }
+    };
 
     const group = new Group(groupData);
 
     it('should not create a new group', (done) => {
-      group.save((err, group) => {
+      group.save((err, newGroup) => {
         expect(err).to.exist;
         done();
       });

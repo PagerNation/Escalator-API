@@ -1,10 +1,8 @@
 import request from 'supertest-as-promised';
 import httpStatus from 'http-status';
-import chai, { expect } from 'chai';
 import app from '../../../index';
 import userService from '../../services/user';
 
-chai.config.includeStack = true;
 
 describe('## User APIs', () => {
   describe('# POST /api/v1/user', () => {
@@ -46,7 +44,7 @@ describe('## User APIs', () => {
     let user = {
       name: 'Jarryd Lee',
       email: 'Jarryd@lee.com'
-    }
+    };
 
     before((done) => {
       userService.createUser(user)
@@ -79,17 +77,19 @@ describe('## User APIs', () => {
   });
 
   describe('# PUT /api/v1/user/:userId', () => {
-    let user = {
+    const uncreatedUser = {
       name: 'Jarryd Lee',
       email: 'Jarryd@lee.com'
-    }
+    };
+
+    let user;
 
     const updateDetails = {
       email: 'update@email.com'
     };
 
-    before((done) => {
-      userService.createUser(user)
+    beforeEach((done) => {
+      userService.createUser(uncreatedUser)
         .then((createdUser) => {
           user = createdUser;
           done();
@@ -123,7 +123,7 @@ describe('## User APIs', () => {
     let user = {
       name: 'Jarryd Lee',
       email: 'Jarryd@lee.com'
-    }
+    };
 
     before((done) => {
       userService.createUser(user)
