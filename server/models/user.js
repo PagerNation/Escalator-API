@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import httpStatus from 'http-status';
 import APIError from '../helpers/APIError';
 import EscalationPolicySchema from './escalationPolicy';
+import Device from './device';
 
 const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/; // eslint-disable-line
 
@@ -27,12 +28,7 @@ const UserSchema = new mongoose.Schema({
     default: null
   },
   groups: [mongoose.Schema.Types.ObjectId],
-  devices: [{
-    type: String,
-    address: String,
-    id: String,
-    name: String
-  }],
+  devices: [Device.schema],
   role: {
     type: Number, // This can be an enum, should we make this an enum?
     default: 0,

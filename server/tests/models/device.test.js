@@ -18,7 +18,7 @@ describe('# Device Model', () => {
     let device = new Device({
       name: 'My Phone',
       type: 'email',
-      contact_information: '555-555-5555'
+      contactInformation: '555-555-5555'
     });
 
     it('creates a devices', (done) => {
@@ -26,7 +26,7 @@ describe('# Device Model', () => {
         expect(err).to.not.exist;
         expect(d.name).to.equal(device.name);
         expect(d.type).to.equal(device.type);
-        expect(d.contact_information).to.equal(device.contact_information);
+        expect(d.contactInformation).to.equal(device.contactInformation);
         done();
       });
     });
