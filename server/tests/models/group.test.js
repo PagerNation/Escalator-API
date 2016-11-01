@@ -7,8 +7,32 @@ describe('Groups', () => {
   const subscriberObjectId = '57e590a0140ebf1cc48bb1bf';
 
   const userObjectId = '67e590a0140ebf1cc48bb1bf';
+  let group = null;
 
   context('with a valid group', () => {
+    const escPolicy = {
+      rotationInterval: subscriberRotationInterval,
+      pagingInterval: subscriberPagingInterval,
+      subscribers: [subscriberObjectId]
+    };
+
+    const groupData = {
+      name: 'Wondertwins',
+      users: [userObjectId],
+      escalationPolicy: escPolicy
+    };
+
+    it('should create a new group', (done) => {
+      new Group(groupData).save((err, newGroup) => {
+        expect(err).to.not.exist;
+        expect(newGroup.name).to.equal(groupData.name);
+        expect(newGroup.users[0].toString()).to.equal(groupData.users[0]);
+        done();
+      });
+    });
+  });
+
+  context('when name is not there', () => {
     const escPolicy = {
       rotationInterval: subscriberRotationInterval,
       pagingInterval: subscriberPagingInterval,
@@ -20,48 +44,7 @@ describe('Groups', () => {
       escalationPolicy: escPolicy
     };
 
-    const group = new Group(groupData);
-
-    it('should create a new group', (done) => {
-      group.save((err, newGroup) => {
-        expect(err).to.not.exist;
-        expect(newGroup.users).to.be.a('array');
-        expect(newGroup.escalationPolicy.subscribers).to.be.a('array');
-        done();
-      });
-    });
-  });
-
-  context('when rotation interval is not there', () => {
-    const escPolicy = {
-      rotationInterval: null,
-      pagingInterval: subscriberPagingInterval,
-      subscribers: [subscriberObjectId]
-    };
-
-    const groupData = {
-      users: [userObjectId],
-      escalationPolicy: escPolicy
-    };
-
-    const group = new Group(groupData);
-
-    it('should create a new group', (done) => {
-      group.save((err, newGroup) => {
-        expect(err).to.not.exist;
-        expect(newGroup.users).to.be.a('array');
-        expect(newGroup.escalationPolicy.subscribers).to.be.a('array');
-        done();
-      });
-    });
-  });
-
-  context('when escalation policy is not there', () => {
-    const groupData = {
-      users: [userObjectId],
-    };
-
-    const group = new Group(groupData);
+    group = new Group(groupData);
 
     it('should not create a new group', (done) => {
       group.save((err, newGroup) => {
@@ -79,10 +62,11 @@ describe('Groups', () => {
     };
 
     const groupData = {
+      name: 'Wondertwins',
       escalationPolicy: escPolicy
     };
 
-    const group = new Group(groupData);
+    group = new Group(groupData);
 
     it('should not create a new group', (done) => {
       group.save((err, newGroup) => {
