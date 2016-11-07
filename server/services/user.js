@@ -1,5 +1,6 @@
 import Joi from 'joi';
 import User from '../models/user';
+import Device from '../models/device';
 
 /**
  * Create user
@@ -55,7 +56,7 @@ function updateUser(userId, userObject) {
   return new Promise((resolve, reject) => {
     Joi.validate(userObject, userSchema, (err, value) => {
       if (err) {
-        reject(err);
+        return reject(err);
       }
       // TODO might have to have another if else here to catch error updating
       resolve(User.findByIdAndUpdate(userId, value, { new: true }));
@@ -72,4 +73,60 @@ function deleteUser(userId) {
   return User.delete(userId);
 }
 
-export default { createUser, getUser, updateUser, deleteUser };
+/**
+ * Device modifications for a user
+ */
+
+function getDevice(user, deviceId) {
+  return user.getDevice(deviceId);
+}
+
+function addDevice(user, deviceObject, index) {
+  const deviceSchema = Joi.object().keys({
+    name: Joi.string().required(),
+    type: Joi.string().valid('email', 'phone', 'sms').required(),
+    contactInformation: Joi.string().required()
+  });
+
+  return new Promise((resolve, reject) => {
+    Joi.validate(deviceObject, deviceSchema, (err, validatedDeviceObject) => {
+      if (err) {
+        return reject(err);
+      }
+
+      const newDevice = new Device(validatedDeviceObject);
+      user.addDevice(newDevice, index);
+      resolve(newDevice);
+    });
+  });
+}
+
+function sortDevices(user, sortOrder) {
+  const joiObjectIdList = Joi.array().items(Joi.string().hex().length(24).required());
+
+  return new Promise((resolve, reject) => {
+    Joi.validate(sortOrder, joiObjectIdList, (err, validatedSortOrder) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(user.sortDevices(validatedSortOrder));
+    });
+  });
+}
+
+function removeDevice(user, deviceId) {
+  return user.removeDevice(deviceId);
+}
+
+export default {
+  // User CRUD
+  createUser,
+  getUser,
+  updateUser,
+  deleteUser,
+  // User Device Modifications
+  getDevice,
+  addDevice,
+  sortDevices,
+  removeDevice
+};

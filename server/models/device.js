@@ -11,12 +11,17 @@ const DeviceSchema = new mongoose.Schema({
     enum: ['email', 'phone', 'sms']
   },
   contactInformation: {
-    type: String
+    type: String,
+    required: true
   },
   createdAt: {
     type: Date,
     default: Date.now
   }
+});
+
+DeviceSchema.virtual('id').get(function () {
+  return this._id.toString();
 });
 
 export default mongoose.model('Device', DeviceSchema);

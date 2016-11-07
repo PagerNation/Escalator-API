@@ -1,14 +1,16 @@
 import httpStatus from 'http-status';
 import userService from '../../services/user';
+import User from '../../models/user';
+import Device from '../../models/device';
 
-describe('# User Service', () => {
+describe('## User Service', () => {
   const userObject = {
     name: 'Jarryd',
     email: 'abc@google.com'
   };
 
   // Create
-  describe('createUser()', () => {
+  describe('# createUser()', () => {
     context('with valid user details', () => {
       it('creates a new user', (done) => {
         userService.createUser(userObject)
@@ -90,13 +92,13 @@ describe('# User Service', () => {
   });
 
   // Get
-  describe('getUser()', () => {
+  describe('# getUser()', () => {
     let savedUserId;
 
     before((done) => {
       userService.createUser(userObject)
         .then((createdUser) => {
-          savedUserId = createdUser._id;
+          savedUserId = createdUser.id;
           done();
         });
     });
@@ -105,7 +107,7 @@ describe('# User Service', () => {
       userService.getUser(savedUserId)
         .then((user) => {
           expect(user).to.exist;
-          expect(user._id.toString()).to.equal(savedUserId.toString());
+          expect(user.id).to.equal(savedUserId);
           expect(user.name).to.equal('Jarryd');
           expect(user.email).to.equal('abc@google.com');
           expect(user.role).to.equal(0);
@@ -129,7 +131,7 @@ describe('# User Service', () => {
   });
 
   // Update
-  describe('updateUser()', () => {
+  describe('# updateUser()', () => {
     let savedUserId;
 
     const updateDetails = {
@@ -140,7 +142,7 @@ describe('# User Service', () => {
     before((done) => {
       userService.createUser(userObject)
         .then((createdUser) => {
-          savedUserId = createdUser._id;
+          savedUserId = createdUser.id;
           done();
         });
     });
@@ -149,7 +151,7 @@ describe('# User Service', () => {
       userService.updateUser(savedUserId, updateDetails)
         .then((user) => {
           expect(user).to.exist;
-          expect(user._id.toString()).to.equal(savedUserId.toString());
+          expect(user.id).to.equal(savedUserId);
           expect(user.name).to.equal('Jarryd');
           expect(user.email).to.equal(updateDetails.email);
           expect(user.role).to.equal(updateDetails.role);
@@ -174,13 +176,13 @@ describe('# User Service', () => {
   });
 
   // Delete
-  describe('deleteUser()', () => {
+  describe('# deleteUser()', () => {
     let savedUserId;
 
     before((done) => {
       userService.createUser(userObject)
         .then((createdUser) => {
-          savedUserId = createdUser._id;
+          savedUserId = createdUser.id;
           done();
         });
     });
@@ -202,6 +204,133 @@ describe('# User Service', () => {
         .catch((err) => {
           expect(err).to.exist;
           expect(err.status).to.equal(httpStatus.NOT_FOUND);
+          done();
+        });
+    });
+  });
+
+  describe('# addDevice() | getDevice()', () => {
+    const baseUser = {
+      name: 'Jarryd Lee',
+      email: 'Jarryd@lee.com'
+    };
+
+    const device = new Device({
+      name: 'email',
+      type: 'email',
+      contactInformation: '1234567890'
+    });
+
+    let user;
+
+    before((done) => {
+      userService.createUser(baseUser)
+        .then((createdUser) => {
+          user = createdUser;
+          done();
+        });
+    });
+
+    it('should add and retrieve a users device', (done) => {
+      user.addDevice(device, 0)
+        .then(savedUser => savedUser.getDevice(device.id))
+        .then((retrievedDevice) => {
+          expect(retrievedDevice.name).to.equal(device.name);
+          expect(retrievedDevice.type).to.equal(device.type);
+          expect(retrievedDevice.contactInformation).to.equal(device.contactInformation);
+          done();
+        });
+    });
+
+    it('should fail to retrieve a users device with incorrect deviceId', (done) => {
+      const fakeId = '1234567890abcdef123456789';
+      user.getDevice(fakeId)
+        .catch((err) => {
+          expect(err).to.exist;
+          expect(err.message).to.equal(`Device with ID ${fakeId} doesn\'t exist!`);
+          done();
+        });
+    });
+  });
+
+
+  describe('# removeDevice()', () => {
+    const baseUser = {
+      name: 'Jarryd Lee',
+      email: 'Jarryd@lee.com'
+    };
+
+    const device = new Device({
+      name: 'email',
+      type: 'email',
+      contactInformation: '1234567890'
+    });
+
+    let user;
+
+    before((done) => {
+      userService.createUser(baseUser)
+        .then(createdUser => createdUser.addDevice(device, 0))
+        .then((updatedUser) => {
+          user = updatedUser;
+          done();
+        });
+    });
+
+    it('should remove a device from the user', (done) => {
+      userService.removeDevice(user, device.id)
+        .then((updatedUser) => {
+          expect(updatedUser).to.exist;
+          expect(updatedUser.devices).to.be.empty;
+          done();
+        });
+    });
+  });
+
+  describe('# sortDevices()', () => {
+    const baseUser = {
+      name: 'Jarryd Lee',
+      email: 'Jarryd@lee.com'
+    };
+
+    const baseDevice = {
+      name: 'email',
+      type: 'email',
+      contactInformation: '1234567890'
+    };
+
+    const device1 = new Device(baseDevice);
+    const device2 = new Device(baseDevice);
+    const device3 = new Device(baseDevice);
+    const sortOrder = [device1.id, device2.id, device3.id];
+
+    let user;
+
+    before((done) => {
+      userService.createUser(baseUser)
+        .then((createdUser) => {
+          user = createdUser;
+          return Promise.all([
+            createdUser.addDevice(device2, 0),
+            createdUser.addDevice(device1, 0),
+            createdUser.addDevice(device3, 0)
+          ]);
+        })
+        .then(() => User.get(user.id))
+        .then((receivedUser) => {
+          user = receivedUser;
+          done();
+        });
+    });
+
+    it('should sort a users device order by a given list', (done) => {
+      userService.sortDevices(user, sortOrder)
+        .then((receivedUser) => {
+          expect(receivedUser).to.exist;
+          const userDevices = receivedUser.devices;
+          for (let i = 0; i < sortOrder.length; i += 1) {
+            expect(userDevices[i].id).to.equal(sortOrder[i]);
+          }
           done();
         });
     });
