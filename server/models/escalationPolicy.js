@@ -8,11 +8,15 @@ import mongoose from 'mongoose';
  * subscribers - ordered list of users/devices to send alerts to
  */
 
-export default {
+const EscalationPolicySchema = new mongoose.Schema({
   rotationInterval: Number,
-  pagingInterval: {
-    type: Number,
-    required: true
-  },
-  subscribers: [mongoose.Schema.Types.ObjectId]
-};
+  subscribers: [{
+    subId: mongoose.Schema.Types.ObjectId,
+    pagingInterval: {
+      type: Number,
+      required: true
+    }
+  }]
+});
+
+export default mongoose.model('EscalationPolicy', EscalationPolicySchema);

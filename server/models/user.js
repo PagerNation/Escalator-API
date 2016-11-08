@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import httpStatus from 'http-status';
 import _ from 'lodash';
 import APIError from '../helpers/APIError';
-import EscalationPolicySchema from './escalationPolicy';
+import EscalationPolicy from './escalationPolicy';
 import Device from './device';
 
 const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/; // eslint-disable-line
@@ -25,7 +25,7 @@ const UserSchema = new mongoose.Schema({
     default: null
   },
   escalationPolicy: {
-    type: EscalationPolicySchema,
+    type: EscalationPolicy.schema,
     default: null
   },
   groups: [mongoose.Schema.Types.ObjectId],

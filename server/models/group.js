@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import httpStatus from 'http-status';
-import EscalationPolicySchema from './escalationPolicy';
+import EscalationPolicy from './escalationPolicy';
 import APIError from '../helpers/APIError';
 
 /**
@@ -23,7 +23,7 @@ const GroupSchema = new mongoose.Schema({
     required: true
   },
   escalationPolicy: {
-    type: EscalationPolicySchema,
+    type: EscalationPolicy.schema,
     default: null
   }
 });
