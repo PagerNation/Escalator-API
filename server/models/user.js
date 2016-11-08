@@ -28,7 +28,10 @@ const UserSchema = new mongoose.Schema({
     type: EscalationPolicy.schema,
     default: null
   },
-  groups: [mongoose.Schema.Types.ObjectId],
+  groups: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Group'
+  }],
   devices: [Device.schema],
   role: {
     type: Number, // This can be an enum, should we make this an enum?

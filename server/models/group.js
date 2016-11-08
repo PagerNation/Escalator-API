@@ -19,7 +19,10 @@ const GroupSchema = new mongoose.Schema({
     unique: true
   },
   users: {
-    type: [mongoose.Schema.Types.ObjectId],
+    type: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }],
     required: true
   },
   escalationPolicy: {
