@@ -335,4 +335,84 @@ describe('## User Service', () => {
         });
     });
   });
+
+  describe('# addGroup', () => {
+    const baseUser = {
+      name: 'Jarryd Lee',
+      email: 'Jarryd@lee.com'
+    };
+
+    const baseGroup = {
+      name: 'Wondertwins'
+    };
+
+    let user;
+
+    before((done) => {
+      userService.createUser(baseUser)
+        .then((createdUser) => {
+          user = createdUser;
+          done();
+        });
+    });
+
+    it('should add a group name to the user', (done) => {
+      userService.addGroup(user, baseGroup.name)
+        .then((modifiedUser) => {
+          expect(modifiedUser).to.exist;
+          expect(modifiedUser.name).to.equal(baseUser.name);
+          expect(modifiedUser.groups).to.include(baseGroup.name);
+          done();
+        });
+    });
+
+    it('should return an error if the group name is not a string', (done) => {
+      userService.addGroup(user, [1, 2, 3])
+        .catch((err) => {
+          expect(err).to.exist;
+          expect(err.name).to.equal('ValidationError');
+          done();
+        });
+    });
+  });
+
+  describe('# removeGroup', () => {
+    const baseUser = {
+      name: 'Jarryd Lee',
+      email: 'Jarryd@lee.com'
+    };
+
+    const baseGroup = {
+      name: 'Wondertwins'
+    };
+
+    let user;
+
+    before((done) => {
+      userService.createUser(baseUser)
+        .then((createdUser) => {
+          user = createdUser;
+          done();
+        });
+    });
+
+    it('should remove a group name from the user', (done) => {
+      userService.removeGroup(user, baseGroup.name)
+        .then((modifiedUser) => {
+          expect(modifiedUser).to.exist;
+          expect(modifiedUser.name).to.equal(baseUser.name);
+          expect(modifiedUser.groups).to.not.include(baseGroup.name);
+          done();
+        });
+    });
+
+    it('should return an error if the group name is not a string', (done) => {
+      userService.removeGroup(user, [1, 2, 3])
+        .catch((err) => {
+          expect(err).to.exist;
+          expect(err.name).to.equal('ValidationError');
+          done();
+        });
+    });
+  });
 });

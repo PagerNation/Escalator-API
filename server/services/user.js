@@ -118,6 +118,28 @@ function removeDevice(user, deviceId) {
   return user.removeDevice(deviceId);
 }
 
+function addGroup(user, groupName) {
+  return new Promise((resolve, reject) => {
+    Joi.validate(groupName, Joi.string(), (err, validatedName) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(user.addGroup(validatedName));
+    });
+  });
+}
+
+function removeGroup(user, groupName) {
+  return new Promise((resolve, reject) => {
+    Joi.validate(groupName, Joi.string(), (err, validatedName) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(user.removeGroup(validatedName));
+    });
+  });
+}
+
 export default {
   // User CRUD
   createUser,
@@ -128,5 +150,8 @@ export default {
   getDevice,
   addDevice,
   sortDevices,
-  removeDevice
+  removeDevice,
+  // User Group Modifications
+  addGroup,
+  removeGroup
 };
