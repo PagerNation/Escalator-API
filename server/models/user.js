@@ -29,7 +29,7 @@ const UserSchema = new mongoose.Schema({
     default: null
   },
   groups: [{
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     ref: 'Group'
   }],
   devices: [Device.schema],
@@ -101,7 +101,35 @@ UserSchema.methods = {
         resolve(savedUser);
       });
     });
-  }
+  },
+
+  addGroup(groupName) {
+    this.groups.push(groupName);
+    this.markModified('groups');
+
+    return new Promise((resolve, reject) => {
+      this.save((err, user) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(user);
+      });
+    });
+  },
+
+  removeGroup(groupName) {
+    _.remove(this.groups, { groupName });
+    this.markModified('groups');
+
+    return new Promise((resolve, reject) => {
+      this.save((err, user) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(user);
+      });
+    });
+  },
 };
 
 UserSchema.statics = {
@@ -137,7 +165,8 @@ UserSchema.statics = {
         reject(error);
       });
     });
-  }
+  },
+
 };
 
 export default mongoose.model('User', UserSchema);

@@ -1,5 +1,6 @@
 import User from '../../models/user';
 import Device from '../../models/device';
+import Group from '../../models/group';
 
 describe('# User Model', () => {
   describe('user creation', () => {
@@ -133,6 +134,49 @@ describe('# User Model', () => {
         .catch((err) => {
           expect(err).to.exist;
           expect(err.message).to.equal(`Device with ID ${fakeId} doesn\'t exist!`);
+          done();
+        });
+    });
+  });
+
+  describe('user group modifications', () => {
+    const userDetails = {
+      name: 'Bryon Wilkins',
+      email: '123@google.com'
+    };
+
+    const group = {
+      name: 'Wondertwins'
+    };
+
+    let createdUser;
+
+    beforeEach((done) => {
+      User.create(new User(userDetails))
+        .then((user) => {
+          createdUser = user;
+          done();
+        });
+    });
+
+    it('should add a group to the user', (done) => {
+      createdUser.addGroup(group.name)
+        .then((modifiedUser) => {
+          expect(modifiedUser).to.exist;
+          expect(modifiedUser.groups[0]).to.equal(group.name);
+          done();
+        });
+    });
+
+    it('should remove a group from the user', (done) => {
+      createdUser.addGroup(group.name)
+        .then((modifiedUser) => {
+          expect(modifiedUser.groups[0]).to.exist;
+        })
+        .then(() => createdUser.removeGroup(group.name))
+        .then((receivedUser) => {
+          expect(receivedUser).to.exist;
+          expect(receivedUser.devices).to.be.empty;
           done();
         });
     });
