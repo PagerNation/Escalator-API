@@ -32,5 +32,32 @@ export default {
     params: {
       userId: Joi.string().hex().length(24).required()
     }
+  },
+
+  // GET/PUT/DELETE /api/v1/user/:userId/device/:deviceId
+  deviceById: {
+    params: {
+      userId: Joi.string().hex().length(24).required(),
+      deviceId: Joi.string().hex().length(24)
+    },
+    body: {
+      sortOrder: Joi.array().items(Joi.string().hex().length(24))
+    }
+  },
+
+  // POST
+  addDevice: {
+    options: { allowUnknownBody: false },
+    params: {
+      userId: Joi.string().hex().length(24).required()
+    },
+    body: {
+      device: Joi.object().keys({
+        name: Joi.string().required(),
+        type: Joi.string().valid('email', 'phone', 'sms').required(),
+        contactInformation: Joi.string().required()
+      }),
+      index: Joi.number().required()
+    }
   }
 };

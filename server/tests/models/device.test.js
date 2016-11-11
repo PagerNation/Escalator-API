@@ -1,12 +1,9 @@
 import Device from '../../models/device';
+import { fixtures } from '../factories';
 
 describe('# Device Model', () => {
   context('given a valid device', () => {
-    const device = new Device({
-      name: 'My Phone',
-      type: 'email',
-      contactInformation: '555-555-5555'
-    });
+    const device = fixtures.email_device();
 
     it('creates a devices', (done) => {
       Device.create(device, (err, d) => {
@@ -20,10 +17,7 @@ describe('# Device Model', () => {
   });
 
   context('when the type is not an enum', () => {
-    const device = new Device({
-      name: 'My Phone',
-      type: 'pidgeon'
-    });
+    const device = fixtures.email_device({ type: 'pidgeon' });
 
     it('throws a type error', (done) => {
       Device.create(device, (err, d) => {

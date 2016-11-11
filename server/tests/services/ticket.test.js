@@ -1,17 +1,9 @@
 import httpStatus from 'http-status';
 import ticketService from '../../services/ticket';
+import { build, fixtures } from '../factories';
 
 describe('# Ticket Service', () => {
-  const ticketObject = {
-    groupId: '551137c2f9e1fac808a5f572',
-    metadata: {
-      message: 'Something bad!',
-      metrics: {
-        foo: 'bar',
-        jiggawatts: 420
-      }
-    }
-  };
+  const ticketObject = fixtures.ticket();
 
   // Create
   describe('createTicket()', () => {
@@ -81,10 +73,11 @@ describe('# Ticket Service', () => {
     it('gets an existing ticket', (done) => {
       ticketService.getById(savedTicketId.toString()).then((ticket) => {
         expect(ticket).to.exist;
-        expect(ticket.groupId.toString()).to.equal('551137c2f9e1fac808a5f572');
-        expect(ticket.metadata.message).to.equal('Something bad!');
-        expect(ticket.metadata.metrics.foo).to.equal('bar');
-        expect(ticket.metadata.metrics.jiggawatts).to.equal(420);
+        expect(ticket.groupId.toString()).to.equal(ticketObject.groupId);
+        expect(ticket.metadata.message).to.equal(ticketObject.metadata.message);
+        expect(ticket.metadata.metrics.foo).to.equal(ticketObject.metadata.metrics.foo);
+        expect(ticket.metadata.metrics.jiggawatts)
+          .to.equal(ticketObject.metadata.metrics.jiggawatts);
         done();
       });
     });

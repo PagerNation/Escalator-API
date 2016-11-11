@@ -39,9 +39,49 @@ function deleteUser(req, res, next) {
 }
 
 /**
+ * Device modifications
+ */
+
+/**
+ * Get device
+ */
+function getDevice(req, res, next) {
+  userService.getDevice(req.user, req.params.deviceId)
+    .then(device => res.json(device))
+    .catch(err => next(err));
+}
+
+/**
+ * Add device
+ */
+function addDevice(req, res, next) {
+  userService.addDevice(req.user, req.body.device, req.body.index)
+    .then(device => res.json(device))
+    .catch(err => next(err));
+}
+
+/**
+ * Sort devices
+ */
+function sortDevices(req, res, next) {
+  userService.sortDevices(req.user, req.params.sortOrder)
+    .then(user => res.json(user))
+    .catch(err => next(err));
+}
+
+/**
+ * Remove device
+ */
+function removeDevice(req, res, next) {
+  userService.removeDevice(req.user, req.params.deviceId)
+    .then(() => res.sendStatus(httpStatus.OK))
+    .catch(err => next(err));
+}
+
+/**
  * Loads user into the request
  */
-function load(req, res, next, userId) {
+function loadUser(req, res, next, userId) {
   userService.getUser(userId)
     .then((user) => {
       req.user = user; // eslint-disable-line no-param-reassign
@@ -50,4 +90,17 @@ function load(req, res, next, userId) {
     .catch(err => next(err));
 }
 
-export default { getUser, createUser, updateUser, deleteUser, load };
+export default {
+  // User CRUD
+  getUser,
+  createUser,
+  updateUser,
+  deleteUser,
+  // User device modifications
+  getDevice,
+  addDevice,
+  sortDevices,
+  removeDevice,
+  // User helpers
+  loadUser
+};

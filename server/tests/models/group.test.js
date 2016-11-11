@@ -1,21 +1,23 @@
 import Group from '../../models/group';
 import EscalationPolicy from '../../models/escalationPolicy';
 
-describe('Groups', () => {
+describe('## Groups', () => {
   const subscriberRotationInterval = 7;
   const subscriberPagingInterval = 15;
   const subscriberObjectId = '57e590a0140ebf1cc48bb1bf';
 
+  const escPolicy = {
+    rotationInterval: subscriberRotationInterval,
+    subscribers: [{
+      subId: subscriberObjectId,
+      pagingInterval: subscriberPagingInterval
+    }]
+  };
+
   const userObjectId = '67e590a0140ebf1cc48bb1bf';
   let group = null;
 
-  context('with a valid group', () => {
-    const escPolicy = {
-      rotationInterval: subscriberRotationInterval,
-      pagingInterval: subscriberPagingInterval,
-      subscribers: [subscriberObjectId]
-    };
-
+  context('# with a valid group', () => {
     const groupData = {
       name: 'Wondertwins',
       users: [userObjectId],
@@ -32,45 +34,39 @@ describe('Groups', () => {
     });
   });
 
-  context('when name is not there', () => {
-    const escPolicy = {
-      rotationInterval: subscriberRotationInterval,
-      pagingInterval: subscriberPagingInterval,
-      subscribers: [subscriberObjectId]
-    };
-
+  context('# when name is not there', () => {
     const groupData = {
       users: [userObjectId],
       escalationPolicy: escPolicy
     };
 
-    group = new Group(groupData);
+    before(() => {
+      group = new Group(groupData);
+    });
 
     it('should not create a new group', (done) => {
       group.save((err, newGroup) => {
         expect(err).to.exist;
+        expect(err.errors.name.message).to.equal('Path `name` is required.');
         done();
       });
     });
   });
 
-  context('when users is not there', () => {
-    const escPolicy = {
-      rotationInterval: subscriberRotationInterval,
-      pagingInterval: subscriberPagingInterval,
-      subscribers: [subscriberObjectId]
-    };
-
+  context('# when users is not there', () => {
     const groupData = {
       name: 'Wondertwins',
       escalationPolicy: escPolicy
     };
 
-    group = new Group(groupData);
+    before(() => {
+      group = new Group(groupData);
+    });
 
     it('should not create a new group', (done) => {
       group.save((err, newGroup) => {
         expect(err).to.exist;
+        expect(err.errors.users.message).to.equal('Path `users` is required.');
         done();
       });
     });

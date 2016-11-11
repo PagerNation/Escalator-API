@@ -1,12 +1,10 @@
 import httpStatus from 'http-status';
 import groupService from '../../services/group';
 import Group from '../../models/group';
+import { build, fixtures } from '../factories';
 
 describe('# Group Service', () => {
-  const groupObject = {
-    name: 'Wondertwins',
-    users: ['123456789012345678901234']
-  };
+  const groupObject = fixtures.group();
 
   context('with no groups in the database beforehand', () => {
     describe('createGroup()', () => {

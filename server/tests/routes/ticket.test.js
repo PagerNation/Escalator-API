@@ -1,15 +1,10 @@
 import request from 'supertest-as-promised';
 import httpStatus from 'http-status';
 import app from '../../../index';
-import ticketService from '../../services/ticket';
+import { build, fixtures } from '../factories';
 
 describe('## Ticket APIs', () => {
-  const ticket = {
-    groupId: '551137c2f9e1fac808a5f572',
-    metadata: {
-      message: 'Something bad!',
-    }
-  };
+  const ticket = fixtures.ticket();
 
   const invalidTicket = {
     metadata: {
@@ -24,8 +19,8 @@ describe('## Ticket APIs', () => {
         .send(ticket)
         .expect(httpStatus.OK)
         .then((res) => {
-          expect(res.body.groupId).to.equal('551137c2f9e1fac808a5f572');
-          expect(res.body.metadata.message).to.equal('Something bad!');
+          expect(res.body.groupId).to.equal(ticket.groupId);
+          expect(res.body.metadata.message).to.equal(ticket.metadata.message);
           done();
         });
     });
@@ -46,7 +41,7 @@ describe('## Ticket APIs', () => {
     let createdTicket;
 
     before((done) => {
-      ticketService.createTicket(ticket)
+      build('ticket', ticket)
         .then((t) => {
           createdTicket = t;
           done();
@@ -76,16 +71,15 @@ describe('## Ticket APIs', () => {
   });
 
   describe('# PUT /api/v1/ticket/:ticketId', () => {
-    const updateDetails = {
-      groupId: '551137c2f9e1fac808a5f572',
+    const updateDetails = fixtures.ticket({
       metadata: {
         message: 'Something else!',
       }
-    };
+    });
 
     let createdTicket;
     before((done) => {
-      ticketService.createTicket(ticket)
+      build('ticket', ticket)
         .then((t) => {
           createdTicket = t;
           done();
@@ -118,7 +112,7 @@ describe('## Ticket APIs', () => {
   describe('# DELETE /api/v1/ticket/:ticketId', () => {
     let createdTicket;
     before((done) => {
-      ticketService.createTicket(ticket)
+      build('ticket', ticket)
         .then((t) => {
           createdTicket = t;
           done();
