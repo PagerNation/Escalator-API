@@ -1,7 +1,8 @@
 import Group from '../../models/group';
+import User from '../../models/user';
 import EscalationPolicy from '../../models/escalationPolicy';
 
-describe('## Groups', () => {
+describe('## Group Model', () => {
   const subscriberRotationInterval = 7;
   const subscriberPagingInterval = 15;
   const subscriberObjectId = '57e590a0140ebf1cc48bb1bf';
@@ -53,22 +54,47 @@ describe('## Groups', () => {
     });
   });
 
-  context('# when users is not there', () => {
-    const groupData = {
+  describe('group user modifications', () => {
+    const baseGroup = {
       name: 'Wondertwins',
-      escalationPolicy: escPolicy
+      users: []
     };
 
-    before(() => {
-      group = new Group(groupData);
+    const newUser = new User({
+      name: 'Bryon Wilkins',
+      email: 'bwilks@gmail.com'
     });
 
-    it('should not create a new group', (done) => {
-      group.save((err, newGroup) => {
-        expect(err).to.exist;
-        expect(err.errors.users.message).to.equal('Path `users` is required.');
-        done();
-      });
+    beforeEach((done) => {
+      Group.create(baseGroup)
+        .then((createdGroup) => {
+          expect(createdGroup).to.exist;
+          group = createdGroup;
+          done();
+        });
+    });
+
+    it('should add a user to the group', (done) => {
+      group.addUser(newUser.id)
+        .then((receivedGroup) => {
+          expect(receivedGroup).to.exist;
+          expect(receivedGroup.name).to.equal(baseGroup.name);
+          expect(receivedGroup.users).to.not.be.empty;
+          done();
+        });
+    });
+
+    it('should remove a user from the group', (done) => {
+      group.addUser(newUser.id)
+        .then((modifiedGroup) => {
+          expect(modifiedGroup.users[0]).to.exist;
+        })
+        .then(() => group.removeUser(newUser.id))
+        .then((receivedGroup) => {
+          expect(receivedGroup).to.exist;
+          expect(receivedGroup.users).to.be.empty;
+          done();
+        });
     });
   });
 });
