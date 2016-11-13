@@ -2,20 +2,15 @@ import request from 'supertest-as-promised';
 import httpStatus from 'http-status';
 import app from '../../../index';
 import userService from '../../services/user';
+import { build, fixtures } from '../factories';
 import Device from '../../models/device';
 
 
 describe('## User APIs', () => {
   describe('# POST /api/v1/user', () => {
-    const user = {
-      name: 'Jarryd Lee',
-      email: 'abc@google.com'
-    };
+    const user = fixtures.user();
 
-    const invalidUser = {
-      name: 'Jarryd Lee',
-      email: 0
-    };
+    const invalidUser = fixtures.user({ email: 1 });
 
     it('should create a new user', (done) => {
       request(app)
@@ -42,15 +37,12 @@ describe('## User APIs', () => {
   });
 
   describe('# GET /api/v1/user/:userId', () => {
-    let user = {
-      name: 'Jarryd Lee',
-      email: 'Jarryd@lee.com'
-    };
+    let user;
 
     before((done) => {
-      userService.createUser(user)
-        .then((createdUser) => {
-          user = createdUser;
+      build('user', fixtures.user())
+        .then((u) => {
+          user = u;
           done();
         });
     });
@@ -78,11 +70,6 @@ describe('## User APIs', () => {
   });
 
   describe('# PUT /api/v1/user/:userId', () => {
-    const uncreatedUser = {
-      name: 'Jarryd Lee',
-      email: 'Jarryd@lee.com'
-    };
-
     let user;
 
     const updateDetails = {
@@ -90,7 +77,7 @@ describe('## User APIs', () => {
     };
 
     beforeEach((done) => {
-      userService.createUser(uncreatedUser)
+      build('user', fixtures.user())
         .then((createdUser) => {
           user = createdUser;
           done();
@@ -121,13 +108,10 @@ describe('## User APIs', () => {
   });
 
   describe('# DELETE /api/v1/user/:userId', () => {
-    let user = {
-      name: 'Jarryd Lee',
-      email: 'Jarryd@lee.com'
-    };
+    let user;
 
     before((done) => {
-      userService.createUser(user)
+      build('user', fixtures.user())
         .then((createdUser) => {
           user = createdUser;
           done();
@@ -158,21 +142,14 @@ describe('## User APIs', () => {
   });
 
   describe('# GET /api/v1/user/:userId/device/:deviceId', () => {
-    const baseUser = {
-      name: 'Jarryd Lee',
-      email: 'Jarryd@lee.com'
-    };
+    const baseUser = fixtures.user();
 
-    const device = new Device({
-      name: 'email',
-      type: 'email',
-      contactInformation: '1234567890'
-    });
+    const device = new Device(fixtures.email_device());
 
     let user;
 
     before((done) => {
-      userService.createUser(baseUser)
+      build('user', baseUser)
         .then(createdUser => createdUser.addDevice(device))
         .then((updatedUser) => {
           user = updatedUser;
@@ -194,21 +171,14 @@ describe('## User APIs', () => {
   });
 
   describe('# POST /api/v1/user/:userId/device', () => {
-    const baseUser = {
-      name: 'Jarryd Lee',
-      email: 'Jarryd@lee.com'
-    };
+    const baseUser = fixtures.user();
 
-    const baseDevice = {
-      name: 'email',
-      type: 'email',
-      contactInformation: '1234567890'
-    };
+    const baseDevice = fixtures.email_device();
 
     let user;
 
     beforeEach((done) => {
-      userService.createUser(baseUser)
+      build('user', baseUser)
         .then((createdUser) => {
           user = createdUser;
           done();

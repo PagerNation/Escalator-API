@@ -1,8 +1,7 @@
 import request from 'supertest-as-promised';
 import httpStatus from 'http-status';
 import app from '../../../index';
-import groupService from '../../services/group';
-import Group from '../../models/group';
+import { fixtures, build } from '../factories';
 
 const groupUrl = '/api/v1/group';
 
@@ -10,10 +9,7 @@ describe('## Group API', () => {
   context('with no groups needed beforehand', () => {
     describe('# POST /api/v1/group', () => {
       context('with a valid group', () => {
-        const group = {
-          name: 'Wondertwins',
-          users: ['123456789012345678901234']
-        };
+        const group = fixtures.group();
 
         it('should create a new group', (done) => {
           request(app)
@@ -47,13 +43,12 @@ describe('## Group API', () => {
 
   context('with a group needed beforehand', () => {
     context('with a valid group', () => {
-      const group = {
-        name: 'Wondertwins',
+      const group = fixtures.group({
         users: ['5c15f987046b1686d22dbea1', 'ba421976ad9b71458d8b91ab']
-      };
+      });
 
       beforeEach((done) => {
-        groupService.createGroup(group)
+        build('group', group)
           .then(() => done());
       });
 
