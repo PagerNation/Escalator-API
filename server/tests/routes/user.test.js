@@ -1,10 +1,8 @@
 import request from 'supertest-as-promised';
 import httpStatus from 'http-status';
 import app from '../../../index';
-import Device from '../../models/device';
 import userService from '../../services/user';
 import { build, fixtures } from '../factories';
-import userService from '../../services/user';
 import Device from '../../models/device';
 
 
