@@ -109,6 +109,52 @@ describe('## Group API', () => {
             });
         });
       });
+
+      describe('# POST /api/v1/group/:groupName/user', () => {
+        const data = {
+          userId: '098765432109876543210987'
+        };
+
+        it('should add a user to the group', (done) => {
+          request(app)
+            .post(`${groupUrl}/${group.name}/user`)
+            .send(data)
+            .expect(httpStatus.OK)
+            .then((res) => {
+              expect(res.body.name).to.equal(group.name);
+              expect(res.body.users).to.include(data.userId);
+              done();
+            });
+        });
+      });
+
+      describe('# DELETE /api/v1/group/:groupName/user/:userId', () => {
+        const data = {
+          userId: group.users[0]
+        };
+
+        it('should remove the user from the group', (done) => {
+          request(app)
+            .delete(`${groupUrl}/${group.name}/user/${data.userId}`)
+            .expect(httpStatus.OK)
+            .then((res) => {
+              expect(res.body.name).to.equal(group.name);
+              expect(res.body.users).to.not.include(data.userId);
+              done();
+            });
+        });
+
+        it('should not remove a user that does not exist', (done) => {
+          request(app)
+            .delete(`${groupUrl}/${group.name}/user/098765432109876543210987`)
+             .expect(httpStatus.OK)
+            .then((res) => {
+              expect(res.body.name).to.equal(group.name);
+              expect(res.body.users).to.include(group.users[0]);
+              done();
+            });
+        });
+      });
     });
 
     context('with an invalid group', () => {

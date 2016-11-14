@@ -38,6 +38,18 @@ function updateGroup(req, res, next) {
     .catch(err => next(err));
 }
 
+function addUser(req, res, next) {
+  groupService.addUser(req.group, req.body.userId)
+    .then(updatedGroup => res.json(updatedGroup))
+    .catch(err => next(err));
+}
+
+function removeUser(req, res, next) {
+  groupService.removeUser(req.group, req.params.userId)
+    .then(updatedGroup => res.json(updatedGroup))
+    .catch(err => next(err));
+}
+
 /**
  * Loads a group into the request based on group name
  */
@@ -50,4 +62,4 @@ function load(req, res, next, groupName) {
     .catch(err => next(err));
 }
 
-export default { getGroup, deleteGroup, createGroup, updateGroup, load };
+export default { getGroup, deleteGroup, createGroup, updateGroup, addUser, removeUser, load };

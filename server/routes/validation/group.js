@@ -24,5 +24,22 @@ export default {
     params: {
       groupName: Joi.string().required()
     }
+  },
+
+  userById: {
+    params: {
+      groupName: Joi.string().required(),
+      userId: Joi.string().hex().length(24)
+    }
+  },
+
+  addUser: {
+    options: { allowUnknownBody: false },
+    body: {
+      userId: Joi.string().hex().length(24)
+    },
+    params: {
+      groupName: Joi.string().required()
+    }
   }
 };
