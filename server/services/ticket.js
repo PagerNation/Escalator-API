@@ -1,7 +1,6 @@
 import Joi from 'joi';
-import httpStatus from 'http-status';
 import Ticket from '../models/ticket';
-import APIError from '../helpers/APIError';
+import JoiHelper from '../helpers/JoiHelper';
 
 const ticketSchema = {
   groupId: Joi.string().required(),
@@ -11,54 +10,23 @@ const ticketSchema = {
 const idPattern = Joi.string().hex().length(24).required();
 
 function getById(id) {
-  return new Promise((resolve, reject) => {
-    Joi.validate(id, idPattern, (err, value) => {
-      if (err) {
-        reject(err);
-      } else {
-        Ticket.findById(value).then((ticket) => {
-          if (ticket) resolve(ticket);
-          else reject(new APIError('No such ticket exists!', httpStatus.NOT_FOUND));
-        });
-      }
-    });
-  });
+  return JoiHelper.validate(id, idPattern)
+    .then(validatedId => Ticket.get(validatedId));
 }
 
 function createTicket(ticketDetails) {
-  return new Promise((resolve, reject) => {
-    Joi.validate(ticketDetails, ticketSchema, (err, value) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(Ticket.create(value));
-      }
-    });
-  });
+  return JoiHelper.validate(ticketDetails, ticketSchema)
+    .then(validatedDetails => Ticket.create(validatedDetails));
 }
 
 function updateTicket(id, ticketDetails) {
-  return new Promise((resolve, reject) => {
-    Joi.validate(ticketDetails, ticketSchema, (err, value) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(Ticket.findByIdAndUpdate(id, value, { new: true }));
-      }
-    });
-  });
+  return JoiHelper.validate(ticketDetails, ticketSchema)
+    .then(validatedDetails => Ticket.findByIdAndUpdate(id, validatedDetails, { new: true }));
 }
 
 function deleteById(id) {
-  return new Promise((resolve, reject) => {
-    Joi.validate(id, idPattern, (err, value) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(Ticket.findById(value).remove().exec());
-      }
-    });
-  });
+  return JoiHelper.validate(id, idPattern)
+    .then(validatedId => Ticket.delete(validatedId));
 }
 
 export default {
