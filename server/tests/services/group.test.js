@@ -130,5 +130,65 @@ describe('# Group Service', () => {
         });
       });
     });
+
+    describe('# addUser', () => {
+      const userId = '098765432109876543210987';
+
+      let group;
+
+      beforeEach((done) => {
+        groupService.getGroup(groupObject.name)
+          .then((receivedGroup) => {
+            group = receivedGroup;
+            expect(receivedGroup).to.exist;
+            done();
+          });
+      });
+
+      it('should add a user to the group by id', (done) => {
+        groupService.addUser(group, userId)
+          .then((savedGroup) => {
+            expect(savedGroup).to.exist;
+            expect(savedGroup.name).to.equal(group.name);
+            expect(savedGroup.users).to.include(userId);
+            done();
+          });
+      });
+    });
+
+    describe('# removeUser', () => {
+      let group;
+      let userId;
+
+      beforeEach((done) => {
+        groupService.getGroup(groupObject.name)
+          .then((receivedGroup) => {
+            group = receivedGroup;
+            userId = groupObject.users[0];
+            expect(receivedGroup).to.exist;
+            done();
+          });
+      });
+
+
+      it('should remove a user to the group by id', (done) => {
+        groupService.removeUser(group, userId)
+          .then((savedGroup) => {
+            expect(savedGroup).to.exist;
+            expect(savedGroup.name).to.equal(group.name);
+            expect(savedGroup.users).to.not.include(userId);
+            done();
+          });
+      });
+
+      it('should throw an error if the user id is invalid', (done) => {
+        groupService.removeUser(group, 'invalid')
+          .catch((err) => {
+            expect(err).to.exist;
+            expect(err.name).to.equal('ValidationError');
+            done();
+          });
+      });
+    });
   });
 });

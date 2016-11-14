@@ -31,4 +31,41 @@ function updateGroup(groupName, groupObject) {
       Group.findOneAndUpdate({ name: groupName }, validatedGroupObject, { new: true }));
 }
 
-export default { getGroup, deleteGroup, createGroup, updateGroup };
+function addUser(group, userId) {
+  const userIdSchema = Joi.string().hex().length(24);
+
+  return new Promise((resolve, reject) => {
+    Joi.validate(userId, userIdSchema, (err, value) => {
+      if (err) {
+        return reject(err);
+      }
+      group.addUser(value);
+      resolve(group);
+    });
+  });
+}
+
+function removeUser(group, userId) {
+  const userIdSchema = Joi.string().hex().length(24);
+
+  return new Promise((resolve, reject) => {
+    Joi.validate(userId, userIdSchema, (err, value) => {
+      if (err) {
+        return reject(err);
+      }
+      group.removeUser(value);
+      resolve(group);
+    });
+  });
+}
+
+export default {
+  // Group CRUD
+  getGroup,
+  deleteGroup,
+  createGroup,
+  updateGroup,
+  // Group User Modifications
+  addUser,
+  removeUser
+};
