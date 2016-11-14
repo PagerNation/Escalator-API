@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import JoiHelper from '../helpers/JoiHelper';
 import User from '../models/user';
 import Device from '../models/device';
 
@@ -13,14 +14,8 @@ function createUser(userObject) {
     email: Joi.string().email().required()
   });
 
-  return new Promise((resolve, reject) => {
-    Joi.validate(userObject, userSchema, (err, value) => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(User.create(value));
-    });
-  });
+  return JoiHelper.validate(userObject, userSchema)
+    .then(validatedUserObject => User.create(validatedUserObject));
 }
 
 /**
@@ -53,15 +48,9 @@ function updateUser(userId, userObject) {
     role: Joi.number()
   });
 
-  return new Promise((resolve, reject) => {
-    Joi.validate(userObject, userSchema, (err, value) => {
-      if (err) {
-        return reject(err);
-      }
-      // TODO might have to have another if else here to catch error updating
-      resolve(User.findByIdAndUpdate(userId, value, { new: true }));
-    });
-  });
+  return JoiHelper.validate(userObject, userSchema)
+    .then(validatedUserObject =>
+      User.findByIdAndUpdate(userId, validatedUserObject, { new: true }));
 }
 
 /**
@@ -88,30 +77,19 @@ function addDevice(user, deviceObject, index) {
     contactInformation: Joi.string().required()
   });
 
-  return new Promise((resolve, reject) => {
-    Joi.validate(deviceObject, deviceSchema, (err, validatedDeviceObject) => {
-      if (err) {
-        return reject(err);
-      }
-
+  return JoiHelper.validate(deviceObject, deviceSchema)
+    .then((validatedDeviceObject) => {
       const newDevice = new Device(validatedDeviceObject);
       user.addDevice(newDevice, index);
-      resolve(newDevice);
-    });
-  });
+      return newDevice;
+    })
 }
 
 function sortDevices(user, sortOrder) {
   const joiObjectIdList = Joi.array().items(Joi.string().hex().length(24).required());
 
-  return new Promise((resolve, reject) => {
-    Joi.validate(sortOrder, joiObjectIdList, (err, validatedSortOrder) => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(user.sortDevices(validatedSortOrder));
-    });
-  });
+  return JoiHelper.validate(sortOrder, joiObjectIdList)
+    .then(validatedSortOrder => user.sortDevices(validatedSortOrder));
 }
 
 function removeDevice(user, deviceId) {
@@ -119,25 +97,13 @@ function removeDevice(user, deviceId) {
 }
 
 function addGroup(user, groupName) {
-  return new Promise((resolve, reject) => {
-    Joi.validate(groupName, Joi.string(), (err, validatedName) => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(user.addGroup(validatedName));
-    });
-  });
+  return JoiHelper.validate(groupName, Joi.string())
+    .then(validatedName => user.addGroup(validatedName));
 }
 
 function removeGroup(user, groupName) {
-  return new Promise((resolve, reject) => {
-    Joi.validate(groupName, Joi.string(), (err, validatedName) => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(user.removeGroup(validatedName));
-    });
-  });
+  return JoiHelper.validate(groupName, Joi.string())
+    .then(validatedName => user.removeGroup(validatedName));
 }
 
 export default {
