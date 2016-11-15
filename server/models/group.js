@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import httpStatus from 'http-status';
+import _ from 'lodash';
 import EscalationPolicy from './escalationPolicy';
 import APIError from '../helpers/APIError';
 
@@ -22,14 +23,44 @@ const GroupSchema = new mongoose.Schema({
     type: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
-    }],
-    required: true
+    }]
   },
   escalationPolicy: {
     type: EscalationPolicy.schema,
     default: null
   }
 });
+
+GroupSchema.methods = {
+  addUser(userId) {
+    this.users.push(userId);
+    this.markModified('users');
+
+    return new Promise((resolve, reject) => {
+      this.save((err, group) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(group);
+      });
+    });
+  },
+
+  removeUser(userId) {
+    _.remove(this.users, n => n.toString() === userId);
+    this.markModified('users');
+
+    return new Promise((resolve, reject) => {
+      this.save((err, group) => {
+        if (err) {
+          reject(err);
+        }
+
+        resolve(group);
+      });
+    });
+  }
+};
 
 GroupSchema.statics = {
   /**

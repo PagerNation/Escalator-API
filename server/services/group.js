@@ -31,4 +31,27 @@ function updateGroup(groupName, groupObject) {
       Group.findOneAndUpdate({ name: groupName }, validatedGroupObject, { new: true }));
 }
 
-export default { getGroup, deleteGroup, createGroup, updateGroup };
+function addUser(group, userId) {
+  const userIdSchema = Joi.string().hex().length(24);
+
+  return JoiHelper.validate(userId, userIdSchema)
+    .then(validatedUserObject => group.addUser(validatedUserObject));
+}
+
+function removeUser(group, userId) {
+  const userIdSchema = Joi.string().hex().length(24);
+
+  return JoiHelper.validate(userId, userIdSchema)
+    .then(validatedUserObject => group.removeUser(validatedUserObject));
+}
+
+export default {
+  // Group CRUD
+  getGroup,
+  deleteGroup,
+  createGroup,
+  updateGroup,
+  // Group User Modifications
+  addUser,
+  removeUser
+};
