@@ -82,7 +82,7 @@ function addDevice(user, deviceObject, index) {
       const newDevice = new Device(validatedDeviceObject);
       user.addDevice(newDevice, index);
       return newDevice;
-    })
+    });
 }
 
 function sortDevices(user, sortOrder) {

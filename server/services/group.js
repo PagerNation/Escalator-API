@@ -34,29 +34,21 @@ function updateGroup(groupName, groupObject) {
 function addUser(group, userId) {
   const userIdSchema = Joi.string().hex().length(24);
 
-  return new Promise((resolve, reject) => {
-    Joi.validate(userId, userIdSchema, (err, value) => {
-      if (err) {
-        return reject(err);
-      }
-      group.addUser(value);
-      resolve(group);
+  return JoiHelper.validate(userId, userIdSchema)
+    .then((validatedUserObject) => {
+      group.addUser(validatedUserObject);
+      return group;
     });
-  });
 }
 
 function removeUser(group, userId) {
   const userIdSchema = Joi.string().hex().length(24);
 
-  return new Promise((resolve, reject) => {
-    Joi.validate(userId, userIdSchema, (err, value) => {
-      if (err) {
-        return reject(err);
-      }
-      group.removeUser(value);
-      resolve(group);
+  return JoiHelper.validate(userId, userIdSchema)
+    .then((validatedUserObject) => {
+      group.removeUser(validatedUserObject);
+      return group;
     });
-  });
 }
 
 export default {
