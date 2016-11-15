@@ -35,20 +35,14 @@ function addUser(group, userId) {
   const userIdSchema = Joi.string().hex().length(24);
 
   return JoiHelper.validate(userId, userIdSchema)
-    .then((validatedUserObject) => {
-      group.addUser(validatedUserObject);
-      return group;
-    });
+    .then(validatedUserObject => group.addUser(validatedUserObject));
 }
 
 function removeUser(group, userId) {
   const userIdSchema = Joi.string().hex().length(24);
 
   return JoiHelper.validate(userId, userIdSchema)
-    .then((validatedUserObject) => {
-      group.removeUser(validatedUserObject);
-      return group;
-    });
+    .then(validatedUserObject => group.removeUser(validatedUserObject));
 }
 
 export default {
