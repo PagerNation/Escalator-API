@@ -147,7 +147,7 @@ describe('## Group API', () => {
         it('should not remove a user that does not exist', (done) => {
           request(app)
             .delete(`${groupUrl}/${group.name}/user/098765432109876543210987`)
-             .expect(httpStatus.OK)
+            .expect(httpStatus.OK)
             .then((res) => {
               expect(res.body.name).to.equal(group.name);
               expect(res.body.users).to.include(group.users[0]);

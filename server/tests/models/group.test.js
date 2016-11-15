@@ -54,7 +54,7 @@ describe('## Group Model', () => {
     });
   });
 
-  describe('group user modifications', () => {
+  describe('# group user modifications', () => {
     const baseGroup = {
       name: 'Wondertwins',
       users: []
@@ -86,9 +86,7 @@ describe('## Group Model', () => {
 
     it('should remove a user from the group', (done) => {
       group.addUser(newUser.id)
-        .then((modifiedGroup) => {
-          expect(modifiedGroup.users[0]).to.exist;
-        })
+        .then(modifiedGroup => expect(modifiedGroup.users[0]).to.exist)
         .then(() => group.removeUser(newUser.id))
         .then((receivedGroup) => {
           expect(receivedGroup).to.exist;
