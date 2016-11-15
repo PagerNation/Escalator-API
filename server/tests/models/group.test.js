@@ -1,6 +1,7 @@
 import Group from '../../models/group';
 import User from '../../models/user';
 import EscalationPolicy from '../../models/escalationPolicy';
+import { build, fixtures } from '../factories';
 
 describe('## Group Model', () => {
   const subscriberRotationInterval = 7;
@@ -55,10 +56,9 @@ describe('## Group Model', () => {
   });
 
   describe('# group user modifications', () => {
-    const baseGroup = {
-      name: 'Wondertwins',
+    const baseGroup = fixtures.group({
       users: []
-    };
+    });
 
     const newUser = new User({
       name: 'Bryon Wilkins',
@@ -66,10 +66,9 @@ describe('## Group Model', () => {
     });
 
     beforeEach((done) => {
-      Group.create(baseGroup)
-        .then((createdGroup) => {
-          expect(createdGroup).to.exist;
-          group = createdGroup;
+      build('group', baseGroup)
+        .then((newGroup) => {
+          group = newGroup;
           done();
         });
     });
