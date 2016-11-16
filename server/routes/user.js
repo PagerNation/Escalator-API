@@ -25,7 +25,9 @@ router.route('/:userId/device/:deviceId')
 
   .get(validate(paramValidation.deviceById), userCtrl.getDevice)
 
-  .put(validate(paramValidation.deviceById), userCtrl.sortDevices)
+  .put(validate(paramValidation.updateDevice), userCtrl.updateDevice)
+
+  .post(validate(paramValidation.deviceById), userCtrl.sortDevices)
 
   .delete(validate(paramValidation.deviceById), userCtrl.removeDevice);
 

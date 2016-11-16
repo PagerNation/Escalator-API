@@ -7,19 +7,20 @@ import Device from '../../models/device';
 
 
 describe('## User APIs', () => {
-  describe('# POST /api/v1/user', () => {
-    const user = fixtures.user();
+  const baseUser = fixtures.user();
+  const baseDevice = fixtures.emailDevice();
 
+  describe('# POST /api/v1/user', () => {
     const invalidUser = fixtures.user({ email: 1 });
 
     it('should create a new user', (done) => {
       request(app)
         .post('/api/v1/user')
-        .send(user)
+        .send(baseUser)
         .expect(httpStatus.OK)
         .then((res) => {
-          expect(res.body.name).to.equal(user.name);
-          expect(res.body.email).to.equal(user.email);
+          expect(res.body.name).to.equal(baseUser.name);
+          expect(res.body.email).to.equal(baseUser.email);
           done();
         });
     });
@@ -40,7 +41,7 @@ describe('## User APIs', () => {
     let user;
 
     before((done) => {
-      build('user', fixtures.user())
+      build('user', baseUser)
         .then((u) => {
           user = u;
           done();
@@ -77,7 +78,7 @@ describe('## User APIs', () => {
     };
 
     beforeEach((done) => {
-      build('user', fixtures.user())
+      build('user', baseUser)
         .then((createdUser) => {
           user = createdUser;
           done();
@@ -111,7 +112,7 @@ describe('## User APIs', () => {
     let user;
 
     before((done) => {
-      build('user', fixtures.user())
+      build('user', baseUser)
         .then((createdUser) => {
           user = createdUser;
           done();
@@ -142,8 +143,6 @@ describe('## User APIs', () => {
   });
 
   describe('# GET /api/v1/user/:userId/device/:deviceId', () => {
-    const baseUser = fixtures.user();
-
     const device = new Device(fixtures.emailDevice());
 
     let user;
@@ -170,11 +169,52 @@ describe('## User APIs', () => {
     });
   });
 
+  describe('# PUT /api/v1/user/:userId/device/:deviceId', () => {
+    let user;
+    let device;
+
+    const updateDetails = {
+      name: 'new name',
+      type: 'sms',
+    };
+
+    beforeEach((done) => {
+      build('user', baseUser)
+        .then(createdUser => createdUser.addDevice(new Device(baseDevice), 0))
+        .then((updatedUser) => {
+          user = updatedUser;
+          device = user.devices[0];
+          done();
+        });
+    });
+
+    it('should update a device', (done) => {
+      request(app)
+        .put(`/api/v1/user/${user.id}/device/${device.id}`)
+        .send(updateDetails)
+        .expect(httpStatus.OK)
+        .then((res) => {
+          const updatedDevice = res.body.devices[0];
+          expect(updatedDevice.name).to.equal(updateDetails.name);
+          expect(updatedDevice.type).to.equal(updateDetails.type);
+          expect(updatedDevice.contactInformation).to.equal(device.contactInformation);
+          done();
+        });
+    });
+
+    it('should fail validation with an invalid device type', (done) => {
+      request(app)
+        .put(`/api/v1/user/${user.id}/device/${device.id}`)
+        .send({ type: 'invalid' })
+        .expect(httpStatus.BAD_REQUEST)
+        .then((res) => {
+          expect(res.body.message).to.equal('"type" must be one of [email, phone, sms]');
+          done();
+        });
+    });
+  });
+
   describe('# POST /api/v1/user/:userId/device', () => {
-    const baseUser = fixtures.user();
-
-    const baseDevice = fixtures.emailDevice();
-
     let user;
 
     beforeEach((done) => {
@@ -194,9 +234,10 @@ describe('## User APIs', () => {
         })
         .expect(httpStatus.OK)
         .then((res) => {
-          expect(res.body.email).to.equal(baseDevice.email);
-          expect(res.body.type).to.equal(baseDevice.type);
-          expect(res.body.contactInformation).to.equal(baseDevice.contactInformation);
+          const device = res.body.devices[0];
+          expect(device.email).to.equal(baseDevice.email);
+          expect(device.type).to.equal(baseDevice.type);
+          expect(device.contactInformation).to.equal(baseDevice.contactInformation);
           done();
         });
     });

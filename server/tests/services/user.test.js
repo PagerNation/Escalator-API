@@ -4,16 +4,21 @@ import User from '../../models/user';
 import Device from '../../models/device';
 
 describe('## User Service', () => {
-  const userObject = {
+  const baseUser = {
     name: 'Jarryd',
     email: 'abc@google.com'
   };
 
-  // Create
+  const baseDevice = {
+    name: 'email',
+    type: 'email',
+    contactInformation: '1234567890'
+  };
+
   describe('# createUser()', () => {
     context('with valid user details', () => {
       it('creates a new user', (done) => {
-        userService.createUser(userObject)
+        userService.createUser(baseUser)
           .then((createdUser) => {
             expect(createdUser).to.exist;
             expect(createdUser.name).to.equal('Jarryd');
@@ -91,12 +96,11 @@ describe('## User Service', () => {
     });
   });
 
-  // Get
   describe('# getUser()', () => {
     let savedUserId;
 
     before((done) => {
-      userService.createUser(userObject)
+      userService.createUser(baseUser)
         .then((createdUser) => {
           savedUserId = createdUser.id;
           done();
@@ -130,7 +134,6 @@ describe('## User Service', () => {
     });
   });
 
-  // Update
   describe('# updateUser()', () => {
     let savedUserId;
 
@@ -140,7 +143,7 @@ describe('## User Service', () => {
     };
 
     before((done) => {
-      userService.createUser(userObject)
+      userService.createUser(baseUser)
         .then((createdUser) => {
           savedUserId = createdUser.id;
           done();
@@ -152,7 +155,7 @@ describe('## User Service', () => {
         .then((user) => {
           expect(user).to.exist;
           expect(user.id).to.equal(savedUserId);
-          expect(user.name).to.equal('Jarryd');
+          expect(user.name).to.equal(baseUser.name);
           expect(user.email).to.equal(updateDetails.email);
           expect(user.role).to.equal(updateDetails.role);
           expect(user.auth).to.be.null;
@@ -175,12 +178,11 @@ describe('## User Service', () => {
     });
   });
 
-  // Delete
   describe('# deleteUser()', () => {
     let savedUserId;
 
     before((done) => {
-      userService.createUser(userObject)
+      userService.createUser(baseUser)
         .then((createdUser) => {
           savedUserId = createdUser.id;
           done();
@@ -210,17 +212,6 @@ describe('## User Service', () => {
   });
 
   describe('# addDevice() | getDevice()', () => {
-    const baseUser = {
-      name: 'Jarryd Lee',
-      email: 'Jarryd@lee.com'
-    };
-
-    const device = new Device({
-      name: 'email',
-      type: 'email',
-      contactInformation: '1234567890'
-    });
-
     let user;
 
     before((done) => {
@@ -232,19 +223,27 @@ describe('## User Service', () => {
     });
 
     it('should add and retrieve a users device', (done) => {
-      user.addDevice(device, 0)
-        .then(savedUser => savedUser.getDevice(device.id))
+      userService.addDevice(user, baseDevice, 0)
+        .then(savedUser => savedUser.getDevice(savedUser.devices[0].id))
         .then((retrievedDevice) => {
-          expect(retrievedDevice.name).to.equal(device.name);
-          expect(retrievedDevice.type).to.equal(device.type);
-          expect(retrievedDevice.contactInformation).to.equal(device.contactInformation);
+          expect(retrievedDevice.name).to.equal(baseDevice.name);
+          expect(retrievedDevice.type).to.equal(baseDevice.type);
+          expect(retrievedDevice.contactInformation).to.equal(baseDevice.contactInformation);
+          done();
+        });
+    });
+
+    it('should fail to add device without all fields', (done) => {
+      userService.addDevice(user, { name: 'test' }, 0)
+        .catch((err) => {
+          expect(err.details[0].message).to.equal('"type" is required');
           done();
         });
     });
 
     it('should fail to retrieve a users device with incorrect deviceId', (done) => {
       const fakeId = '1234567890abcdef123456789';
-      user.getDevice(fakeId)
+      userService.getDevice(user, fakeId)
         .catch((err) => {
           expect(err).to.exist;
           expect(err.message).to.equal(`Device with ID ${fakeId} doesn\'t exist!`);
@@ -253,18 +252,8 @@ describe('## User Service', () => {
     });
   });
 
-
   describe('# removeDevice()', () => {
-    const baseUser = {
-      name: 'Jarryd Lee',
-      email: 'Jarryd@lee.com'
-    };
-
-    const device = new Device({
-      name: 'email',
-      type: 'email',
-      contactInformation: '1234567890'
-    });
+    const device = new Device(baseDevice);
 
     let user;
 
@@ -287,18 +276,45 @@ describe('## User Service', () => {
     });
   });
 
+  describe('# updateDevice()', () => {
+    const device = new Device(baseDevice);
+
+    const updateDetails = {
+      name: 'sms',
+      type: 'sms'
+    };
+
+    let user;
+
+    beforeEach((done) => {
+      userService.createUser(baseUser)
+        .then(createdUser => createdUser.addDevice(device, 0))
+        .then((updatedUser) => {
+          user = updatedUser;
+          done();
+        });
+    });
+
+    it('should update a device', (done) => {
+      userService.updateDevice(user, device.id, updateDetails)
+        .then((updatedUser) => {
+          const updatedDevice = updatedUser.devices[0];
+          expect(updatedDevice.name).to.equal(updateDetails.name);
+          expect(updatedDevice.type).to.equal(updateDetails.type);
+          done();
+        });
+    });
+
+    it('should fail to update with ValidationError', (done) => {
+      userService.updateDevice(user, device.id, { fake: 'fake' })
+        .catch((err) => {
+          expect(err.details[0].message).to.equal('"fake" is not allowed');
+          done();
+        });
+    });
+  });
+
   describe('# sortDevices()', () => {
-    const baseUser = {
-      name: 'Jarryd Lee',
-      email: 'Jarryd@lee.com'
-    };
-
-    const baseDevice = {
-      name: 'email',
-      type: 'email',
-      contactInformation: '1234567890'
-    };
-
     const device1 = new Device(baseDevice);
     const device2 = new Device(baseDevice);
     const device3 = new Device(baseDevice);
@@ -337,11 +353,6 @@ describe('## User Service', () => {
   });
 
   describe('# addGroup', () => {
-    const baseUser = {
-      name: 'Jarryd Lee',
-      email: 'Jarryd@lee.com'
-    };
-
     const baseGroup = {
       name: 'Wondertwins'
     };
@@ -377,11 +388,6 @@ describe('## User Service', () => {
   });
 
   describe('# removeGroup', () => {
-    const baseUser = {
-      name: 'Jarryd Lee',
-      email: 'Jarryd@lee.com'
-    };
-
     const baseGroup = {
       name: 'Wondertwins'
     };

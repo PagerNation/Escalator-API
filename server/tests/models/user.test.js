@@ -1,6 +1,7 @@
 import User from '../../models/user';
 import Device from '../../models/device';
 import Group from '../../models/group';
+import { build, fixtures } from '../factories';
 
 describe('# User Model', () => {
   describe('user creation', () => {
@@ -53,7 +54,7 @@ describe('# User Model', () => {
     let user;
 
     beforeEach((done) => {
-      User.create(new User(baseUser))
+      build('user', baseUser)
         .then((createdUser) => {
           expect(createdUser).to.exist;
           user = createdUser;
@@ -93,6 +94,33 @@ describe('# User Model', () => {
           expect(device.type).to.equal(newDevice.type);
           expect(device.contactInformation).to.equal(newDevice.contactInformation);
           expect(device.id).to.equal(newDevice.id);
+          done();
+        });
+    });
+
+    it('should update a device on a user', (done) => {
+      const updateDetails = {
+        name: 'telephone',
+        contactInformation: '+123456789'
+      };
+
+      user.addDevice(newDevice, 0)
+        .then(updatedUser => updatedUser.updateDevice(newDevice.id, updateDetails))
+        .then((updatedUser) => {
+          const updatedDevice = updatedUser.devices[0];
+          expect(updatedDevice.name).to.equal(updateDetails.name);
+          expect(updatedDevice.contactInformation).to.equal(updateDetails.contactInformation);
+          expect(updatedDevice.type).to.equal(newDevice.type);
+          done();
+        });
+    });
+
+    it('should fail to update with an invalid device type', (done) => {
+      user.addDevice(newDevice, 0)
+        .then(updatedUser => updatedUser.updateDevice(newDevice.id, { type: 'false' }))
+        .catch((err) => {
+          expect(err.errors['devices.0.type'].message)
+            .to.equal('`false` is not a valid enum value for path `type`.');
           done();
         });
     });
@@ -153,8 +181,8 @@ describe('# User Model', () => {
 
     beforeEach((done) => {
       User.create(new User(userDetails))
-        .then((user) => {
-          createdUser = user;
+        .then((updatedUser) => {
+          createdUser = updatedUser;
           done();
         });
     });

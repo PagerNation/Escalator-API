@@ -34,7 +34,7 @@ export default {
     }
   },
 
-  // GET/PUT/DELETE /api/v1/user/:userId/device/:deviceId
+  // GET/POST/DELETE /api/v1/user/:userId/device/:deviceId
   deviceById: {
     params: {
       userId: Joi.string().hex().length(24).required(),
@@ -42,6 +42,19 @@ export default {
     },
     body: {
       sortOrder: Joi.array().items(Joi.string().hex().length(24))
+    }
+  },
+
+  // PUT
+  updateDevice: {
+    options: { allowUnknownBody: false },
+    params: {
+      userId: Joi.string().hex().length(24).required(),
+    },
+    body: {
+      name: Joi.string(),
+      type: Joi.string().valid('email', 'phone', 'sms'),
+      contactInformation: Joi.string()
     }
   },
 

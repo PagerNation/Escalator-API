@@ -1,8 +1,8 @@
 import Joi from 'joi';
 
-function validate(toValidate, validationSchema) {
+function validate(toValidate, validationSchema, options = {}) {
   return new Promise((resolve, reject) => {
-    Joi.validate(toValidate, validationSchema, (err, value) => {
+    Joi.validate(toValidate, validationSchema, options, (err, value) => {
       if (err) {
         reject(err);
       } else {

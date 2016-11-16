@@ -3,11 +3,12 @@ import JoiHelper from '../helpers/JoiHelper';
 import User from '../models/user';
 import Device from '../models/device';
 
-/**
- * Create user
- * @param {Object} userObject - The user details
- * @returns {Promise<User, ValidationError>}
- */
+const DEVICE_SCHEMA = Joi.object().keys({
+  name: Joi.string(),
+  type: Joi.string().valid('email', 'phone', 'sms'),
+  contactInformation: Joi.string()
+});
+
 function createUser(userObject) {
   const userSchema = Joi.object().keys({
     name: Joi.string().required(),
@@ -18,21 +19,10 @@ function createUser(userObject) {
     .then(validatedUserObject => User.create(validatedUserObject));
 }
 
-/**
- * Get user
- * @param {ObjectId} userId - The objectId of user.
- * @returns {Promise<User, APIError>}
- */
 function getUser(userId) {
   return User.get(userId);
 }
 
-/**
- * Update user
- * @param {ObjectId} userId - The objectId of user.
- * @param {Object} userObject - The user details
- * @returns {Promise<User, ValidationError>}
- */
 function updateUser(userId, userObject) {
   const userSchema = Joi.object().keys({
     name: Joi.string(),
@@ -53,17 +43,12 @@ function updateUser(userId, userObject) {
       User.findByIdAndUpdate(userId, validatedUserObject, { new: true }));
 }
 
-/**
- * Delete user
- * @param {ObjectId} userId - The objectId of user.
- * @returns {Promise<APIError>}
- */
 function deleteUser(userId) {
   return User.delete(userId);
 }
 
 /**
- * Device modifications for a user
+ * Device modifications
  */
 
 function getDevice(user, deviceId) {
@@ -71,18 +56,17 @@ function getDevice(user, deviceId) {
 }
 
 function addDevice(user, deviceObject, index) {
-  const deviceSchema = Joi.object().keys({
-    name: Joi.string().required(),
-    type: Joi.string().valid('email', 'phone', 'sms').required(),
-    contactInformation: Joi.string().required()
-  });
-
-  return JoiHelper.validate(deviceObject, deviceSchema)
+  return JoiHelper.validate(deviceObject, DEVICE_SCHEMA, { presence: 'required' })
     .then((validatedDeviceObject) => {
       const newDevice = new Device(validatedDeviceObject);
-      user.addDevice(newDevice, index);
-      return newDevice;
+      const updatedUser = user.addDevice(newDevice, index);
+      return updatedUser;
     });
+}
+
+function updateDevice(user, deviceId, updateInfo) {
+  return JoiHelper.validate(updateInfo, DEVICE_SCHEMA)
+    .then(validatedUpdateInfo => user.updateDevice(deviceId, validatedUpdateInfo));
 }
 
 function sortDevices(user, sortOrder) {
@@ -115,6 +99,7 @@ export default {
   // User Device Modifications
   getDevice,
   addDevice,
+  updateDevice,
   sortDevices,
   removeDevice,
   // User Group Modifications

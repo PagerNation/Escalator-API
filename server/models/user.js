@@ -75,6 +75,26 @@ UserSchema.methods = {
     });
   },
 
+  updateDevice(id, updateInfo) {
+    return new Promise((resolve, reject) => {
+      let foundDevice = _.find(this.devices, { id });
+      if (!foundDevice) {
+        const error = new APIError(`Device with ID ${id} doesn\'t exist!`, httpStatus.NOT_FOUND);
+        return reject(error);
+      }
+
+      foundDevice = _.extend(foundDevice, updateInfo);
+      this.markModified('devices');
+
+      this.save((err, savedUser) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(savedUser);
+      });
+    });
+  },
+
   removeDevice(id) {
     _.remove(this.devices, { id });
     this.markModified('devices');
