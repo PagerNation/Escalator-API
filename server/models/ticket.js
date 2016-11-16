@@ -3,11 +3,18 @@ import httpStatus from 'http-status';
 import APIError from '../helpers/APIError';
 
 const TicketSchema = new mongoose.Schema({
-  groupId: {
-    type: mongoose.Schema.Types.ObjectId,
+  groupName: {
+    type: String,
     required: true,
   },
   metadata: mongoose.Schema.Types.Mixed
+});
+
+TicketSchema.virtual('group', {
+  ref: 'Group',
+  localField: 'groupName',
+  foreignField: 'name',
+  justOne: true
 });
 
 TicketSchema.statics = {

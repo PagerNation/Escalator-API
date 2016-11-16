@@ -12,7 +12,7 @@ describe('# Ticket Service', () => {
         ticketService.createTicket(ticketObject)
           .then((createdTicket) => {
             expect(createdTicket).to.exist;
-            expect(createdTicket.groupId.toString()).to.equal(ticketObject.groupId);
+            expect(createdTicket.groupName).to.equal(ticketObject.groupName);
             expect(createdTicket.metadata.message).to.equal(ticketObject.metadata.message);
             expect(createdTicket.metadata.metrics.foo).to.equal(ticketObject.metadata.metrics.foo);
             expect(createdTicket.metadata.metrics.jiggawatts).to
@@ -35,14 +35,14 @@ describe('# Ticket Service', () => {
       };
 
       const missingMetadataTicket = {
-        groupId: '551137c2f9e1fac808a5f572'
+        groupName: 'testGroupName'
       };
 
-      it('should fail validation due to the ticket missing a groupId', (done) => {
+      it('should fail validation due to the ticket missing a groupName', (done) => {
         ticketService.createTicket(missingGroupIdTicket)
           .catch((err) => {
             expect(err.name).to.equal('ValidationError');
-            expect(err.details[0].message).to.equal('"groupId" is required');
+            expect(err.details[0].message).to.equal('"groupName" is required');
             done();
           });
       });
@@ -65,7 +65,7 @@ describe('# Ticket Service', () => {
     before((done) => {
       ticketService.createTicket(ticketObject)
         .then((createdTicket) => {
-          savedTicketId = createdTicket._id;
+          savedTicketId = createdTicket.id;
           done();
         });
     });
@@ -73,7 +73,7 @@ describe('# Ticket Service', () => {
     it('gets an existing ticket', (done) => {
       ticketService.getById(savedTicketId.toString()).then((ticket) => {
         expect(ticket).to.exist;
-        expect(ticket.groupId.toString()).to.equal(ticketObject.groupId);
+        expect(ticket.groupName).to.equal(ticketObject.groupName);
         expect(ticket.metadata.message).to.equal(ticketObject.metadata.message);
         expect(ticket.metadata.metrics.foo).to.equal(ticketObject.metadata.metrics.foo);
         expect(ticket.metadata.metrics.jiggawatts)
@@ -94,10 +94,10 @@ describe('# Ticket Service', () => {
 
   // Update
   describe('updateTicket()', () => {
-    let savedTicketId;
+    let savedTicket;
 
     const updateDetails = {
-      groupId: '551137c2f9e1fac808a5f573',
+      groupName: 'updateTestGroupName',
       metadata: {
         foo: 'baz'
       }
@@ -106,17 +106,17 @@ describe('# Ticket Service', () => {
     before((done) => {
       ticketService.createTicket(ticketObject)
         .then((createdTicket) => {
-          savedTicketId = createdTicket._id;
+          savedTicket = createdTicket;
           done();
         });
     });
 
     it('updates an existing ticket', (done) => {
-      ticketService.updateTicket(savedTicketId, updateDetails)
+      ticketService.updateTicket(savedTicket.id, updateDetails)
         .then((ticket) => {
           expect(ticket).to.exist;
-          expect(ticket._id.toString()).to.equal(savedTicketId.toString());
-          expect(ticket.groupId.toString()).to.equal('551137c2f9e1fac808a5f573');
+          expect(ticket.id).to.equal(savedTicket.id);
+          expect(ticket.groupName).to.equal(updateDetails.groupName);
           expect(ticket.metadata.foo).to.equal('baz');
           expect(ticket.metadata.jiggawatts).to.not.exist;
           done();
@@ -124,11 +124,11 @@ describe('# Ticket Service', () => {
     });
 
     it('fails to update a ticket with invalid fields', (done) => {
-      ticketService.updateTicket(savedTicketId, { metadata: 0 })
+      ticketService.updateTicket(savedTicket.id, { metadata: 0 })
         .catch((err, ticket) => {
           expect(err).to.exist;
           expect(err.name).to.equal('ValidationError');
-          expect(err.details[0].message).to.equal('"groupId" is required');
+          expect(err.details[0].message).to.equal('"groupName" is required');
           done();
         });
     });

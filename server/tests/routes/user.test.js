@@ -144,7 +144,7 @@ describe('## User APIs', () => {
   describe('# GET /api/v1/user/:userId/device/:deviceId', () => {
     const baseUser = fixtures.user();
 
-    const device = new Device(fixtures.email_device());
+    const device = new Device(fixtures.emailDevice());
 
     let user;
 
@@ -173,7 +173,7 @@ describe('## User APIs', () => {
   describe('# POST /api/v1/user/:userId/device', () => {
     const baseUser = fixtures.user();
 
-    const baseDevice = fixtures.email_device();
+    const baseDevice = fixtures.emailDevice();
 
     let user;
 

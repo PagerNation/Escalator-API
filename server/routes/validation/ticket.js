@@ -16,7 +16,7 @@ export default {
     },
 
     body: {
-      groupId: Joi.string().required(),
+      groupName: Joi.string().required(),
       metadata: Joi.object().required()
     }
   },
@@ -24,7 +24,7 @@ export default {
   // POST /api/v1/ticket
   createTicket: {
     body: {
-      groupId: Joi.string().required(),
+      groupName: Joi.string().required(),
       metadata: Joi.object().required()
     }
   },

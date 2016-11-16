@@ -1,6 +1,14 @@
 export default {
   env: 'test',
-  jwtSecret: '0a6b944d-d2fb-46fc-a85e-0295c986cd9f',
   db: 'mongodb://localhost/escalator-api-test',
-  port: 3000
+  port: 3000,
+  email: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  },
+  twilio: {
+    accountSid: process.env.PHONE_SID,
+    token: process.env.PHONE_TOKEN,
+    fromPhone: '+15005550006'
+  }
 };

@@ -19,7 +19,7 @@ describe('## Ticket APIs', () => {
         .send(ticket)
         .expect(httpStatus.OK)
         .then((res) => {
-          expect(res.body.groupId).to.equal(ticket.groupId);
+          expect(res.body.groupName).to.equal(ticket.groupName);
           expect(res.body.metadata.message).to.equal(ticket.metadata.message);
           done();
         });
@@ -31,7 +31,7 @@ describe('## Ticket APIs', () => {
         .send(invalidTicket)
         .expect(httpStatus.BAD_REQUEST)
         .then((res) => {
-          expect(res.body.message).to.equal('"groupId" is required');
+          expect(res.body.message).to.equal('"groupName" is required');
           done();
         });
     });
@@ -50,10 +50,10 @@ describe('## Ticket APIs', () => {
 
     it('should get a ticket', (done) => {
       request(app)
-        .get(`/api/v1/ticket/${createdTicket._id}`)
+        .get(`/api/v1/ticket/${createdTicket.id}`)
         .expect(httpStatus.OK)
         .then((res) => {
-          expect(res.body.groupId).to.equal(ticket.groupId);
+          expect(res.body.groupName).to.equal(ticket.groupName);
           expect(res.body.metadata.message).to.equal(ticket.metadata.message);
           done();
         });
@@ -88,7 +88,7 @@ describe('## Ticket APIs', () => {
 
     it('should update ticket details', (done) => {
       request(app)
-        .put(`/api/v1/ticket/${createdTicket._id}`)
+        .put(`/api/v1/ticket/${createdTicket.id}`)
         .send(updateDetails)
         .expect(httpStatus.OK)
         .then((res) => {
@@ -99,11 +99,11 @@ describe('## Ticket APIs', () => {
 
     it('should report error with message for any invalid field', (done) => {
       request(app)
-        .put(`/api/v1/ticket/${createdTicket._id}`)
+        .put(`/api/v1/ticket/${createdTicket.id}`)
         .send({ fake: 0 })
         .expect(httpStatus.BAD_REQUEST)
         .then((res) => {
-          expect(res.body.message).to.equal('"groupId" is required and "metadata" is required');
+          expect(res.body.message).to.equal('"groupName" is required and "metadata" is required');
           done();
         });
     });
@@ -121,11 +121,11 @@ describe('## Ticket APIs', () => {
 
     it('deletes a ticket', (done) => {
       request(app)
-        .delete(`/api/v1/ticket/${createdTicket._id.toString()}`)
+        .delete(`/api/v1/ticket/${createdTicket.id}`)
         .expect(httpStatus.OK)
         .then(() => {
           request(app)
-            .get(`/api/v1/ticket/${createdTicket._id.toString()}`)
+            .get(`/api/v1/ticket/${createdTicket.id}`)
             .expect(httpStatus.NOT_FOUND)
             .then(() => done());
         });

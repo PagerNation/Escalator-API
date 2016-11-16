@@ -23,7 +23,8 @@ const GroupSchema = new mongoose.Schema({
     type: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
-    }]
+    }],
+    default: []
   },
   escalationPolicy: {
     type: EscalationPolicy.schema,

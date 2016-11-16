@@ -3,7 +3,7 @@ import { fixtures } from '../factories';
 
 describe('# Device Model', () => {
   context('given a valid device', () => {
-    const device = fixtures.email_device();
+    const device = fixtures.emailDevice();
 
     it('creates a devices', (done) => {
       Device.create(device, (err, d) => {
@@ -17,7 +17,7 @@ describe('# Device Model', () => {
   });
 
   context('when the type is not an enum', () => {
-    const device = fixtures.email_device({ type: 'pidgeon' });
+    const device = fixtures.emailDevice({ type: 'pidgeon' });
 
     it('throws a type error', (done) => {
       Device.create(device, (err, d) => {

@@ -17,17 +17,24 @@ const fixtures = {
       email: user.email || Faker.internet.email()
     };
   },
-  email_device(device = {}) {
+  emailDevice(device = {}) {
     return {
       name: device.name || Faker.lorem.word(),
       type: device.type || 'email',
       contactInformation: device.contactInformation || Faker.internet.email()
     };
   },
-  sms_device(device = {}) {
+  smsDevice(device = {}) {
     return {
       name: device.name || Faker.lorem.word(),
       type: device.type || 'sms',
+      contactInformation: device.contactInformation || Faker.phone.phoneNumber()
+    };
+  },
+  phoneDevice(device = {}) {
+    return {
+      name: device.name || Faker.lorem.word(),
+      type: device.type || 'phone',
       contactInformation: device.contactInformation || Faker.phone.phoneNumber()
     };
   },
@@ -39,7 +46,7 @@ const fixtures = {
   },
   ticket(ticket = {}) {
     return {
-      groupId: ticket.groupId || '551137c2f9e1fac808a5f572',
+      groupName: ticket.groupName || 'testGroupName',
       metadata: ticket.metadata || {
         message: Faker.hacker.phrase(),
         metrics: {
