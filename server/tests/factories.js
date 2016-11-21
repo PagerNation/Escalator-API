@@ -14,7 +14,8 @@ const fixtures = {
     return {
       id: user.id,
       name: user.name || Faker.internet.userName(),
-      email: user.email || Faker.internet.email()
+      email: user.email || Faker.internet.email(),
+      groups: user.groups
     };
   },
   emailDevice(device = {}) {

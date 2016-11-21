@@ -4,6 +4,7 @@ import app from '../../../index';
 import userService from '../../services/user';
 import { build, fixtures } from '../factories';
 import Device from '../../models/device';
+import { buildUserAndGroups } from '../helpers/user_helper';
 
 
 describe('## User APIs', () => {
@@ -253,6 +254,67 @@ describe('## User APIs', () => {
           expect(res.body.message).to.equal('"index" is required');
           done();
         });
+    });
+  });
+
+  describe('# GET / api/v1/user/:userId/group', () => {
+    context('when the user is in one or more group', () => {
+      let user;
+      let groups;
+      before((done) => {
+        buildUserAndGroups().then((values) => {
+          user = values.user;
+          groups = values.groups;
+          done();
+        });
+      });
+
+      it('returns all of the groups that a user is in', (done) => {
+        request(app)
+          .get(`/api/v1/user/${user.id}/group`)
+          .expect(httpStatus.OK)
+          .then((res) => {
+            const groupsResponse = res.body.groups;
+            expect(groupsResponse.length).to.equal(groups.length);
+            for (let i = 0; i < groupsResponse.length; i += 1) {
+              expect(groupsResponse[i].name).to.equal(groups[i].name);
+            }
+            done();
+          });
+      });
+    });
+
+    context('when the user is not in any group', () => {
+      let user;
+      before((done) => {
+        build('user', baseUser).then((u) => {
+          user = u;
+          done();
+        });
+      });
+
+      it('returns an empty array of groups', (done) => {
+        request(app)
+          .get(`/api/v1/user/${user.id}/group`)
+          .expect(httpStatus.OK)
+          .then((res) => {
+            expect(res.body.groups).to.be.empty;
+            done();
+          });
+      });
+    });
+
+    context('when there is no user', () => {
+      const badId = 'abc123';
+
+      it('returns a bad request', (done) => {
+        request(app)
+          .get(`/api/v1/user/${badId}/group`)
+          .expect(httpStatus.NOT_FOUND)
+          .then((res) => {
+            done();
+          });
+      });
     });
   });
 });

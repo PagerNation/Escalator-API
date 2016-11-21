@@ -31,6 +31,10 @@ router.route('/:userId/device/:deviceId')
 
   .delete(validate(paramValidation.deviceById), userCtrl.removeDevice);
 
+router.route('/:userId/group')
+
+  .get(validate(paramValidation.byId), userCtrl.getGroupsForUser);
+
 /** Load user when API with userId route parameter is hit */
 router.param('userId', userCtrl.loadUser);
 

@@ -48,6 +48,12 @@ UserSchema.virtual('id').get(function () {
   return this._id.toString();
 });
 
+UserSchema.virtual('activeGroups', {
+  ref: 'Group',
+  localField: 'groups',
+  foreignField: 'name'
+});
+
 UserSchema.methods = {
   getDevice(id) {
     return new Promise((resolve, reject) => {

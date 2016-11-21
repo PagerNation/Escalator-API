@@ -2,6 +2,9 @@ import httpStatus from 'http-status';
 import userService from '../../services/user';
 import User from '../../models/user';
 import Device from '../../models/device';
+import { build, fixtures } from '../factories';
+import Group from '../../models/group';
+import { buildUserAndGroups } from '../helpers/user_helper';
 
 describe('## User Service', () => {
   const baseUser = {
@@ -419,6 +422,51 @@ describe('## User Service', () => {
           expect(err.name).to.equal('ValidationError');
           done();
         });
+    });
+  });
+
+  describe('# getGroupsForUser', () => {
+    let user;
+    context('given a user with many groups', () => {
+      let groups;
+
+      before((done) => {
+        buildUserAndGroups().then((values) => {
+          user = values.user;
+          groups = values.groups;
+          done();
+        });
+      });
+
+      it('returns all of the groups', (done) => {
+        userService.getGroupsForUser(user)
+          .then((response) => {
+            expect(response.groups.length).to.equal(groups.length);
+            for (let i = 0; i < response.groups.length; i += 1) {
+              expect(response.groups[i].name).to.equal(groups[i].name);
+            }
+            done();
+          });
+      });
+    });
+
+    context('given a user with no groups', () => {
+      before((done) => {
+        userService.createUser(baseUser);
+        build('user', baseUser)
+          .then((createdUser) => {
+            user = createdUser;
+            done();
+          });
+      });
+
+      it('returns no groups', (done) => {
+        userService.getGroupsForUser(user)
+          .then((response) => {
+            expect(response.groups).to.be.empty;
+            done();
+          });
+      });
     });
   });
 });
