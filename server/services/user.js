@@ -90,6 +90,19 @@ function removeGroup(user, groupName) {
     .then(validatedName => user.removeGroup(validatedName));
 }
 
+function getGroupsForUser(user) {
+  return new Promise((resolve, reject) => {
+    User.findOne(user)
+    .populate('activeGroups')
+    .exec((err, u) => {
+      if (err) {
+        reject(err);
+      }
+      resolve({ groups: u.groups });
+    });
+  });
+}
+
 export default {
   // User CRUD
   createUser,
@@ -104,5 +117,6 @@ export default {
   removeDevice,
   // User Group Modifications
   addGroup,
+  getGroupsForUser,
   removeGroup
 };

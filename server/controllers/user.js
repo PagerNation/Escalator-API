@@ -57,6 +57,12 @@ function removeDevice(req, res, next) {
     .catch(err => next(err));
 }
 
+function getGroupsForUser(req, res, next) {
+  userService.getGroupsForUser(req.user)
+    .then(groups => res.json(groups))
+    .catch(err => next(err));
+}
+
 function loadUser(req, res, next, userId) {
   userService.getUser(userId)
     .then((user) => {
@@ -78,6 +84,8 @@ export default {
   updateDevice,
   sortDevices,
   removeDevice,
+  // User Groups
+  getGroupsForUser,
   // User helpers
   loadUser
 };
