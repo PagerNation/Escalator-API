@@ -1,6 +1,7 @@
 import Joi from 'joi';
 import JoiHelper from '../helpers/JoiHelper';
 import Group from '../models/group';
+import userService from './user';
 
 function getGroup(groupName) {
   return Group.get(groupName);
@@ -34,8 +35,15 @@ function updateGroup(groupName, groupObject) {
 function addUser(group, userId) {
   const userIdSchema = Joi.string().hex().length(24);
 
+  let tmpGroup;
+
   return JoiHelper.validate(userId, userIdSchema)
-    .then(validatedUserObject => group.addUser(validatedUserObject));
+    .then(validatedUserObject => group.addUser(validatedUserObject))
+    .then((updatedGroup) => {
+      tmpGroup = updatedGroup;
+      return userService.addGroupByUserId(userId, updatedGroup.name);
+    })
+    .then(() => tmpGroup);
 }
 
 function removeUser(group, userId) {

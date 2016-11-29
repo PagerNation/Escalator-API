@@ -2,6 +2,7 @@ import request from 'supertest-as-promised';
 import httpStatus from 'http-status';
 import app from '../../../index';
 import { fixtures, build } from '../factories';
+import User from '../../models/user';
 
 const groupUrl = '/api/v1/group';
 
@@ -111,18 +112,28 @@ describe('## Group API', () => {
       });
 
       describe('# POST /api/v1/group/:groupName/user', () => {
-        const data = {
-          userId: '098765432109876543210987'
-        };
+        let user;
+
+        before((done) => {
+          build('user', fixtures.user())
+            .then((newUser) => {
+              user = newUser;
+              done();
+            });
+        });
 
         it('should add a user to the group', (done) => {
           request(app)
             .post(`${groupUrl}/${group.name}/user`)
-            .send(data)
+            .send({ userId: user.id })
             .expect(httpStatus.OK)
             .then((res) => {
               expect(res.body.name).to.equal(group.name);
-              expect(res.body.users).to.include(data.userId);
+              expect(res.body.users).to.include(user.id);
+            })
+            .then(() => User.get(user.id))
+            .then((updatedUser) => {
+              expect(updatedUser.groups).to.include(group.name);
               done();
             });
         });

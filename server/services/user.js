@@ -80,9 +80,16 @@ function removeDevice(user, deviceId) {
   return user.removeDevice(deviceId);
 }
 
-function addGroup(user, groupName) {
-  return JoiHelper.validate(groupName, Joi.string())
-    .then(validatedName => user.addGroup(validatedName));
+function addGroupByUserId(userId, groupName) {
+  const validatePromise = JoiHelper.validate(groupName, Joi.string());
+  const getUserPromise = getUser(userId);
+
+  return Promise.all([getUserPromise, validatePromise])
+    .then((promiseResults) => {
+      const user = promiseResults[0];
+      const validatedName = promiseResults[1];
+      return user.addGroup(validatedName);
+    });
 }
 
 function removeGroup(user, groupName) {
@@ -116,7 +123,7 @@ export default {
   sortDevices,
   removeDevice,
   // User Group Modifications
-  addGroup,
+  addGroupByUserId,
   getGroupsForUser,
   removeGroup
 };

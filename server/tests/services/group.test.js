@@ -132,25 +132,32 @@ describe('# Group Service', () => {
     });
 
     describe('# addUser', () => {
-      const userId = '098765432109876543210987';
+      const userObject = fixtures.user();
 
       let group;
+      let user;
 
       beforeEach((done) => {
         groupService.getGroup(groupObject.name)
           .then((receivedGroup) => {
             group = receivedGroup;
             expect(receivedGroup).to.exist;
-            done();
+          })
+          .then(() => {
+            build('user', userObject)
+              .then((u) => {
+                user = u;
+                done();
+              });
           });
       });
 
-      it('should add a user to the group by id', (done) => {
-        groupService.addUser(group, userId)
+      it('should add a two way relationship between user and group', (done) => {
+        groupService.addUser(group, user.id)
           .then((savedGroup) => {
             expect(savedGroup).to.exist;
             expect(savedGroup.name).to.equal(group.name);
-            expect(savedGroup.users).to.include(userId);
+            expect(savedGroup.users).to.include(user.id);
             done();
           });
       });

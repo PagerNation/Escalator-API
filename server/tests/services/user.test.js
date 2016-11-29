@@ -371,7 +371,7 @@ describe('## User Service', () => {
     });
 
     it('should add a group name to the user', (done) => {
-      userService.addGroup(user, baseGroup.name)
+      userService.addGroupByUserId(user.id, baseGroup.name)
         .then((modifiedUser) => {
           expect(modifiedUser).to.exist;
           expect(modifiedUser.name).to.equal(baseUser.name);
@@ -381,7 +381,7 @@ describe('## User Service', () => {
     });
 
     it('should return an error if the group name is not a string', (done) => {
-      userService.addGroup(user, [1, 2, 3])
+      userService.addGroupByUserId(user.id, [1, 2, 3])
         .catch((err) => {
           expect(err).to.exist;
           expect(err.name).to.equal('ValidationError');
