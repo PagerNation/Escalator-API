@@ -1,15 +1,30 @@
 language: node_js
 node_js:
-  - "4.6"
-  - "6.7"
+  - '4.6'
+  - '6.7'
 services:
   - mongodb
 cache:
   directories:
-  - node_modules
+    - node_modules
 git:
   depth: 3
+skip_cleanup: true
 before_script:
+  - echo -e "Host $DEPLOY_HOST\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   - npm prune
+  - chmod +x deploy.sh
 after_script:
   - npm run report-coverage
+after_success:
+  - ./deploy.sh
+addons:
+  apt:
+    packages:
+      - sshpass
+env:
+  global:
+    - secure: t85HMckHA0Xl0jCXPtkId45JdskkuPFY1yb5CkBM5Jmyb+Pnetwy3pNv+adV65McgiI6CC931KNXC92DjorqNjU96WSBagZLGU/W0nLWGN2TDRXnUEaTJwSNpWnuCy8Le93+3+8hrdgrZ02O/ZTCyKy2RNw43DZs1yDXm5nR5trCqJQKy6rOETgV9EFWcZAodlCM3dICETdkeSRLSc8ygIH2n3cLPTIFDLik+cEik6s+18SBBUaPq2fQWDIWK+ulW5MW/fzdlyij/Bq6kDYifQjZlDvg4MaEjwT5g6RNPW87vs5Lp93hNBWnUSV7hSDLL9qhPCOXyb6/iRXHgexcDI41ya0qyGcfRnsbUb7qz4iI16p+LOsTgGVqx8uYvX9DIGQBsJz7Klpu+4HGJkHBsdyy7Cnt5TxvWNlmvq57lpymITIhy34C2hGLP5NVMyFHvOHLuZCuTdbLAplVXmY/1KGXTFm5ohI7ozLnsb5JbPoi/oh00CwaVm4RF65Ehi1Jr8/8nj5D8MYFj5yiYwxjhct/eOTGluTR3Gv47wrH7DLzqUn3Hr4+mLuRbIqiXfnrvVXCsqZybtf8XXsPASsf2Dx6rEdBLIiJDhzUgDKEa03pp/NneDcYJ0NBHKovDN4Y30BvIApnFN7TE18n3q0s8f4AUJpAULYoj+2JtZuJ8bY=
+    - secure: ighD1ig52Y8uvbKNHJnWZTBGeFnAB1tAuxGg5vV1M1cYG5QNd2woOGkstJtCCrBHCSmzdlcI14WLQJwE0SMlAczPROJzeQt1KBuZxYm47ZycgXPigzeYFqMsOKgjCPmx+6sNTuTfButgR1reMtP6Z+iGjAprKqVRZ6kHDhTCM56Bkm00ay+S8R/0ZLjlVN/4hfBb5ZW8+TG1uuS/G5SgmgtWzYoPwO1EDhgfdKKmauUqoVIsiV+9Vj45z/0Uia5uA3EB8cG1/LzEe8Zh/9bB5ghGUEWgf8t40ayLwoz1P4RpnqyexcGnNobNWRO7hbc/Gjb+KBjJfxdnCFG1P6Yb9S/7HSh7mhRnCMABj8jzCiMoxVZ0dgQQAs1N8bErompV/Woa5PQePOqet+GNX0zEOkC0AGRIS7bXnQ27AJZb4g/jB6eTfyqjVJ5nXVsSEBZHavZS2o2a/7rMYMHRVPLpUGbxjbesr8rgOcBJKddIRp6JoJnWERIXjqW5KQpABp/TGovCNfyDLZA6ZZVAAm+8YCHdXSNYekEFEKewwkjfI7odMy7YuhfM6TeMB06vLXaymSuvPgbg7TUffyIBCZeRvCIDXxStGMbJl/Fic+tC8DrhG3Q+MjHjD4BCYkKJOHKruXdcGaBcZ1SBxjJx+U10+Hc1K8y6gqmzmtXRxVjnTt8=
+    - secure: j4l9seaSiaHTLTysm3mM2G6UVoTrEGZNgPj6fP8CZL6tdl9QkUxzwtCWcef8Y3I5WqygVY5VG9gTr9LHTrj5TjGIU/i5GmaxKrnliITyeZeoMR+PL/14d/C+C8QSVTvYR4cLSpHCP+kUJog6RA7JKJed2Ih9qMvsPQDp0QVw3SY6/EWxqPiPBkSCg/A4y3LG1On8oqkKa4UAHyMUgK/06gFJ1IosCVj1LEW79TM12dDVN02o2iSHpig63PKrmqhvBdJuN0gd+VZWvieoO+nnMSgW19p7W2v0kpAFM+7FE0QPIE1IJYHsajjFav+/WSpN/TBDjkKA0BnmJW5uSPamK9EGy+kl/YcPy80Mquk2t+hen44GgV0FaU/AKdvewu6VP30WY2be8t5Iv+UWmr/wKXUJb8BzbihIzU4zgvh8cP99LTTfkMSlkJvWYYNO6IlkVM4zsUy9c8/lH3yl7IKyGDIVvvRaiVvqMtuPcwFGzw7Kc1jJlHdX8kJo6uQ2Pgo+80I4NQTztT9sceU7XgwAvLcLKBJHL3DuHdY6dhpeWXbraFII0lwWXH5UpJvlLdPbFg5xa3YA0BeB+TAOB659MpLFJtf0fHlM43/gG5iJtOtrvp8d7butxPIKuIcfihgHUJTdL3CY6TL5a/D22kKk8U/yV3bd5n/bD9f/s1UNb2U=
+    - secure: OnbopB8NC+sthwktOvDRE9Qy52/cbGYoseLfF1GzlMb/yNEhNXHnlbHSenBcOdi7QbnMcUPoi2+R+NgRWDeweJpoOTc+LeqnhgxIGaAL2OPaoW+iDrut3Lc72ahal50aXABvaODXD9NeqE3UkpyC1an43pFqzg2X5p0vSOk3jYA+8bQK9K0HCM6Bx7WS5GF7LSs66/ZAamkIWjQWNKYZbD/Ia8CFp8PlffqC6ON4p0VYyvnv9noFY11QUc+fvz30LzjDP96c0xindnGJHWw9bHn3xKYzjR09ynkYI/R/5vkWG3B4UqyuqIeuUIvaSyLdSq1LR/8TtVc9h7yL4wYfd8ehpgH9H4PoUCMslQvhBJCoJ+wvcdfbvxZNgslMxbIH0ibfRNSSMBd/S00cbHJmb0n5uCAUSW+D7ITA+6AU2jQW/8ISnJesUPQXELzLgJqIAufTyF7M4XTEG89pyvBcvhs1zYTjfE3twmQElf3r9M7Ax3y/EBjeopSNYnYTgF6HXCTPHw9a3/gX4WFKvww/BLFmlJSj6ZJ/bBtZbfUi3xt9UQNoGE2iqgQpLLt7mRTqLg4e6TuthAA86EOm0zrc9HKvM92GiUbaI5Q14Oxd3MAwJHkCBZ+hv/qWH12ln39x9jwgx+OyGfzAMk1Iq6Jwqbz3ImLu5nJ6ePqiG954IQc=
