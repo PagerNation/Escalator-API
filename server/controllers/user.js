@@ -53,7 +53,7 @@ function sortDevices(req, res, next) {
 
 function removeDevice(req, res, next) {
   userService.removeDevice(req.user, req.params.deviceId)
-    .then(() => res.sendStatus(httpStatus.OK))
+    .then(user => res.json(user))
     .catch(err => next(err));
 }
 
