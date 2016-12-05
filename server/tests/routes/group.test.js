@@ -1,7 +1,7 @@
 import request from 'supertest-as-promised';
 import httpStatus from 'http-status';
 import app from '../../../index';
-import { fixtures, build } from '../factories';
+import { fixtures, build } from '../../utils/factories';
 import User from '../../models/user';
 
 const groupUrl = '/api/v1/group';
@@ -19,7 +19,6 @@ describe('## Group API', () => {
             .expect(httpStatus.OK)
             .then((res) => {
               expect(res.body.name).to.equal(group.name);
-              expect(res.body.users[0]).to.equal(group.users[0]);
               done();
             });
         });

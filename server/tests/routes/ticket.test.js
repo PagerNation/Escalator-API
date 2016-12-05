@@ -1,7 +1,7 @@
 import request from 'supertest-as-promised';
 import httpStatus from 'http-status';
 import app from '../../../index';
-import { build, fixtures } from '../factories';
+import { build, fixtures } from '../../utils/factories';
 
 describe('## Ticket APIs', () => {
   const ticket = fixtures.ticket();

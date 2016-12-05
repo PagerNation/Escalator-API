@@ -1,7 +1,7 @@
 import User from '../../models/user';
 import Device from '../../models/device';
 import Group from '../../models/group';
-import { build, fixtures } from '../factories';
+import { build, fixtures } from '../../utils/factories';
 
 describe('# User Model', () => {
   describe('user creation', () => {

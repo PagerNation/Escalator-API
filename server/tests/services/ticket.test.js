@@ -1,6 +1,6 @@
 import httpStatus from 'http-status';
 import ticketService from '../../services/ticket';
-import { build, fixtures } from '../factories';
+import { build, fixtures } from '../../utils/factories';
 
 describe('# Ticket Service', () => {
   const ticketObject = fixtures.ticket();

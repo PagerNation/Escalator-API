@@ -1,5 +1,5 @@
 import Device from '../../models/device';
-import { fixtures } from '../factories';
+import { fixtures } from '../../utils/factories';
 
 describe('# Device Model', () => {
   context('given a valid device', () => {

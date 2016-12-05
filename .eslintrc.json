@@ -31,7 +31,8 @@
     "no-underscore-dangle": [
       0
     ],
-    "consistent-return": "off"
+    "consistent-return": "off",
+    "no-loop-func": "off"
   },
   "env": {
     "node": true,

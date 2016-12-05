@@ -1,6 +1,6 @@
 import phoneService from '../../services/phone';
 import config from '../../../config/env';
-import { build, fixtures } from '../factories';
+import { build, fixtures } from '../../utils/factories';
 
 describe('## Phone Service', () => {
   const VALID_TO_NUMBER = '+15005550006';

@@ -1,4 +1,4 @@
-import { fixtures, build } from '../factories';
+import { fixtures, build } from '../../utils/factories';
 
 function buildUserAndGroups() {
   return new Promise((resolve, reject) => {

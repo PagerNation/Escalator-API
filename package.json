@@ -13,7 +13,7 @@
     "start": "gulp serve",
     "build": "gulp",
     "lint": "eslint --fix *.js server/** config/**/*.js && echo Lint Passed ❤",
-    "test": "npm run lint && gulp mocha",
+    "test": "gulp mocha",
     "commit": "git-cz",
     "report-coverage": "coveralls < ./coverage/lcov.info"
   },

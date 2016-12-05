@@ -2,7 +2,7 @@ import request from 'supertest-as-promised';
 import httpStatus from 'http-status';
 import app from '../../../index';
 import userService from '../../services/user';
-import { build, fixtures } from '../factories';
+import { build, fixtures } from '../../utils/factories';
 import Device from '../../models/device';
 import { buildUserAndGroups } from '../helpers/user_helper';
 

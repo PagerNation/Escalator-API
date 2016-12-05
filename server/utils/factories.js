@@ -42,7 +42,7 @@ const fixtures = {
   group(group = {}) {
     return {
       name: group.name || Faker.internet.userName(),
-      users: group.users || [uuid.user]
+      users: group.users
     };
   },
   ticket(ticket = {}) {
@@ -61,7 +61,7 @@ const fixtures = {
     return {
       rotationInterval: escalationPolicy.rotationInterval || 7,
       pagingInterval: escalationPolicy.pagingInterval || 15,
-      subscribers: escalationPolicy.subscribers || ['57e590a0140ebf1cc48bb1bf']
+      subscribers: escalationPolicy.subscribers || [{ subId: '57e590a0140ebf1cc48bb1bf', pagingInterval: 5 }]
     };
   },
 };
@@ -77,6 +77,9 @@ const models = {
 function build(model, object) {
   return new Promise((resolve, reject) => {
     models[model].create(object, (err, u) => {
+      if (err) {
+        reject(err);
+      }
       resolve(u);
     });
   });

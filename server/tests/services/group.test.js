@@ -1,7 +1,7 @@
 import httpStatus from 'http-status';
 import groupService from '../../services/group';
 import Group from '../../models/group';
-import { build, fixtures } from '../factories';
+import { build, fixtures } from '../../utils/factories';
 
 describe('# Group Service', () => {
   const groupObject = fixtures.group();
@@ -14,7 +14,6 @@ describe('# Group Service', () => {
             .then((createdGroup) => {
               expect(createdGroup).to.exist;
               expect(createdGroup.name).to.equal(groupObject.name);
-              expect(createdGroup.users[0].toString()).to.equal(groupObject.users[0]);
               done();
             })
             .catch(err => done(err));
@@ -53,7 +52,6 @@ describe('# Group Service', () => {
             .then((group) => {
               expect(group).to.exist;
               expect(group.name).to.equal(groupObject.name);
-              expect(group.users[0].toString()).to.equal(groupObject.users[0]);
               done();
             });
         });
@@ -157,6 +155,7 @@ describe('# Group Service', () => {
           .then((savedGroup) => {
             expect(savedGroup).to.exist;
             expect(savedGroup.name).to.equal(group.name);
+            expect(savedGroup.users.length).to.equal(1);
             expect(savedGroup.users).to.include(user.id);
             done();
           });
@@ -164,17 +163,18 @@ describe('# Group Service', () => {
     });
 
     describe('# removeUser', () => {
+      const userId = '123456789098765432123456';
+
       let group;
-      let userId;
 
       beforeEach((done) => {
-        groupService.getGroup(groupObject.name)
-          .then((receivedGroup) => {
-            group = receivedGroup;
-            userId = groupObject.users[0];
-            expect(receivedGroup).to.exist;
+        build('group', fixtures.group({ users: [`${userId}`] }))
+          .then((newGroup) => {
+            group = newGroup;
+            expect(newGroup).to.exist;
             done();
-          });
+          })
+          ;
       });
 
 

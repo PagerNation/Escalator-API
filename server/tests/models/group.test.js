@@ -1,7 +1,7 @@
 import Group from '../../models/group';
 import User from '../../models/user';
 import EscalationPolicy from '../../models/escalationPolicy';
-import { build, fixtures } from '../factories';
+import { build, fixtures } from '../../utils/factories';
 
 describe('## Group Model', () => {
   const subscriberRotationInterval = 7;

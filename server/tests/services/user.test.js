@@ -2,7 +2,7 @@ import httpStatus from 'http-status';
 import userService from '../../services/user';
 import User from '../../models/user';
 import Device from '../../models/device';
-import { build, fixtures } from '../factories';
+import { build, fixtures } from '../../utils/factories';
 import Group from '../../models/group';
 import { buildUserAndGroups } from '../helpers/user_helper';
 

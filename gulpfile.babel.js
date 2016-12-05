@@ -5,6 +5,7 @@ import del from 'del';
 import runSequence from 'run-sequence';
 import babelCompiler from 'babel-core/register';
 import * as isparta from 'isparta';
+import * as childProcess from 'child_process';
 
 const plugins = gulpLoadPlugins();
 
@@ -68,6 +69,11 @@ gulp.task('nodemon', ['copy', 'babel'], () =>
     tasks: ['copy', 'babel']
   })
 );
+
+// Run the seeder
+gulp.task('seed', ['copy', 'babel'], () => {
+  childProcess.exec('node dist/server/utils/seedScript.js');
+});
 
 // covers files for code coverage
 gulp.task('pre-test', () =>
