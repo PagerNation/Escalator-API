@@ -98,16 +98,11 @@ function removeGroup(user, groupName) {
 }
 
 function getGroupsForUser(user) {
-  return new Promise((resolve, reject) => {
-    User.findOne(user)
-    .populate('activeGroups')
-    .exec((err, u) => {
-      if (err) {
-        reject(err);
-      }
-      resolve({ groups: u.groups });
+  return user.populate('activeGroups')
+    .execPopulate()
+    .then((user) => { // eslint-disable-line
+      return { groups: user.groups };
     });
-  });
 }
 
 export default {
