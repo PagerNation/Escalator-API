@@ -29,14 +29,14 @@ const fixtures = {
     return {
       name: device.name || Faker.lorem.word(),
       type: device.type || 'sms',
-      contactInformation: device.contactInformation || Faker.phone.phoneNumber()
+      contactInformation: device.contactInformation || Faker.phone.phoneNumber('##########')
     };
   },
   phoneDevice(device = {}) {
     return {
       name: device.name || Faker.lorem.word(),
       type: device.type || 'phone',
-      contactInformation: device.contactInformation || Faker.phone.phoneNumber()
+      contactInformation: device.contactInformation || Faker.phone.phoneNumber('##########')
     };
   },
   group(group = {}) {
