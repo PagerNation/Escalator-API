@@ -1,4 +1,5 @@
 import express from 'express';
+import expressJWT from 'express-jwt';
 import logger from 'morgan';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
@@ -46,6 +47,9 @@ if (config.env === 'development') {
   }));
 }
 
+if(process.env.NODE_ENV !== 'test') {
+  app.use(expressJWT({ secret: config.auth.jwt_secret }).unless({ path: ['/api/v1/auth/login', '/api/v1/auth/signup'] }));
+}
 // mount all routes on /api path
 app.use('/api', routes);
 
