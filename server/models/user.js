@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import findOrCreate from 'mongoose-findorcreate';
 import httpStatus from 'http-status';
 import _ from 'lodash';
 import APIError from '../helpers/APIError';
@@ -159,11 +160,6 @@ UserSchema.methods = {
 };
 
 UserSchema.statics = {
-  /**
-   * Get user
-   * @param {ObjectId} id - The objectId of user.
-   * @returns {Promise<User, APIError>}
-   */
   get(id) {
     return new Promise((resolve, reject) => {
       this.findById(id, (err, user) => {
@@ -176,11 +172,35 @@ UserSchema.statics = {
     });
   },
 
-  /**
-   * Delete user
-   * @param {ObjectId} id - The objectId of user.
-   * @returns {Promise<APIError>}
-   */
+  getByEmail(email) {
+    return new Promise((resolve, reject) => {
+      this.findOne({ email }, (err, user) => {
+        if (user) {
+          return resolve(user);
+        }
+        const error = new APIError('No such user exists!', httpStatus.NOT_FOUND);
+        reject(error);
+      });
+    });
+  },
+
+  findByEmailOrCreate(userObj) {
+    return new Promise((resolve, reject) => {
+      this.findOrCreate(userObj, (err, user, created) => {
+        if (err) {
+          return reject(err);
+        }
+
+        if (!created) {
+          const error = new APIError('User already exists', httpStatus.NOT_FOUND);
+          return reject(error);
+        }
+
+        resolve(user);
+      });
+    });
+  },
+
   delete(id) {
     return new Promise((resolve, reject) => {
       this.findByIdAndRemove(id, (err, user) => {
@@ -192,7 +212,8 @@ UserSchema.statics = {
       });
     });
   },
-
 };
+
+UserSchema.plugin(findOrCreate);
 
 export default mongoose.model('User', UserSchema);
