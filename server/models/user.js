@@ -24,15 +24,15 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: null
   },
-  escalationPolicy: {
-    type: EscalationPolicy.schema,
-    default: null
-  },
   groups: [{
     type: String,
     ref: 'Group'
   }],
   devices: [Device.schema],
+  delays: {
+    type: [Number],
+    default: []
+  },
   role: {
     type: Number, // This can be an enum, should we make this an enum?
     default: 0,

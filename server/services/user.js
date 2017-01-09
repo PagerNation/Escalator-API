@@ -28,13 +28,9 @@ function updateUser(userId, userObject) {
     name: Joi.string(),
     email: Joi.string().email(),
     auth: Joi.string(),
-    escalationPolicy: Joi.object().keys({
-      rotationInterval: Joi.number(),
-      pagingInterval: Joi.number(),
-      subscribers: Joi.array().items(Joi.string().hex().length(24))
-    }),
     groups: Joi.array().items(Joi.string().hex().length(24)),
     devices: Joi.array(), // TODO this needs to be updated once the device model is done
+    delays: Joi.array().items(Joi.number()),
     role: Joi.number()
   });
 

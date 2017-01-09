@@ -28,9 +28,9 @@ describe('## User Service', () => {
             expect(createdUser.email).to.equal('abc@google.com');
             expect(createdUser.role).to.equal(0);
             expect(createdUser.auth).to.be.null;
-            expect(createdUser.escalationPolicy).to.be.null;
             expect(createdUser.groups).to.be.empty;
             expect(createdUser.devices).to.be.empty;
+            expect(createdUser.delays).to.be.empty;
             expect(createdUser.createdAt).to.be.not.null;
             done();
           })
@@ -119,9 +119,9 @@ describe('## User Service', () => {
           expect(user.email).to.equal('abc@google.com');
           expect(user.role).to.equal(0);
           expect(user.auth).to.be.null;
-          expect(user.escalationPolicy).to.be.null;
           expect(user.groups).to.be.empty;
           expect(user.devices).to.be.empty;
+          expect(user.delays).to.be.empty;
           expect(user.createdAt).to.be.not.null;
           done();
         });
@@ -162,9 +162,9 @@ describe('## User Service', () => {
           expect(user.email).to.equal(updateDetails.email);
           expect(user.role).to.equal(updateDetails.role);
           expect(user.auth).to.be.null;
-          expect(user.escalationPolicy).to.be.null;
           expect(user.groups).to.be.empty;
           expect(user.devices).to.be.empty;
+          expect(user.delays).to.be.empty;
           expect(user.createdAt).to.be.not.null;
           done();
         });

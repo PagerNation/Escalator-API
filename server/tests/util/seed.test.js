@@ -31,7 +31,7 @@ describe('## Seed', () => {
         const firstUser = users[0];
         expect(firstUser.devices.length).to.equal(2);
         expect(firstUser.groups.length).to.equal(1);
-        expect(firstUser.escalationPolicy.subscribers.length).to.equal(2);
+        expect(firstUser.delays.length).to.equal(1);
       })
       .then(() => Group.find({}).exec())
       .then((groups) => {

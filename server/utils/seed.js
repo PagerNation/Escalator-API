@@ -1,5 +1,6 @@
 import { build, fixtures } from './factories';
 import groupService from '../services/group';
+import userService from '../services/user';
 
 const EMAIL_CONTACT_INFORMATION = ''; // update these with desired values
 const PHONE_CONTACT_INFORMATION = '';
@@ -37,7 +38,7 @@ function createUser() {
   return build('user', fixtures.user())
     .then(newUser => addEmailDevice(newUser, EMAIL_CONTACT_INFORMATION))
     .then(updatedUser => addPhoneDevice(updatedUser, PHONE_CONTACT_INFORMATION))
-    .then(updatedUser => addEscalationPolicy(updatedUser))
+    .then(updatedUser => addDeviceDelay(updatedUser))
     .then(updatedUser => USERS.push(updatedUser));
 }
 
@@ -61,16 +62,8 @@ function addPhoneDevice(user, contactInformation) {
     .then(device => user.addDevice(device, 0));
 }
 
-function addEscalationPolicy(user) {
-  const deviceIds = user.devices.map((device) => { // eslint-disable-line
-    return { subId: device.id, pagingInterval: 5 };
-  });
-
-  return build('escalationPolicy', fixtures.escalationPolicy({ subscribers: deviceIds }))
-    .then((escalationPolicy) => {
-      user.escalationPolicy = escalationPolicy; // eslint-disable-line
-      return user.save();
-    });
+function addDeviceDelay(user) {
+  return userService.updateUser(user, { delays: [1] });
 }
 
 function genericSeeder(numToSeed, seeder) {
