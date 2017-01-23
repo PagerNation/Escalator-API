@@ -1,7 +1,7 @@
 import authService from '../../services/auth';
 import { build, fixtures } from '../../utils/factories';
 
-describe('# Auth Service', () => {
+describe('## Auth Service', () => {
   const userObj = fixtures.user();
   let user = {};
 
@@ -13,7 +13,7 @@ describe('# Auth Service', () => {
       });
   });
 
-  context('## Login User', () => {
+  describe('# loginUser()', () => {
     it('should return a user object and a token', (done) => {
       authService.loginUser(userObj.email)
         .then((authObj) => {
@@ -34,7 +34,7 @@ describe('# Auth Service', () => {
     });
   });
 
-  context('## Signup User', () => {
+  describe('# signupUser()', () => {
     it('should create a new user', (done) => {
       const newUserObj = {
         email: "new_user@test.com",
