@@ -16,6 +16,8 @@ function loginUser(email) {
     });
 }
 
+// TODO: User does not have a way of storing passwords, so for dummy authentication we are choosing to
+// drop the password entirely
 function signupUser(body) {
   const userObj = {
     email: body.email,
