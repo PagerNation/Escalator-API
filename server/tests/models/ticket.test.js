@@ -2,7 +2,7 @@ import _ from 'lodash';
 import Ticket from '../../models/ticket';
 
 describe('## Ticket Model', () => {
-  context('with new ticket', () => {
+  context('# with new ticket', () => {
     const ticket = new Ticket({
       groupName: 'testGroupName',
       metadata: {
@@ -23,7 +23,7 @@ describe('## Ticket Model', () => {
     });
   });
 
-  context('with no group name', () => {
+  context('# with no group name', () => {
     const ticket = new Ticket({
       metadata: {
         message: 'blah',

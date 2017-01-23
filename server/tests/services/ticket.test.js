@@ -2,11 +2,10 @@ import httpStatus from 'http-status';
 import ticketService from '../../services/ticket';
 import { build, fixtures } from '../../utils/factories';
 
-describe('# Ticket Service', () => {
+describe('## Ticket Service', () => {
   const ticketObject = fixtures.ticket();
 
-  // Create
-  describe('createTicket()', () => {
+  describe('# createTicket()', () => {
     context('with valid ticket details', () => {
       it('creates a new ticket', (done) => {
         ticketService.createTicket(ticketObject)
@@ -58,8 +57,7 @@ describe('# Ticket Service', () => {
     });
   });
 
-  // Get
-  describe('getTicket()', () => {
+  describe('# getTicket()', () => {
     let savedTicketId;
 
     before((done) => {
@@ -92,8 +90,7 @@ describe('# Ticket Service', () => {
     });
   });
 
-  // Update
-  describe('updateTicket()', () => {
+  describe('# updateTicket()', () => {
     let savedTicket;
 
     const updateDetails = {
@@ -134,8 +131,7 @@ describe('# Ticket Service', () => {
     });
   });
 
-  // Delete
-  describe('deleteTicket()', () => {
+  describe('# deleteTicket()', () => {
     let savedTicketId;
 
     before((done) => {

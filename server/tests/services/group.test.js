@@ -3,11 +3,11 @@ import groupService from '../../services/group';
 import Group from '../../models/group';
 import { build, fixtures } from '../../utils/factories';
 
-describe('# Group Service', () => {
+describe('## Group Service', () => {
   const groupObject = fixtures.group();
 
   context('with no groups in the database beforehand', () => {
-    describe('createGroup()', () => {
+    describe('# createGroup()', () => {
       context('with valid group details', () => {
         it('creates a new group', (done) => {
           groupService.createGroup(groupObject)
@@ -45,7 +45,7 @@ describe('# Group Service', () => {
         });
     });
 
-    describe('getGroup()', () => {
+    describe('# getGroup()', () => {
       context('with a valid group name', () => {
         it('returns a group object', (done) => {
           groupService.getGroup(groupObject.name)
@@ -69,7 +69,7 @@ describe('# Group Service', () => {
       });
     });
 
-    describe('updateGroup()', () => {
+    describe('# updateGroup()', () => {
       context('with valid update details', () => {
         const updateDetails = {
           name: 'Superman'
@@ -102,7 +102,7 @@ describe('# Group Service', () => {
       });
     });
 
-    describe('deleteGroup()', () => {
+    describe('# deleteGroup()', () => {
       context('with a group that exists', () => {
         it('deletes the group', (done) => {
           groupService.deleteGroup(groupObject.name)
@@ -129,7 +129,7 @@ describe('# Group Service', () => {
       });
     });
 
-    describe('# addUser', () => {
+    describe('# addUser()', () => {
       const userObject = fixtures.user();
 
       let group;
@@ -162,7 +162,7 @@ describe('# Group Service', () => {
       });
     });
 
-    describe('# removeUser', () => {
+    describe('# removeUser()', () => {
       const userId = '123456789098765432123456';
 
       let group;

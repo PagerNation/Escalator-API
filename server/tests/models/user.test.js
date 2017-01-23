@@ -3,8 +3,8 @@ import Device from '../../models/device';
 import Group from '../../models/group';
 import { build, fixtures } from '../../utils/factories';
 
-describe('# User Model', () => {
-  describe('user creation', () => {
+describe('## User Model', () => {
+  describe('# user creation', () => {
     const user = new User({
       name: 'Kaleb Davis',
       email: 'abc@google.com'
@@ -39,7 +39,7 @@ describe('# User Model', () => {
     });
   });
 
-  describe('user devices modifications', () => {
+  describe('# user devices modifications', () => {
     const baseUser = {
       name: 'Kaleb Davis',
       email: 'abc@google.com'
@@ -167,7 +167,7 @@ describe('# User Model', () => {
     });
   });
 
-  describe('user group modifications', () => {
+  describe('# user group modifications', () => {
     const userDetails = {
       name: 'Bryon Wilkins',
       email: '123@google.com'
