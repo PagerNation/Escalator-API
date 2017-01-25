@@ -15,6 +15,10 @@ for instructions on how to set up, run tests, etc.
 
 `npm test`
 
+## Seeding
+
+`gulp seed`
+
 ## Problems?
 
 If babel takes a while, try `npm dedupe` to flatten dependencies
