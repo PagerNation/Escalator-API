@@ -50,6 +50,12 @@ function removeUser(req, res, next) {
     .catch(err => next(err));
 }
 
+function updateEscalationPolicy(req, res, next) {
+  groupService.updateEscalationPolicy(req.group.name, req.body)
+    .then(updatedGroup => res.json(updatedGroup))
+    .catch(err => next(err));
+}
+
 /**
  * Loads a group into the request based on group name
  */
@@ -62,4 +68,13 @@ function load(req, res, next, groupName) {
     .catch(err => next(err));
 }
 
-export default { getGroup, deleteGroup, createGroup, updateGroup, addUser, removeUser, load };
+export default {
+  getGroup,
+  deleteGroup,
+  createGroup,
+  updateGroup,
+  addUser,
+  removeUser,
+  updateEscalationPolicy,
+  load
+};

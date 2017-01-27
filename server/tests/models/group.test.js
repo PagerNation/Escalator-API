@@ -10,10 +10,8 @@ describe('## Group Model', () => {
 
   const escPolicy = {
     rotationInterval: subscriberRotationInterval,
-    subscribers: [{
-      subId: subscriberObjectId,
-      pagingInterval: subscriberPagingInterval
-    }]
+    pagingInterval: subscriberPagingInterval,
+    subscribers: [subscriberObjectId]
   };
 
   const userObjectId = '67e590a0140ebf1cc48bb1bf';

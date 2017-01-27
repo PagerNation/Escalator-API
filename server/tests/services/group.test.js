@@ -197,5 +197,54 @@ describe('## Group Service', () => {
           });
       });
     });
+
+    describe('# updateEscalationPolicy()', () => {
+      const userId = '123456789098765432123456';
+
+      let group;
+
+      beforeEach((done) => {
+        build('escalationPolicy', fixtures.escalationPolicy({ subscribers: [userId] }))
+          .then(escalationPolicy => build('group', fixtures.group({ escalationPolicy: escalationPolicy })))
+          .then((newGroup) => {
+            group = newGroup;
+            done();
+          });
+      });
+
+      context('with correct body fields', () => {
+        const newEscalationPolicy = {
+          pagingInterval: 1111,
+          rotationInterval: 2222
+        };
+
+        it('should update a group\'s escalation policy', (done) => {
+          groupService.updateEscalationPolicy(group.name, newEscalationPolicy)
+            .then((savedGroup) => {
+              expect(savedGroup).to.exist;
+              expect(savedGroup.escalationPolicy.pagingInterval)
+                .to.equal(newEscalationPolicy.pagingInterval);
+              expect(savedGroup.escalationPolicy.rotationInterval)
+                .to.equal(newEscalationPolicy.rotationInterval);
+              done();
+            });
+        });
+      });
+
+      context('with incorrect body fields', () => {
+        const newEscalationPolicy = {
+          pagingIntervalssss: 1111
+        };
+
+        it('should not update escalation policy with incorrect fields', (done) => {
+          groupService.updateEscalationPolicy(group.name, newEscalationPolicy)
+            .catch((err) => {
+              expect(err).to.exist;
+              expect(err.message).to.equal('"pagingIntervalssss" is not allowed');
+              done();
+            });
+        });
+      });
+    });
   });
 });

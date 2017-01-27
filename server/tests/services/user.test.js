@@ -355,7 +355,7 @@ describe('## User Service', () => {
     });
   });
 
-  describe('# addGroup', () => {
+  describe('# addGroup()', () => {
     const baseGroup = {
       name: 'Wondertwins'
     };
@@ -390,7 +390,7 @@ describe('## User Service', () => {
     });
   });
 
-  describe('# removeGroup', () => {
+  describe('# removeGroup()', () => {
     const baseGroup = {
       name: 'Wondertwins'
     };
@@ -425,7 +425,7 @@ describe('## User Service', () => {
     });
   });
 
-  describe('# getGroupsForUser', () => {
+  describe('# getGroupsForUser()', () => {
     let user;
     context('given a user with many groups', () => {
       let groups;

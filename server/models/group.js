@@ -96,6 +96,18 @@ GroupSchema.statics = {
         reject(error);
       });
     });
+  },
+
+  updateEscalationPolicy(name, updates) {
+    return new Promise((resolve, reject) => {
+      this.findOneAndUpdate({ name }, { $set: updates }, { new: true }, (err, group) => {
+        if (err) {
+          reject(err);
+        }
+
+        resolve(group);
+      });
+    });
   }
 };
 

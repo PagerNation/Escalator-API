@@ -10,10 +10,8 @@ describe('## EscalationPolicy: models', () => {
     // Create EscalationPolicy object to pass to EscalationPolicy.create()
     const escalationPolicy = new EscalationPolicy({
       rotationInterval: subscriberRotationInterval, // 7 days
-      subscribers: [{
-        subId: subscriberObjectId,
-        pagingInterval: subscriberPagingInterval, // 15 minutes
-      }]
+      pagingInterval: subscriberPagingInterval, // 15 minutes
+      subscribers: [subscriberObjectId]
     });
 
     escalationPolicy.save((err, createdEscalationPolicy) => {
@@ -22,10 +20,9 @@ describe('## EscalationPolicy: models', () => {
       // verify all fields were saved and have correct information
       expect(createdEscalationPolicy.rotationInterval).to.equal(subscriberRotationInterval);
       expect(createdEscalationPolicy.subscribers.length).to.equal(1);
-      expect(createdEscalationPolicy.subscribers[0].subId.toString())
+      expect(createdEscalationPolicy.subscribers[0].toString())
         .to.equal(subscriberObjectId);
-      expect(createdEscalationPolicy.subscribers[0].pagingInterval)
-        .to.equal(subscriberPagingInterval);
+      expect(createdEscalationPolicy.pagingInterval).to.equal(subscriberPagingInterval);
       done();
     });
   });

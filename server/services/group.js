@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import _ from 'lodash';
 import JoiHelper from '../helpers/JoiHelper';
 import Group from '../models/group';
 import userService from './user';
@@ -14,7 +15,8 @@ function deleteGroup(groupName) {
 function createGroup(groupObject) {
   const groupSchema = Joi.object().keys({
     name: Joi.string().required(),
-    users: Joi.array().items(Joi.string().hex().length(24))
+    users: Joi.array().items(Joi.string().hex().length(24)),
+    escalationPolicy: Joi.object()
   });
 
   return JoiHelper.validate(groupObject, groupSchema)
@@ -53,6 +55,25 @@ function removeUser(group, userId) {
     .then(validatedUserObject => group.removeUser(validatedUserObject));
 }
 
+function updateEscalationPolicy(groupName, escalationPolicy) {
+  const escalationPolicySchema = Joi.object().keys({
+    rotationInterval: Joi.number(),
+    pagingInterval: Joi.number(),
+    subscribers: Joi.array().items(Joi.string().hex().length(24))
+  });
+
+  return JoiHelper.validate(escalationPolicy, escalationPolicySchema)
+    .then((validatedEscalationPolicy) => {
+      const updates = {};
+
+      _.each(validatedEscalationPolicy, (value, key) => {
+        updates[`escalationPolicy.${key}`] = value;
+      });
+
+      return Group.updateEscalationPolicy(groupName, updates);
+    });
+}
+
 export default {
   // Group CRUD
   getGroup,
@@ -61,5 +82,7 @@ export default {
   updateGroup,
   // Group User Modifications
   addUser,
-  removeUser
+  removeUser,
+  // Escalation Policy Modifications
+  updateEscalationPolicy
 };

@@ -19,6 +19,9 @@ router.route('/:groupName/user')
 router.route('/:groupName/user/:userId')
   .delete(validate(paramValidation.userById), groupCtrl.removeUser);
 
+router.route('/:groupName/escalationpolicy')
+  .put(validate(paramValidation.updateEscalationPolicy), groupCtrl.updateEscalationPolicy);
+
 // Loads group when API with groupName parameter is hit
 router.param('groupName', groupCtrl.load);
 

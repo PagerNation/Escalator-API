@@ -10,13 +10,15 @@ import mongoose from 'mongoose';
 
 const EscalationPolicySchema = new mongoose.Schema({
   rotationInterval: Number,
-  subscribers: [{
-    subId: mongoose.Schema.Types.ObjectId,
-    pagingInterval: {
-      type: Number,
-      required: true
-    }
-  }]
+  pagingInterval: {
+    type: Number,
+    required: true
+  },
+  subscribers: {
+    type: [mongoose.Schema.Types.ObjectId],
+    required: true,
+    default: []
+  }
 });
 
 export default mongoose.model('EscalationPolicy', EscalationPolicySchema);

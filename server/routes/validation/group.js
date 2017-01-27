@@ -41,5 +41,17 @@ export default {
     params: {
       groupName: Joi.string().required()
     }
+  },
+
+  updateEscalationPolicy: {
+    options: { allowUnknownBody: false },
+    body: {
+      rotationInterval: Joi.number(),
+      pagingInterval: Joi.number(),
+      subscribers: Joi.array().items(Joi.string().hex().length(24))
+    },
+    params: {
+      groupName: Joi.string().required()
+    }
   }
 };
