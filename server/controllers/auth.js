@@ -1,9 +1,10 @@
+import httpStatus from 'http-status';
 import authService from '../services/auth';
 
 function loginUser(req, res) {
   authService.loginUser(req.body.email, req.body)
     .then(authObj => res.json(authObj))
-    .catch(err => res.send(err.message));
+    .catch(err => res.status(httpStatus.UNAUTHORIZED).send(err.message));
 }
 
 function signupUser(req, res) {
