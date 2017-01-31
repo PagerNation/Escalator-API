@@ -6,6 +6,7 @@ import { build, fixtures } from '../../utils/factories';
 import Device from '../../models/device';
 import { buildUserAndGroups } from '../helpers/user_helper';
 
+const userUrl = '/api/v1/user';
 
 describe('## User APIs', () => {
   const baseUser = fixtures.user();
@@ -16,7 +17,7 @@ describe('## User APIs', () => {
 
     it('should create a new user', (done) => {
       request(app)
-        .post('/api/v1/user')
+        .post(userUrl)
         .send(baseUser)
         .expect(httpStatus.OK)
         .then((res) => {
@@ -28,7 +29,7 @@ describe('## User APIs', () => {
 
     it('should fail with status 400 with invalid userObject', (done) => {
       request(app)
-        .post('/api/v1/user')
+        .post(userUrl)
         .send(invalidUser)
         .expect(httpStatus.BAD_REQUEST)
         .then((res) => {
@@ -51,7 +52,7 @@ describe('## User APIs', () => {
 
     it('should get a user', (done) => {
       request(app)
-        .get(`/api/v1/user/${user.id}`)
+        .get(`${userUrl}/${user.id}`)
         .expect(httpStatus.OK)
         .then((res) => {
           expect(res.body.name).to.equal(user.name);
@@ -62,7 +63,7 @@ describe('## User APIs', () => {
 
     it('should report error with message - Not found, when user does not exist', (done) => {
       request(app)
-        .get('/api/v1/user/56c787ccc67fc16ccc1a5e92')
+        .get(`${userUrl}/56c787ccc67fc16ccc1a5e92`)
         .expect(httpStatus.NOT_FOUND)
         .then((res) => {
           expect(res.body.message).to.equal('Not Found');
@@ -88,7 +89,7 @@ describe('## User APIs', () => {
 
     it('should update user details', (done) => {
       request(app)
-        .put(`/api/v1/user/${user.id}`)
+        .put(`${userUrl}/${user.id}`)
         .send(updateDetails)
         .expect(httpStatus.OK)
         .then((res) => {
@@ -99,13 +100,43 @@ describe('## User APIs', () => {
 
     it('should report error with message for any invalid field', (done) => {
       request(app)
-        .put(`/api/v1/user/${user.id}`)
+        .put(`${userUrl}/${user.id}`)
         .send({ fake: 0 })
         .expect(httpStatus.BAD_REQUEST)
         .then((res) => {
           expect(res.body.message).to.equal('"fake" is not allowed');
           done();
         });
+    });
+
+    it('should report error with message for a field that should not be updated', (done) => {
+      request(app)
+        .put(`${userUrl}/${user.id}`)
+        .send({ devices: [{}] })
+        .expect(httpStatus.BAD_REQUEST)
+        .then((res) => {
+          expect(res.body.message).to.equal('"devices" is not allowed');
+          done();
+        });
+    });
+
+    context('when updating escalation policy fields', () => {
+      const delays = [1,2,3,4,5];
+      const updateDetails = {
+        delays: delays
+      };
+
+      it('should update the escalation policy', (done) => {
+        request(app)
+          .put(`${userUrl}/${user.id}`)
+          .send(updateDetails)
+          .expect(httpStatus.OK)
+          .then((res) => {
+            expect(res.body.delays[0]).to.equal(delays[0]);
+            expect(res.body.delays[1]).to.equal(delays[1]);
+            done();
+          });
+      })
     });
   });
 
@@ -122,11 +153,11 @@ describe('## User APIs', () => {
 
     it('deletes a user', (done) => {
       request(app)
-        .delete(`/api/v1/user/${user.id}`)
+        .delete(`${userUrl}/${user.id}`)
         .expect(httpStatus.OK)
         .then(() => {
           request(app)
-            .get(`/api/v1/user/${user.id}`)
+            .get(`${userUrl}/${user.id}`)
             .expect(httpStatus.NOT_FOUND)
             .then(() => done());
         });
@@ -134,7 +165,7 @@ describe('## User APIs', () => {
 
     it('should report error with message - Not found, when user does not exists', (done) => {
       request(app)
-        .delete('/api/v1/user/56c787ccc67fc16ccc1a5e92')
+        .delete(`${userUrl}/56c787ccc67fc16ccc1a5e92`)
         .expect(httpStatus.NOT_FOUND)
         .then((res) => {
           expect(res.body.message).to.equal('Not Found');
@@ -159,7 +190,7 @@ describe('## User APIs', () => {
 
     it('should get a device from the user', (done) => {
       request(app)
-        .get(`/api/v1/user/${user.id}/device/${device.id}`)
+        .get(`${userUrl}/${user.id}/device/${device.id}`)
         .expect(httpStatus.OK)
         .then((res) => {
           expect(res.body.email).to.equal(device.email);
@@ -191,7 +222,7 @@ describe('## User APIs', () => {
 
     it('should update a device', (done) => {
       request(app)
-        .put(`/api/v1/user/${user.id}/device/${device.id}`)
+        .put(`${userUrl}/${user.id}/device/${device.id}`)
         .send(updateDetails)
         .expect(httpStatus.OK)
         .then((res) => {
@@ -205,7 +236,7 @@ describe('## User APIs', () => {
 
     it('should fail validation with an invalid device type', (done) => {
       request(app)
-        .put(`/api/v1/user/${user.id}/device/${device.id}`)
+        .put(`${userUrl}/${user.id}/device/${device.id}`)
         .send({ type: 'invalid' })
         .expect(httpStatus.BAD_REQUEST)
         .then((res) => {
@@ -228,7 +259,7 @@ describe('## User APIs', () => {
 
     it('should add a device to the user', (done) => {
       request(app)
-        .post(`/api/v1/user/${user.id}/device`)
+        .post(`${userUrl}/${user.id}/device`)
         .send({
           device: baseDevice,
           index: 0
@@ -245,7 +276,7 @@ describe('## User APIs', () => {
 
     it('should throw validation error if body is invalid', (done) => {
       request(app)
-        .post(`/api/v1/user/${user.id}/device`)
+        .post(`${userUrl}/${user.id}/device`)
         .send({
           device: baseDevice
         })
@@ -271,7 +302,7 @@ describe('## User APIs', () => {
 
       it('returns all of the groups that a user is in', (done) => {
         request(app)
-          .get(`/api/v1/user/${user.id}/group`)
+          .get(`${userUrl}/${user.id}/group`)
           .expect(httpStatus.OK)
           .then((res) => {
             const groupsResponse = res.body.groups;
@@ -295,7 +326,7 @@ describe('## User APIs', () => {
 
       it('returns an empty array of groups', (done) => {
         request(app)
-          .get(`/api/v1/user/${user.id}/group`)
+          .get(`${userUrl}/${user.id}/group`)
           .expect(httpStatus.OK)
           .then((res) => {
             expect(res.body.groups).to.be.empty;
@@ -309,7 +340,7 @@ describe('## User APIs', () => {
 
       it('returns a bad request', (done) => {
         request(app)
-          .get(`/api/v1/user/${badId}/group`)
+          .get(`${userUrl}/${badId}/group`)
           .expect(httpStatus.NOT_FOUND)
           .then((res) => {
             done();

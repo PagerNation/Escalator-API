@@ -1,4 +1,5 @@
 import httpStatus from 'http-status';
+import config from '../../../config/env'
 import userService from '../../services/user';
 import User from '../../models/user';
 import Device from '../../models/device';
@@ -140,44 +141,98 @@ describe('## User Service', () => {
   describe('# updateUser()', () => {
     let savedUserId;
 
+    const userObj = fixtures.user();
+
     const updateDetails = {
-      role: 1,
-      email: 'update@email.com',
+      email: 'update@email.com'
     };
 
-    before((done) => {
-      userService.createUser(baseUser)
-        .then((createdUser) => {
-          savedUserId = createdUser.id;
+    beforeEach((done) => {
+      build('user', userObj)
+        .then((u) => {
+          savedUserId = u.id;
           done();
         });
     });
 
-    it('updates an existing user', (done) => {
-      userService.updateUser(savedUserId, updateDetails)
-        .then((user) => {
-          expect(user).to.exist;
-          expect(user.id).to.equal(savedUserId);
-          expect(user.name).to.equal(baseUser.name);
-          expect(user.email).to.equal(updateDetails.email);
-          expect(user.role).to.equal(updateDetails.role);
-          expect(user.auth).to.be.null;
-          expect(user.groups).to.be.empty;
-          expect(user.devices).to.be.empty;
-          expect(user.delays).to.be.empty;
-          expect(user.createdAt).to.be.not.null;
-          done();
-        });
+    context('when updating name or email', () => {
+      it('updates an existing user', (done) => {
+        userService.updateUser(savedUserId, updateDetails)
+          .then((user) => {
+            expect(user).to.exist;
+            expect(user.id).to.equal(savedUserId);
+            expect(user.name).to.equal(userObj.name);
+            expect(user.email).to.equal(updateDetails.email);
+            expect(user.auth).to.be.null;
+            expect(user.groups).to.be.empty;
+            expect(user.devices).to.be.empty;
+            expect(user.delays).to.be.empty;
+            expect(user.createdAt).to.be.not.null;
+            done();
+          });
+      });
+
+      it('fails to update a user with invalid fields', (done) => {
+        userService.updateUser(savedUserId, {fake: 0})
+          .catch((err, user) => {
+            expect(err).to.exist;
+            expect(err.name).to.equal('ValidationError');
+            expect(err.details[0].message).to.equal('"fake" is not allowed');
+            done();
+          });
+      });
     });
 
-    it('fails to update a user with invalid fields', (done) => {
-      userService.updateUser(savedUserId, { fake: 0 })
-        .catch((err, user) => {
-          expect(err).to.exist;
-          expect(err.name).to.equal('ValidationError');
-          expect(err.details[0].message).to.equal('"fake" is not allowed');
-          done();
-        });
+    context('when updating delays', () => {
+      const beginningDelays = [1, 2, 3, 4, 5];
+      const endingDelays = [5, 4, 3, 2, 1];
+      let user = {};
+
+      beforeEach((done) => {
+        userObj.delays = beginningDelays;
+        build('user', userObj)
+          .then((u) => {
+            user = u;
+            done();
+          });
+      });
+
+      it('should update the delay field of the user', (done) => {
+        const updates = {
+          'delays': endingDelays
+        };
+        userService.updateUser(user.id, updates)
+          .then((newUser) => {
+            expect(newUser.id).to.equal(user.id);
+            expect(newUser.delays[0]).to.equal(endingDelays[0]);
+            expect(newUser.delays[1]).to.equal(endingDelays[1]);
+            done();
+          });
+      });
+
+      it('should not update the devices field of the user', (done) => {
+        const updates = {
+          'devices': [{}]
+        };
+        userService.updateUser(user.id, updates)
+          .catch((err) => {
+            expect(err).to.exist;
+            expect(err.message).to.equal('"devices" is not allowed')
+            done();
+          });
+      });
+
+      it('should not update any field that does not exist', (done) => {
+        const updates = {
+          'doesNotExist': 1
+        };
+        userService.updateUser(user.id, updates)
+          .catch((err) => {
+            expect(err).to.exist;
+            expect(err.message).to.equal('"doesNotExist" is not allowed');
+            done();
+          });
+      });
     });
   });
 
@@ -217,7 +272,7 @@ describe('## User Service', () => {
   describe('# addDevice() | getDevice()', () => {
     let user;
 
-    before((done) => {
+    beforeEach((done) => {
       userService.createUser(baseUser)
         .then((createdUser) => {
           user = createdUser;
@@ -234,6 +289,15 @@ describe('## User Service', () => {
           expect(retrievedDevice.contactInformation).to.equal(baseDevice.contactInformation);
           done();
         });
+    });
+
+    it('should add a default delay to the delays array', (done) => {
+      userService.addDevice(user, baseDevice, 0)
+        .then((savedUser) => {
+          expect(savedUser.delays.length).to.equal(savedUser.devices.length);
+          expect(savedUser.delays[savedUser.delays.length-1]).to.equal(config.default_delay);
+          done();
+        })
     });
 
     it('should fail to add device without all fields', (done) => {
@@ -260,7 +324,7 @@ describe('## User Service', () => {
 
     let user;
 
-    before((done) => {
+    beforeEach((done) => {
       userService.createUser(baseUser)
         .then(createdUser => createdUser.addDevice(device, 0))
         .then((updatedUser) => {
@@ -276,6 +340,16 @@ describe('## User Service', () => {
           expect(updatedUser.devices).to.be.empty;
           done();
         });
+    });
+
+    it('should remove a delay from the delays array', (done) => {
+      userService.removeDevice(user, device.id)
+        .then((savedUser) => {
+          expect(savedUser).to.exist;
+          expect(savedUser.devices).to.be.empty;
+          expect(savedUser.delays.length).to.equal(savedUser.devices.length);
+          done();
+        })
     });
   });
 

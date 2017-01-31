@@ -3,7 +3,7 @@ import findOrCreate from 'mongoose-findorcreate';
 import httpStatus from 'http-status';
 import _ from 'lodash';
 import APIError from '../helpers/APIError';
-import EscalationPolicy from './escalationPolicy';
+import config from '../../config/env'
 import Device from './device';
 
 const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/; // eslint-disable-line
@@ -68,9 +68,13 @@ UserSchema.methods = {
     });
   },
 
-  addDevice(deviceModel, index) {
+  addDevice(deviceModel, index, delay = config.default_delay) {
     this.devices.splice(index, 0, deviceModel);
+    // Anytime a device is added, a new delay should be added
+    // This keeps the delays and devices arrays the same size, since they are tied together
+    this.delays.push(delay);
     this.markModified('devices');
+    this.markModified('delays');
 
     return new Promise((resolve, reject) => {
       this.save((err, savedUser) => {
@@ -104,7 +108,11 @@ UserSchema.methods = {
 
   removeDevice(id) {
     _.remove(this.devices, { id });
+    // Anytime a device is deleted, the last delay in the array should also be removed
+    // This keeps the delays and devices arrays the same size, since they are tied together
+    this.delays.pop();
     this.markModified('devices');
+    this.markModified('delays');
 
     return new Promise((resolve, reject) => {
       this.save((err, savedUser) => {
@@ -156,7 +164,7 @@ UserSchema.methods = {
         resolve(user);
       });
     });
-  },
+  }
 };
 
 UserSchema.statics = {
