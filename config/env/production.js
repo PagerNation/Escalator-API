@@ -2,6 +2,9 @@ export default {
   env: 'production',
   db: process.env.DB_URI,
   port: process.env.PORT || 3000,
+  auth: {
+    jwt_secret: process.env.JWT_SECRET
+  },
   default_delay: 10,
   email: {
     user: process.env.EMAIL_USER,
