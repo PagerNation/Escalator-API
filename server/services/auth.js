@@ -7,7 +7,7 @@ import userService from '../services/user';
 function loginUser(email) {
   return User.getByEmail(email)
     .then((user) => {
-      const token = jwt.sign({ email }, config.auth.jwt_secret);
+      const token = jwt.sign({ email, id: user._id }, config.auth.jwt_secret);
       const returnObj = {
         user: user,
         token: token
@@ -26,7 +26,7 @@ function signupUser(body) {
 
   return User.findByEmailOrCreate(userObj)
     .then((user) => {
-      const token = jwt.sign({ email: userObj.email }, config.auth.jwt_secret);
+      const token = jwt.sign({ email: userObj.email, id: userObj._id }, config.auth.jwt_secret);
       const returnObj = {
         user: user,
         token: token
