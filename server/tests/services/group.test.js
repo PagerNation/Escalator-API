@@ -205,7 +205,7 @@ describe('## Group Service', () => {
 
       beforeEach((done) => {
         build('escalationPolicy', fixtures.escalationPolicy({ subscribers: [userId] }))
-          .then(escalationPolicy => build('group', fixtures.group({ escalationPolicy: escalationPolicy })))
+          .then(escalationPolicy => build('group', fixtures.group({ escalationPolicy })))
           .then((newGroup) => {
             group = newGroup;
             done();

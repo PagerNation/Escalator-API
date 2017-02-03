@@ -2,7 +2,7 @@ import Faker from 'faker';
 import User from '../models/user';
 import Device from '../models/device';
 import Group from '../models/group';
-import Ticket from '../models/ticket';
+import Ticket, { actionTypes } from '../models/ticket';
 import EscalationPolicy from '../models/escalationPolicy';
 
 const uuid = {
@@ -65,6 +65,13 @@ const fixtures = {
       subscribers: escalationPolicy.subscribers || ['57e590a0140ebf1cc48bb1bf']
     };
   },
+  action(action = {}) {
+    return {
+      actionTaken: action.actionTaken || actionTypes.ACKNOWLEDGED,
+      timestamp: action.timestamp || Date.now(),
+      userId: action.userId || uuid.user
+    }
+  }
 };
 
 const models = {

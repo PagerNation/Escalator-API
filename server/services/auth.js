@@ -9,8 +9,8 @@ function loginUser(email) {
     .then((user) => {
       const token = jwt.sign({ email, id: user._id }, config.auth.jwt_secret);
       const returnObj = {
-        user: user,
-        token: token
+        user,
+        token
       };
       return returnObj;
     });
@@ -28,8 +28,8 @@ function signupUser(body) {
     .then((user) => {
       const token = jwt.sign({ email: userObj.email, id: userObj._id }, config.auth.jwt_secret);
       const returnObj = {
-        user: user,
-        token: token
+        user,
+        token
       };
       return returnObj;
     });

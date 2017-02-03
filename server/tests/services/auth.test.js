@@ -37,9 +37,9 @@ describe('## Auth Service', () => {
   describe('# signupUser()', () => {
     it('should create a new user', (done) => {
       const newUserObj = {
-        email: "new_user@test.com",
-        name: "Test User"
-      }
+        email: 'new_user@test.com',
+        name: 'Test User'
+      };
       authService.signupUser(newUserObj)
         .then((authObj) => {
           expect(authObj).to.exist;
@@ -53,7 +53,7 @@ describe('## Auth Service', () => {
       const user = {
         email: userObj.email,
         name: userObj.name
-      }
+      };
       authService.signupUser(user)
         .catch((err) => {
           expect(err).to.exist;
@@ -61,5 +61,5 @@ describe('## Auth Service', () => {
           done();
         });
     });
-  }); 
+  });
 });
