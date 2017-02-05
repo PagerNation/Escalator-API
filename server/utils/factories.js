@@ -41,7 +41,7 @@ const fixtures = {
   },
   group(group = {}) {
     return {
-      name: group.name || Faker.internet.userName(),
+      name: group.name || Faker.lorem.word(),
       users: group.users,
       escalationPolicy: group.escalationPolicy
     };
