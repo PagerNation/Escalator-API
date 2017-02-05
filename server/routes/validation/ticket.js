@@ -28,4 +28,13 @@ export default {
       metadata: Joi.object().required()
     }
   },
+
+  getTicketsByDate: {
+    query: {
+      isOpen: Joi.boolean(),
+      groupName: Joi.string(),
+      to: Joi.number(),
+      from: Joi.number()
+    }
+  }
 };

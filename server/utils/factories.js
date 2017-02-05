@@ -55,7 +55,9 @@ const fixtures = {
           foo: 'bar',
           jiggawatts: 42
         }
-      }
+      },
+      isOpen: ticket.isOpen,
+      createdAt: ticket.createdAt || Date.now()
     };
   },
   escalationPolicy(escalationPolicy = {}) {
