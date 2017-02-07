@@ -5,7 +5,9 @@ import alertService from './alert';
 
 const ticketSchema = {
   groupName: Joi.string().required(),
-  metadata: Joi.object().required()
+  metadata: Joi.object().required(),
+  isOpen: Joi.boolean(),
+  createdAt: Joi.number()
 };
 
 const idPattern = Joi.string().hex().length(24).required();

@@ -116,7 +116,7 @@ TicketSchema.statics = {
     return new Promise((resolve, reject) => {
       const query = this.find()
         .limit(10)
-        .sort('createdAt');
+        .sort('-createdAt');
 
         if (isOpen != undefined) {
           query.where('isOpen').equals(isOpen);

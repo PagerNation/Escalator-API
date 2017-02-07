@@ -154,4 +154,62 @@ describe('## Ticket Service', () => {
         });
     });
   });
+
+  describe('# getTicketsByDate()', (done) => {
+
+    beforeEach((done) => {
+      const promiseChain = [];
+      for (var i = 0; i < 3; i++) {
+        let ticketPromise = build('ticket', fixtures.ticket({ createdAt: i }));
+        promiseChain.push(ticketPromise);
+      }
+
+      promiseChain.push(build('ticket', fixtures.ticket({ isOpen: false, groupName: 't', createdAt: 3 })));
+
+      Promise.all(promiseChain)
+        .then(() => done());
+    });
+
+    context('with valid filters', () => {
+      it('gets all tickets', (done) => {
+        ticketService.getTicketsByDate()
+          .then((tickets) => {
+            expect(tickets).to.have.lengthOf(4);
+            done();
+          });
+      });
+
+      it('gets all tickets between two times', (done) => {
+        ticketService.getTicketsByDate(null, null, 3, 2)
+          .then((tickets) => {
+            expect(tickets).to.have.lengthOf(2);
+            done();
+          });
+      });
+
+      it('gets all open tickets', (done) => {
+        ticketService.getTicketsByDate(1)
+          .then((tickets) => {
+            expect(tickets).to.have.lengthOf(3);
+            done();
+          });
+      });
+
+      it('gets all closed tickets', (done) => {
+        ticketService.getTicketsByDate(0)
+          .then((tickets) => {
+            expect(tickets).to.have.lengthOf(1);
+            done();
+          });
+      });
+
+      it('gets all tickets for a given group tickets', (done) => {
+        ticketService.getTicketsByDate(null, 't')
+          .then((tickets) => {
+            expect(tickets).to.have.lengthOf(1);
+            done();
+          });
+      });
+    });
+  });
 });
