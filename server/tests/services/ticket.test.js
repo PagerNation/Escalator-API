@@ -180,7 +180,12 @@ describe('## Ticket Service', () => {
       });
 
       it('gets all tickets between two times', (done) => {
-        ticketService.getTicketsByDate(null, null, 3, 2)
+        const filters = {
+          from: 2,
+          to: 3
+        };
+
+        ticketService.getTicketsByDate(filters)
           .then((tickets) => {
             expect(tickets).to.have.lengthOf(2);
             done();
@@ -188,7 +193,11 @@ describe('## Ticket Service', () => {
       });
 
       it('gets all open tickets', (done) => {
-        ticketService.getTicketsByDate(1)
+        const filters = {
+          isOpen: 1
+        };
+
+        ticketService.getTicketsByDate(filters)
           .then((tickets) => {
             expect(tickets).to.have.lengthOf(3);
             done();
@@ -196,7 +205,11 @@ describe('## Ticket Service', () => {
       });
 
       it('gets all closed tickets', (done) => {
-        ticketService.getTicketsByDate(0)
+        const filters = {
+          isOpen: 0
+        };
+
+        ticketService.getTicketsByDate(filters)
           .then((tickets) => {
             expect(tickets).to.have.lengthOf(1);
             done();
@@ -204,9 +217,27 @@ describe('## Ticket Service', () => {
       });
 
       it('gets all tickets for a given group tickets', (done) => {
-        ticketService.getTicketsByDate(null, 't')
+        const filters = {
+          groupName: 't'
+        };
+
+        ticketService.getTicketsByDate(filters)
           .then((tickets) => {
             expect(tickets).to.have.lengthOf(1);
+            done();
+          });
+      });
+    });
+
+    context('with invalid filters', () => {
+      it('ignores nil filters', (done) => {
+        const filters = {
+          groupName: null
+        };
+
+        ticketService.getTicketsByDate(filters)
+          .then((tickets) => {
+            expect(tickets).to.have.lengthOf(4);
             done();
           });
       });

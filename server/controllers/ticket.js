@@ -25,7 +25,7 @@ function deleteById(req, res, next) {
 }
 
 function getTicketsByDate(req, res, next) {
-  ticketService.getTicketsByDate(req.query.isOpen, req.query.groupName, req.query.to, req.query.from)
+  ticketService.getTicketsByDate(req.query)
     .then(tickets => res.json(tickets))
     .catch(e => next(e));
 }

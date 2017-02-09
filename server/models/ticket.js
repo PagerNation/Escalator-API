@@ -112,25 +112,29 @@ TicketSchema.statics = {
     });
   },
 
-  getTicketsByDate(isOpen, groupName, to, from) {
+  getTicketsByDate(filterOpts) {
     return new Promise((resolve, reject) => {
       const query = this.find()
         .limit(10)
         .sort('-createdAt');
 
-        if (isOpen != undefined) {
+        const isOpen = _.get(filterOpts, 'isOpen');
+        if (!_.isNil(isOpen)) {
           query.where('isOpen').equals(isOpen);
         }
 
-        if (groupName) {
+        const groupName = _.get(filterOpts, 'groupName');
+        if (!_.isNil(groupName)) {
           query.where('groupName').equals(groupName);
         }
 
-        if (to) {
+        const to = _.get(filterOpts, 'to');
+        if (!_.isNil(to)) {
           query.where('createdAt').lte(to);
         }
 
-        if (from) {
+        const from = _.get(filterOpts, 'from');
+        if (!_.isNil(from)) {
           query.where('createdAt').gte(from);
         }
 

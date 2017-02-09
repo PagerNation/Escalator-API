@@ -37,8 +37,8 @@ function deleteById(id) {
     .then(validatedId => Ticket.delete(validatedId));
 }
 
-function getTicketsByDate(isOpen, groupName, to, from) {
-  return Ticket.getTicketsByDate(isOpen, groupName, to, from);
+function getTicketsByDate(filterOpts) {
+  return Ticket.getTicketsByDate(filterOpts);
 }
 
 export default {
