@@ -154,4 +154,93 @@ describe('## Ticket Service', () => {
         });
     });
   });
+
+  describe('# getTicketsByDate()', (done) => {
+
+    beforeEach((done) => {
+      const promiseChain = [];
+      for (var i = 0; i < 3; i++) {
+        let ticketPromise = build('ticket', fixtures.ticket({ createdAt: i }));
+        promiseChain.push(ticketPromise);
+      }
+
+      promiseChain.push(build('ticket', fixtures.ticket({ isOpen: false, groupName: 't', createdAt: 3 })));
+
+      Promise.all(promiseChain)
+        .then(() => done());
+    });
+
+    context('with valid filters', () => {
+      it('gets all tickets', (done) => {
+        ticketService.getTicketsByDate()
+          .then((tickets) => {
+            expect(tickets).to.have.lengthOf(4);
+            done();
+          });
+      });
+
+      it('gets all tickets between two times', (done) => {
+        const filters = {
+          from: 2,
+          to: 3
+        };
+
+        ticketService.getTicketsByDate(filters)
+          .then((tickets) => {
+            expect(tickets).to.have.lengthOf(2);
+            done();
+          });
+      });
+
+      it('gets all open tickets', (done) => {
+        const filters = {
+          isOpen: 1
+        };
+
+        ticketService.getTicketsByDate(filters)
+          .then((tickets) => {
+            expect(tickets).to.have.lengthOf(3);
+            done();
+          });
+      });
+
+      it('gets all closed tickets', (done) => {
+        const filters = {
+          isOpen: 0
+        };
+
+        ticketService.getTicketsByDate(filters)
+          .then((tickets) => {
+            expect(tickets).to.have.lengthOf(1);
+            done();
+          });
+      });
+
+      it('gets all tickets for a given group tickets', (done) => {
+        const filters = {
+          groupName: 't'
+        };
+
+        ticketService.getTicketsByDate(filters)
+          .then((tickets) => {
+            expect(tickets).to.have.lengthOf(1);
+            done();
+          });
+      });
+    });
+
+    context('with invalid filters', () => {
+      it('ignores nil filters', (done) => {
+        const filters = {
+          groupName: null
+        };
+
+        ticketService.getTicketsByDate(filters)
+          .then((tickets) => {
+            expect(tickets).to.have.lengthOf(4);
+            done();
+          });
+      });
+    });
+  });
 });

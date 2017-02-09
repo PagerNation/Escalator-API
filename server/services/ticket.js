@@ -5,7 +5,9 @@ import alertService from './alert';
 
 const ticketSchema = {
   groupName: Joi.string().required(),
-  metadata: Joi.object().required()
+  metadata: Joi.object().required(),
+  isOpen: Joi.boolean(),
+  createdAt: Joi.number()
 };
 
 const idPattern = Joi.string().hex().length(24).required();
@@ -35,9 +37,14 @@ function deleteById(id) {
     .then(validatedId => Ticket.delete(validatedId));
 }
 
+function getTicketsByDate(filterOpts) {
+  return Ticket.getTicketsByDate(filterOpts);
+}
+
 export default {
   createTicket,
   getById,
   updateTicket,
-  deleteById
+  deleteById,
+  getTicketsByDate
 };

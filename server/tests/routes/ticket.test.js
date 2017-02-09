@@ -5,6 +5,7 @@ import { build, fixtures } from '../../utils/factories';
 
 describe('## Ticket APIs', () => {
   const ticket = fixtures.ticket();
+  const basePath = '/api/v1/ticket';
 
   const invalidTicket = {
     metadata: {
@@ -27,7 +28,7 @@ describe('## Ticket APIs', () => {
 
     it('should fail with status 400 with invalid ticketObject', (done) => {
       request(app)
-        .post('/api/v1/ticket')
+        .post(basePath)
         .send(invalidTicket)
         .expect(httpStatus.BAD_REQUEST)
         .then((res) => {
@@ -50,7 +51,7 @@ describe('## Ticket APIs', () => {
 
     it('should get a ticket', (done) => {
       request(app)
-        .get(`/api/v1/ticket/${createdTicket.id}`)
+        .get(`${basePath}/${createdTicket.id}`)
         .expect(httpStatus.OK)
         .then((res) => {
           expect(res.body.groupName).to.equal(ticket.groupName);
@@ -61,7 +62,7 @@ describe('## Ticket APIs', () => {
 
     it('should report error with message - Not found, when ticket does not exists', (done) => {
       request(app)
-        .get('/api/v1/ticket/56c787ccc67fc16ccc1a5e92')
+        .get(`${basePath}/56c787ccc67fc16ccc1a5e92`)
         .expect(httpStatus.NOT_FOUND)
         .then((res) => {
           expect(res.body.message).to.equal('Not Found');
@@ -88,7 +89,7 @@ describe('## Ticket APIs', () => {
 
     it('should update ticket details', (done) => {
       request(app)
-        .put(`/api/v1/ticket/${createdTicket.id}`)
+        .put(`${basePath}/${createdTicket.id}`)
         .send(updateDetails)
         .expect(httpStatus.OK)
         .then((res) => {
@@ -99,7 +100,7 @@ describe('## Ticket APIs', () => {
 
     it('should report error with message for any invalid field', (done) => {
       request(app)
-        .put(`/api/v1/ticket/${createdTicket.id}`)
+        .put(`${basePath}/${createdTicket.id}`)
         .send({ fake: 0 })
         .expect(httpStatus.BAD_REQUEST)
         .then((res) => {
@@ -121,14 +122,81 @@ describe('## Ticket APIs', () => {
 
     it('deletes a ticket', (done) => {
       request(app)
-        .delete(`/api/v1/ticket/${createdTicket.id}`)
+        .delete(`${basePath}/${createdTicket.id}`)
         .expect(httpStatus.OK)
         .then(() => {
           request(app)
-            .get(`/api/v1/ticket/${createdTicket.id}`)
+            .get(`${basePath}/${createdTicket.id}`)
             .expect(httpStatus.NOT_FOUND)
             .then(() => done());
         });
+    });
+  });
+
+  describe('# GET /api/v1/ticket/all?isOpen=...&groupName=...&to=...&from=...', () => {
+    beforeEach((done) => {
+      const promiseChain = [];
+      for (var i = 0; i < 3; i++) {
+        let ticketPromise = build('ticket', fixtures.ticket({ createdAt: i }));
+        promiseChain.push(ticketPromise);
+      }
+
+      promiseChain.push(build('ticket', fixtures.ticket({ isOpen: false, groupName: 't', createdAt: 3 })));
+
+      Promise.all(promiseChain)
+        .then(() => done());
+    });
+
+    context('with valid filters', () => {
+      it('gets all tickets', (done) => {
+        request(app)
+          .get(`${basePath}/all`)
+          .expect(httpStatus.OK)
+          .then((res) => {
+            expect(res.body).to.have.lengthOf(4);
+            done();
+          });
+      });
+
+      it('gets all tickets between two times', (done) => {
+        request(app)
+          .get(`${basePath}/all?to=3&from=2`)
+          .expect(httpStatus.OK)
+          .then((res) => {
+            expect(res.body).to.have.lengthOf(2);
+            done();
+          });
+      });
+
+      it('gets all open tickets', (done) => {
+        request(app)
+          .get(`${basePath}/all?isOpen=1`)
+          .expect(httpStatus.OK)
+          .then((res) => {
+            expect(res.body).to.have.lengthOf(3);
+            done();
+          });
+      });
+
+      it('gets all closed tickets', (done) => {
+        request(app)
+          .get(`${basePath}/all?isOpen=0`)
+          .expect(httpStatus.OK)
+          .then((res) => {
+            expect(res.body).to.have.lengthOf(1);
+            done();
+          });
+      });
+
+      it('gets all tickets for a given group tickets', (done) => {
+        request(app)
+          .get(`${basePath}/all?groupName=t`)
+          .expect(httpStatus.OK)
+          .then((res) => {
+            expect(res.body).to.have.lengthOf(1);
+            done();
+          });
+      });
     });
   });
 });

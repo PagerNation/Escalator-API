@@ -6,6 +6,10 @@ import ticketController from '../controllers/ticket';
 
 const router = express.Router();  // eslint-disable-line new-cap
 
+router.route('/all')
+
+  .get(validate(paramValidation.getTicketsByDate), ticketController.getTicketsByDate);
+
 router.route('/:id')
 
   /** GET /api/v1/ticket/:id - Get a ticket by Id */

@@ -34,6 +34,15 @@ const TicketSchema = new mongoose.Schema({
       }
     }],
     default: []
+  },
+  isOpen: {
+    type: Boolean,
+    default: true,
+    required: true
+  },
+  createdAt: {
+    type: Number,
+    default: Date.now()
   }
 });
 
@@ -101,6 +110,42 @@ TicketSchema.statics = {
         reject(err);
       });
     });
+  },
+
+  getTicketsByDate(filterOpts) {
+    return new Promise((resolve, reject) => {
+      const query = this.find()
+        .limit(10)
+        .sort('-createdAt');
+
+        const isOpen = _.get(filterOpts, 'isOpen');
+        if (!_.isNil(isOpen)) {
+          query.where('isOpen').equals(isOpen);
+        }
+
+        const groupName = _.get(filterOpts, 'groupName');
+        if (!_.isNil(groupName)) {
+          query.where('groupName').equals(groupName);
+        }
+
+        const to = _.get(filterOpts, 'to');
+        if (!_.isNil(to)) {
+          query.where('createdAt').lte(to);
+        }
+
+        const from = _.get(filterOpts, 'from');
+        if (!_.isNil(from)) {
+          query.where('createdAt').gte(from);
+        }
+
+        query.exec((err, tickets) => {
+          if (tickets) {
+            return resolve(tickets);
+          }
+          reject(err);
+        });
+    });
+
   }
 };
 

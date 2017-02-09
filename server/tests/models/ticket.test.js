@@ -17,7 +17,6 @@ describe('## Ticket Model', () => {
     it('should successfully save', (done) => {
       ticket.save((err) => {
         expect(err).to.be.null;
-        // saved!
         done();
       });
     });
