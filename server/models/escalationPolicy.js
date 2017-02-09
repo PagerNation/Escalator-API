@@ -1,24 +1,24 @@
 import mongoose from 'mongoose';
 
-/**
- * EscalationPolicy Schema
- *
- * rotationInterval - interval for rotating escalation policy subscribers
- * pagingInterval - interval between sending pages to next subscriber
- * subscribers - ordered list of users/devices to send alerts to
- */
-
 const EscalationPolicySchema = new mongoose.Schema({
-  rotationInterval: Number,
-  pagingInterval: {
+  rotationIntervalInDays: {
     type: Number,
-    required: true
+    default: 7
+  },
+  pagingIntervalInDays: {
+    type: Number,
+    default: 10,
   },
   subscribers: {
     type: [mongoose.Schema.Types.ObjectId],
-    required: true,
     default: []
   }
 });
+
+EscalationPolicySchema.statics = {
+  defaultEscalationPolicy() {
+    return new this();
+  }
+}
 
 export default mongoose.model('EscalationPolicy', EscalationPolicySchema);

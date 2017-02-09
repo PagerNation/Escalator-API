@@ -4,13 +4,13 @@ import EscalationPolicy from '../../models/escalationPolicy';
 import { build, fixtures } from '../../utils/factories';
 
 describe('## Group Model', () => {
-  const subscriberRotationInterval = 7;
-  const subscriberPagingInterval = 15;
+  const subscriberRotationIntervalInDays = 7;
+  const subscriberPagingIntervalInDays = 15;
   const subscriberObjectId = '57e590a0140ebf1cc48bb1bf';
 
   const escPolicy = {
-    rotationInterval: subscriberRotationInterval,
-    pagingInterval: subscriberPagingInterval,
+    rotationIntervalInDays: subscriberRotationIntervalInDays,
+    pagingIntervalInDays: subscriberPagingIntervalInDays,
     subscribers: [subscriberObjectId]
   };
 
@@ -21,14 +21,17 @@ describe('## Group Model', () => {
     const groupData = {
       name: 'Wondertwins',
       users: [userObjectId],
-      escalationPolicy: escPolicy
     };
 
     it('should create a new group', (done) => {
       new Group(groupData).save((err, newGroup) => {
+        const compareEP = EscalationPolicy.defaultEscalationPolicy();
         expect(err).to.not.exist;
         expect(newGroup.name).to.equal(groupData.name);
         expect(newGroup.users[0].toString()).to.equal(groupData.users[0]);
+        expect(newGroup.escalationPolicy.pagingIntervalInDays).to.equal(compareEP.pagingIntervalInDays);
+        expect(newGroup.escalationPolicy.rotationIntervalInDays).to.equal(compareEP.rotationIntervalInDays);
+        expect(newGroup.escalationPolicy.subscribers).to.be.empty;
         done();
       });
     });

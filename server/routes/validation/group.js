@@ -46,8 +46,8 @@ export default {
   updateEscalationPolicy: {
     options: { allowUnknownBody: false },
     body: {
-      rotationInterval: Joi.number(),
-      pagingInterval: Joi.number(),
+      rotationIntervalInDays: Joi.number(),
+      pagingIntervalInDays: Joi.number(),
       subscribers: Joi.array().items(Joi.string().hex().length(24))
     },
     params: {

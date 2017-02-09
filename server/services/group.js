@@ -57,8 +57,8 @@ function removeUser(group, userId) {
 
 function updateEscalationPolicy(groupName, escalationPolicy) {
   const escalationPolicySchema = Joi.object().keys({
-    rotationInterval: Joi.number(),
-    pagingInterval: Joi.number(),
+    rotationIntervalInDays: Joi.number(),
+    pagingIntervalInDays: Joi.number(),
     subscribers: Joi.array().items(Joi.string().hex().length(24))
   });
 

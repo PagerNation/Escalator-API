@@ -43,7 +43,7 @@ const fixtures = {
     return {
       name: group.name || Faker.lorem.word(),
       users: group.users,
-      escalationPolicy: group.escalationPolicy
+      escalationPolicy: group.escalationPolicy || EscalationPolicy.defaultEscalationPolicy()
     };
   },
   ticket(ticket = {}) {
@@ -60,8 +60,8 @@ const fixtures = {
   },
   escalationPolicy(escalationPolicy = {}) {
     return {
-      rotationInterval: escalationPolicy.rotationInterval || 7,
-      pagingInterval: escalationPolicy.pagingInterval || 15,
+      rotationIntervalInDays: escalationPolicy.rotationIntervalInDays || 7,
+      pagingIntervalInDays: escalationPolicy.pagingIntervalInDays || 15,
       subscribers: escalationPolicy.subscribers || ['57e590a0140ebf1cc48bb1bf']
     };
   },

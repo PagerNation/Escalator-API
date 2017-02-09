@@ -214,18 +214,18 @@ describe('## Group Service', () => {
 
       context('with correct body fields', () => {
         const newEscalationPolicy = {
-          pagingInterval: 1111,
-          rotationInterval: 2222
+          pagingIntervalInDays: 1111,
+          rotationIntervalInDays: 2222
         };
 
         it('should update a group\'s escalation policy', (done) => {
           groupService.updateEscalationPolicy(group.name, newEscalationPolicy)
             .then((savedGroup) => {
               expect(savedGroup).to.exist;
-              expect(savedGroup.escalationPolicy.pagingInterval)
-                .to.equal(newEscalationPolicy.pagingInterval);
-              expect(savedGroup.escalationPolicy.rotationInterval)
-                .to.equal(newEscalationPolicy.rotationInterval);
+              expect(savedGroup.escalationPolicy.pagingIntervalInDays)
+                .to.equal(newEscalationPolicy.pagingIntervalInDays);
+              expect(savedGroup.escalationPolicy.rotationIntervalInDays)
+                .to.equal(newEscalationPolicy.rotationIntervalInDays);
               done();
             });
         });
@@ -233,14 +233,14 @@ describe('## Group Service', () => {
 
       context('with incorrect body fields', () => {
         const newEscalationPolicy = {
-          pagingIntervalssss: 1111
+          pagingIntervalInDaysssss: 1111
         };
 
         it('should not update escalation policy with incorrect fields', (done) => {
           groupService.updateEscalationPolicy(group.name, newEscalationPolicy)
             .catch((err) => {
               expect(err).to.exist;
-              expect(err.message).to.equal('"pagingIntervalssss" is not allowed');
+              expect(err.message).to.equal('"pagingIntervalInDaysssss" is not allowed');
               done();
             });
         });
