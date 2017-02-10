@@ -18,6 +18,10 @@ before_script:
   - npm prune
   - chmod +x deploy.sh
 
+script:
+  - npm run lint
+  - npm test
+
 after_success:
   - ./deploy.sh
 
