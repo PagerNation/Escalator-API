@@ -50,7 +50,7 @@ describe('## Auth Service', () => {
     });
 
     it('should not create a user that already exists', (done) => {
-      const user = {
+      user = {
         email: userObj.email,
         name: userObj.name
       };

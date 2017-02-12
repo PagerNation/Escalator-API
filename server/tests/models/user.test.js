@@ -149,7 +149,7 @@ describe('## User Model', () => {
           expect(receivedUser).to.exist;
 
           const userDevices = receivedUser.devices;
-          for (let i = 0; i < sortOrder.length; i += 1) {
+          for (let i = 0; i < sortOrder.length; i++) {
             expect(userDevices[i].id).to.equal(sortOrder[i]);
           }
           done();

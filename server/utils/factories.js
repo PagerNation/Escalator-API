@@ -72,7 +72,7 @@ const fixtures = {
       actionTaken: action.actionTaken || actionTypes.ACKNOWLEDGED,
       timestamp: action.timestamp || Date.now(),
       userId: action.userId || uuid.user
-    }
+    };
   }
 };
 

@@ -155,12 +155,11 @@ describe('## Ticket Service', () => {
     });
   });
 
-  describe('# getTicketsByDate()', (done) => {
-
+  describe('# getTicketsByDate()', () => {
     beforeEach((done) => {
       const promiseChain = [];
-      for (var i = 0; i < 3; i++) {
-        let ticketPromise = build('ticket', fixtures.ticket({ createdAt: i }));
+      for (let i = 0; i < 3; i++) {
+        const ticketPromise = build('ticket', fixtures.ticket({ createdAt: i }));
         promiseChain.push(ticketPromise);
       }
 

@@ -70,7 +70,7 @@ function addDeviceDelay(user) {
 function genericSeeder(numToSeed, seeder) {
   const promises = [];
 
-  for (let i = 0; i < numToSeed; i += 1) {
+  for (let i = 0; i < numToSeed; i++) {
     promises.push(seeder(Faker.fake('{{name.firstName}}{{name.lastName}}')));
   }
 

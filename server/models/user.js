@@ -3,7 +3,7 @@ import findOrCreate from 'mongoose-findorcreate';
 import httpStatus from 'http-status';
 import _ from 'lodash';
 import APIError from '../helpers/APIError';
-import config from '../../config/env'
+import config from '../../config/env';
 import Device from './device';
 
 const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/; // eslint-disable-line
