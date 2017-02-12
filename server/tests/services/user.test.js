@@ -1,5 +1,5 @@
 import httpStatus from 'http-status';
-import config from '../../../config/env'
+import config from '../../../config/env';
 import userService from '../../services/user';
 import User from '../../models/user';
 import Device from '../../models/device';
@@ -173,7 +173,7 @@ describe('## User Service', () => {
       });
 
       it('fails to update a user with invalid fields', (done) => {
-        userService.updateUser(savedUserId, {fake: 0})
+        userService.updateUser(savedUserId, { fake: 0 })
           .catch((err, user) => {
             expect(err).to.exist;
             expect(err.name).to.equal('ValidationError');
@@ -199,7 +199,7 @@ describe('## User Service', () => {
 
       it('should update the delay field of the user', (done) => {
         const updates = {
-          'delays': endingDelays
+          delays: endingDelays
         };
         userService.updateUser(user.id, updates)
           .then((newUser) => {
@@ -212,19 +212,19 @@ describe('## User Service', () => {
 
       it('should not update the devices field of the user', (done) => {
         const updates = {
-          'devices': [{}]
+          devices: [{}]
         };
         userService.updateUser(user.id, updates)
           .catch((err) => {
             expect(err).to.exist;
-            expect(err.message).to.equal('"devices" is not allowed')
+            expect(err.message).to.equal('"devices" is not allowed');
             done();
           });
       });
 
       it('should not update any field that does not exist', (done) => {
         const updates = {
-          'doesNotExist': 1
+          doesNotExist: 1
         };
         userService.updateUser(user.id, updates)
           .catch((err) => {
@@ -295,9 +295,9 @@ describe('## User Service', () => {
       userService.addDevice(user, baseDevice, 0)
         .then((savedUser) => {
           expect(savedUser.delays.length).to.equal(savedUser.devices.length);
-          expect(savedUser.delays[savedUser.delays.length-1]).to.equal(config.default_delay);
+          expect(savedUser.delays[savedUser.delays.length - 1]).to.equal(config.default_delay);
           done();
-        })
+        });
     });
 
     it('should fail to add device without all fields', (done) => {
@@ -349,7 +349,7 @@ describe('## User Service', () => {
           expect(savedUser.devices).to.be.empty;
           expect(savedUser.delays.length).to.equal(savedUser.devices.length);
           done();
-        })
+        });
     });
   });
 
@@ -421,7 +421,7 @@ describe('## User Service', () => {
         .then((receivedUser) => {
           expect(receivedUser).to.exist;
           const userDevices = receivedUser.devices;
-          for (let i = 0; i < sortOrder.length; i += 1) {
+          for (let i = 0; i < sortOrder.length; i++) {
             expect(userDevices[i].id).to.equal(sortOrder[i]);
           }
           done();
@@ -516,7 +516,7 @@ describe('## User Service', () => {
         userService.getGroupsForUser(user)
           .then((response) => {
             expect(response.groups.length).to.equal(groups.length);
-            for (let i = 0; i < response.groups.length; i += 1) {
+            for (let i = 0; i < response.groups.length; i++) {
               expect(response.groups[i].name).to.equal(groups[i].name);
             }
             done();

@@ -26,12 +26,13 @@ describe('## Group Model', () => {
     it('should create a new group', (done) => {
       new Group(groupData).save((err, newGroup) => {
         const compareEP = EscalationPolicy.defaultEscalationPolicy();
+        const newGroupEP = newGroup.escalationPolicy;
         expect(err).to.not.exist;
         expect(newGroup.name).to.equal(groupData.name);
         expect(newGroup.users[0].toString()).to.equal(groupData.users[0]);
-        expect(newGroup.escalationPolicy.pagingIntervalInDays).to.equal(compareEP.pagingIntervalInDays);
-        expect(newGroup.escalationPolicy.rotationIntervalInDays).to.equal(compareEP.rotationIntervalInDays);
-        expect(newGroup.escalationPolicy.subscribers).to.be.empty;
+        expect(newGroupEP.pagingIntervalInDays).to.equal(compareEP.pagingIntervalInDays);
+        expect(newGroupEP.rotationIntervalInDays).to.equal(compareEP.rotationIntervalInDays);
+        expect(newGroupEP.subscribers).to.be.empty;
         done();
       });
     });

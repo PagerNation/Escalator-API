@@ -11,5 +11,5 @@ try {
     process.env[k] = envConfig[k];
   }
 } catch (err) {
-  console.warn('Env variables not loaded! ', err);
+  console.warn('Env variables not loaded! ', err); //eslint-disable-line
 }

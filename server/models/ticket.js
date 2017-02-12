@@ -81,12 +81,13 @@ TicketSchema.statics = {
   addAction(id, action, userId) {
     const builtActionObject = {
       actionTaken: action,
-      userId: userId,
+      userId,
       timestamp: Date.now()
     };
 
     return new Promise((resolve, reject) => {
-      this.findByIdAndUpdate(id, { $push: { actions: builtActionObject } }, { new: true }, (err, ticket) => {
+      const update = { $push: { actions: builtActionObject } };
+      this.findByIdAndUpdate(id, update, { new: true }, (err, ticket) => {
         if (ticket) {
           return resolve(ticket);
         }
@@ -98,12 +99,13 @@ TicketSchema.statics = {
   removeAction(id, action, timestamp, userId) {
     const builtActionObject = {
       actionTaken: action,
-      userId: userId,
-      timestamp: timestamp
+      userId,
+      timestamp
     };
 
     return new Promise((resolve, reject) => {
-      this.findByIdAndUpdate(id, { $pull: { actions: builtActionObject } }, { new: true }, (err, ticket) => {
+      const update = { $pull: { actions: builtActionObject } };
+      this.findByIdAndUpdate(id, update, { new: true }, (err, ticket) => {
         if (ticket) {
           return resolve(ticket);
         }
@@ -118,34 +120,33 @@ TicketSchema.statics = {
         .limit(10)
         .sort('-createdAt');
 
-        const isOpen = _.get(filterOpts, 'isOpen');
-        if (!_.isNil(isOpen)) {
-          query.where('isOpen').equals(isOpen);
-        }
+      const isOpen = _.get(filterOpts, 'isOpen');
+      if (!_.isNil(isOpen)) {
+        query.where('isOpen').equals(isOpen);
+      }
 
-        const groupName = _.get(filterOpts, 'groupName');
-        if (!_.isNil(groupName)) {
-          query.where('groupName').equals(groupName);
-        }
+      const groupName = _.get(filterOpts, 'groupName');
+      if (!_.isNil(groupName)) {
+        query.where('groupName').equals(groupName);
+      }
 
-        const to = _.get(filterOpts, 'to');
-        if (!_.isNil(to)) {
-          query.where('createdAt').lte(to);
-        }
+      const to = _.get(filterOpts, 'to');
+      if (!_.isNil(to)) {
+        query.where('createdAt').lte(to);
+      }
 
-        const from = _.get(filterOpts, 'from');
-        if (!_.isNil(from)) {
-          query.where('createdAt').gte(from);
-        }
+      const from = _.get(filterOpts, 'from');
+      if (!_.isNil(from)) {
+        query.where('createdAt').gte(from);
+      }
 
-        query.exec((err, tickets) => {
-          if (tickets) {
-            return resolve(tickets);
-          }
-          reject(err);
-        });
+      query.exec((err, tickets) => {
+        if (tickets) {
+          return resolve(tickets);
+        }
+        reject(err);
+      });
     });
-
   }
 };
 

@@ -75,7 +75,7 @@ describe('## User APIs', () => {
   describe('# PUT /api/v1/user/:userId', () => {
     let user;
 
-    const updateDetails = {
+    const newEmail = {
       email: 'update@email.com'
     };
 
@@ -90,10 +90,10 @@ describe('## User APIs', () => {
     it('should update user details', (done) => {
       request(app)
         .put(`${userUrl}/${user.id}`)
-        .send(updateDetails)
+        .send(newEmail)
         .expect(httpStatus.OK)
         .then((res) => {
-          expect(res.body.email).to.equal(updateDetails.email);
+          expect(res.body.email).to.equal(newEmail.email);
           done();
         });
     });
@@ -121,22 +121,22 @@ describe('## User APIs', () => {
     });
 
     context('when updating escalation policy fields', () => {
-      const delays = [1,2,3,4,5];
-      const updateDetails = {
-        delays: delays
+      const delays = [1, 2, 3, 4, 5];
+      const newDelays = {
+        delays
       };
 
       it('should update the escalation policy', (done) => {
         request(app)
           .put(`${userUrl}/${user.id}`)
-          .send(updateDetails)
+          .send(newDelays)
           .expect(httpStatus.OK)
           .then((res) => {
             expect(res.body.delays[0]).to.equal(delays[0]);
             expect(res.body.delays[1]).to.equal(delays[1]);
             done();
           });
-      })
+      });
     });
   });
 
@@ -205,7 +205,7 @@ describe('## User APIs', () => {
     let user;
     let device;
 
-    const updateDetails = {
+    const deviceUpdates = {
       name: 'new name',
       type: 'sms',
     };
@@ -223,12 +223,12 @@ describe('## User APIs', () => {
     it('should update a device', (done) => {
       request(app)
         .put(`${userUrl}/${user.id}/device/${device.id}`)
-        .send(updateDetails)
+        .send(deviceUpdates)
         .expect(httpStatus.OK)
         .then((res) => {
           const updatedDevice = res.body.devices[0];
-          expect(updatedDevice.name).to.equal(updateDetails.name);
-          expect(updatedDevice.type).to.equal(updateDetails.type);
+          expect(updatedDevice.name).to.equal(deviceUpdates.name);
+          expect(updatedDevice.type).to.equal(deviceUpdates.type);
           expect(updatedDevice.contactInformation).to.equal(device.contactInformation);
           done();
         });
@@ -307,7 +307,7 @@ describe('## User APIs', () => {
           .then((res) => {
             const groupsResponse = res.body.groups;
             expect(groupsResponse.length).to.equal(groups.length);
-            for (let i = 0; i < groupsResponse.length; i += 1) {
+            for (let i = 0; i < groupsResponse.length; i++) {
               expect(groupsResponse[i].name).to.equal(groups[i].name);
             }
             done();

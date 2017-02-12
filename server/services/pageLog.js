@@ -21,7 +21,7 @@ function removeAction(ticketId, actionType, timestamp, userId) {
     userId: Joi.string().hex().length(24)
   };
   return JoiHelper.validate({ ticketId, actionType, timestamp, userId }, schema)
-    .then(values => Ticket.removeAction(values.ticketId, values.actionType, values.timestamp, values.userId));
+    .then(v => Ticket.removeAction(v.ticketId, v.actionType, v.timestamp, v.userId));
 }
 
 export default {

@@ -14,15 +14,15 @@ describe('## EscalationPolicy: models', () => {
       subscribers: [subscriberObjectId]
     });
 
-    escalationPolicy.save((err, createdEscalationPolicy) => {
+    escalationPolicy.save((err, createdEP) => {
       // verify no error
       expect(err).to.not.exist;
       // verify all fields were saved and have correct information
-      expect(createdEscalationPolicy.rotationIntervalInDays).to.equal(subscriberRotationIntervalInDays);
-      expect(createdEscalationPolicy.subscribers.length).to.equal(1);
-      expect(createdEscalationPolicy.subscribers[0].toString())
+      expect(createdEP.rotationIntervalInDays).to.equal(subscriberRotationIntervalInDays);
+      expect(createdEP.subscribers.length).to.equal(1);
+      expect(createdEP.subscribers[0].toString())
         .to.equal(subscriberObjectId);
-      expect(createdEscalationPolicy.pagingIntervalInDays).to.equal(subscriberPagingIntervalInDays);
+      expect(createdEP.pagingIntervalInDays).to.equal(subscriberPagingIntervalInDays);
       done();
     });
   });

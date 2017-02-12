@@ -1,6 +1,5 @@
 import express from 'express';
 
-import config from '../../config/env';
 import authRoutes from './auth';
 import ticketRoutes from './ticket';
 import userRoutes from './user';

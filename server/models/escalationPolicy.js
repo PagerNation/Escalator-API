@@ -19,6 +19,6 @@ EscalationPolicySchema.statics = {
   defaultEscalationPolicy() {
     return new this();
   }
-}
+};
 
 export default mongoose.model('EscalationPolicy', EscalationPolicySchema);

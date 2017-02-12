@@ -1,7 +1,6 @@
-import { actionTypes } from '../../models/ticket';
 import { fixtures, build } from '../../utils/factories';
 import pageLogService from '../../services/pageLog';
-import Ticket from '../../models/ticket';
+import Ticket, { actionTypes } from '../../models/ticket';
 
 describe('## PageLogService', () => {
   const userId = '123456789098765432123456';
@@ -42,12 +41,13 @@ describe('## PageLogService', () => {
   describe('# removeAction()', () => {
     const action = {
       actionTaken: actionTypes.CREATED,
-      userId: userId,
+      userId,
       timestamp: Date.now()
     };
 
     beforeEach((done) => {
-      Ticket.findByIdAndUpdate(ticketId, { $set: { actions: [action]}}, { new: true }, (err, ticket) => {
+      const updates = { $set: { actions: [action] } };
+      Ticket.findByIdAndUpdate(ticketId, updates, { new: true }, (err, ticket) => {
         if (ticket) {
           done();
         }
