@@ -1,3 +1,4 @@
+import Faker from 'faker';
 import { build, fixtures } from './factories';
 import groupService from '../services/group';
 import userService from '../services/user';
@@ -70,7 +71,7 @@ function genericSeeder(numToSeed, seeder) {
   const promises = [];
 
   for (let i = 0; i < numToSeed; i += 1) {
-    promises.push(seeder());
+    promises.push(seeder(Faker.fake('{{name.firstName}}{{name.lastName}}')));
   }
 
   return Promise.all(promises);
