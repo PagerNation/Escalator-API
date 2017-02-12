@@ -32,7 +32,8 @@
       0
     ],
     "consistent-return": "off",
-    "no-loop-func": "off"
+    "no-loop-func": "off",
+    "no-plusplus": [2, { "allowForLoopAfterthoughts": true}]
   },
   "env": {
     "node": true,
