@@ -1,7 +1,7 @@
 import request from 'supertest-as-promised';
 import httpStatus from 'http-status';
 import app from '../../../index';
-import userService from '../../services/user';
+import authService from '../../services/auth';
 import { build, fixtures } from '../../utils/factories';
 import Device from '../../models/device';
 import { buildUserAndGroups } from '../helpers/user_helper';
@@ -12,12 +12,25 @@ describe('## User APIs', () => {
   const baseUser = fixtures.user();
   const baseDevice = fixtures.emailDevice();
 
+  let token;
+
   describe('# POST /api/v1/user', () => {
     const invalidUser = fixtures.user({ email: 1 });
+    const userObj = fixtures.user();
+
+    beforeEach((done) => {
+      build('user', userObj)
+        .then(u => authService.loginUser(u.email))
+        .then((authObject) => {
+          token = authObject.token;
+          done();
+        });
+    });
 
     it('should create a new user', (done) => {
       request(app)
         .post(userUrl)
+        .set('Authorization', `Bearer ${token}`)
         .send(baseUser)
         .expect(httpStatus.OK)
         .then((res) => {
@@ -30,6 +43,7 @@ describe('## User APIs', () => {
     it('should fail with status 400 with invalid userObject', (done) => {
       request(app)
         .post(userUrl)
+        .set('Authorization', `Bearer ${token}`)
         .send(invalidUser)
         .expect(httpStatus.BAD_REQUEST)
         .then((res) => {
@@ -46,6 +60,10 @@ describe('## User APIs', () => {
       build('user', baseUser)
         .then((u) => {
           user = u;
+          return authService.loginUser(u.email);
+        })
+        .then((authObject) => {
+          token = authObject.token;
           done();
         });
     });
@@ -53,6 +71,7 @@ describe('## User APIs', () => {
     it('should get a user', (done) => {
       request(app)
         .get(`${userUrl}/${user.id}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(httpStatus.OK)
         .then((res) => {
           expect(res.body.name).to.equal(user.name);
@@ -64,6 +83,7 @@ describe('## User APIs', () => {
     it('should report error with message - Not found, when user does not exist', (done) => {
       request(app)
         .get(`${userUrl}/56c787ccc67fc16ccc1a5e92`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(httpStatus.NOT_FOUND)
         .then((res) => {
           expect(res.body.message).to.equal('Not Found');
@@ -83,6 +103,10 @@ describe('## User APIs', () => {
       build('user', baseUser)
         .then((createdUser) => {
           user = createdUser;
+          return authService.loginUser(user.email);
+        })
+        .then((authObject) => {
+          token = authObject.token;
           done();
         });
     });
@@ -91,6 +115,7 @@ describe('## User APIs', () => {
       request(app)
         .put(`${userUrl}/${user.id}`)
         .send(newEmail)
+        .set('Authorization', `Bearer ${token}`)
         .expect(httpStatus.OK)
         .then((res) => {
           expect(res.body.email).to.equal(newEmail.email);
@@ -101,6 +126,7 @@ describe('## User APIs', () => {
     it('should report error with message for any invalid field', (done) => {
       request(app)
         .put(`${userUrl}/${user.id}`)
+        .set('Authorization', `Bearer ${token}`)
         .send({ fake: 0 })
         .expect(httpStatus.BAD_REQUEST)
         .then((res) => {
@@ -112,6 +138,7 @@ describe('## User APIs', () => {
     it('should report error with message for a field that should not be updated', (done) => {
       request(app)
         .put(`${userUrl}/${user.id}`)
+        .set('Authorization', `Bearer ${token}`)
         .send({ devices: [{}] })
         .expect(httpStatus.BAD_REQUEST)
         .then((res) => {
@@ -130,6 +157,7 @@ describe('## User APIs', () => {
         request(app)
           .put(`${userUrl}/${user.id}`)
           .send(newDelays)
+          .set('Authorization', `Bearer ${token}`)
           .expect(httpStatus.OK)
           .then((res) => {
             expect(res.body.delays[0]).to.equal(delays[0]);
@@ -147,6 +175,10 @@ describe('## User APIs', () => {
       build('user', baseUser)
         .then((createdUser) => {
           user = createdUser;
+          return authService.loginUser(user.email);
+        })
+        .then((authObject) => {
+          token = authObject.token;
           done();
         });
     });
@@ -154,10 +186,12 @@ describe('## User APIs', () => {
     it('deletes a user', (done) => {
       request(app)
         .delete(`${userUrl}/${user.id}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(httpStatus.OK)
         .then(() => {
           request(app)
             .get(`${userUrl}/${user.id}`)
+            .set('Authorization', `Bearer ${token}`)
             .expect(httpStatus.NOT_FOUND)
             .then(() => done());
         });
@@ -166,6 +200,7 @@ describe('## User APIs', () => {
     it('should report error with message - Not found, when user does not exists', (done) => {
       request(app)
         .delete(`${userUrl}/56c787ccc67fc16ccc1a5e92`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(httpStatus.NOT_FOUND)
         .then((res) => {
           expect(res.body.message).to.equal('Not Found');
@@ -184,6 +219,10 @@ describe('## User APIs', () => {
         .then(createdUser => createdUser.addDevice(device))
         .then((updatedUser) => {
           user = updatedUser;
+          return authService.loginUser(user.email);
+        })
+        .then((authObject) => {
+          token = authObject.token;
           done();
         });
     });
@@ -191,6 +230,7 @@ describe('## User APIs', () => {
     it('should get a device from the user', (done) => {
       request(app)
         .get(`${userUrl}/${user.id}/device/${device.id}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(httpStatus.OK)
         .then((res) => {
           expect(res.body.email).to.equal(device.email);
@@ -216,6 +256,10 @@ describe('## User APIs', () => {
         .then((updatedUser) => {
           user = updatedUser;
           device = user.devices[0];
+          return authService.loginUser(user.email);
+        })
+        .then((authObject) => {
+          token = authObject.token;
           done();
         });
     });
@@ -224,6 +268,7 @@ describe('## User APIs', () => {
       request(app)
         .put(`${userUrl}/${user.id}/device/${device.id}`)
         .send(deviceUpdates)
+        .set('Authorization', `Bearer ${token}`)
         .expect(httpStatus.OK)
         .then((res) => {
           const updatedDevice = res.body.devices[0];
@@ -237,6 +282,7 @@ describe('## User APIs', () => {
     it('should fail validation with an invalid device type', (done) => {
       request(app)
         .put(`${userUrl}/${user.id}/device/${device.id}`)
+        .set('Authorization', `Bearer ${token}`)
         .send({ type: 'invalid' })
         .expect(httpStatus.BAD_REQUEST)
         .then((res) => {
@@ -253,6 +299,10 @@ describe('## User APIs', () => {
       build('user', baseUser)
         .then((createdUser) => {
           user = createdUser;
+          return authService.loginUser(user.email);
+        })
+        .then((authObject) => {
+          token = authObject.token;
           done();
         });
     });
@@ -260,6 +310,7 @@ describe('## User APIs', () => {
     it('should add a device to the user', (done) => {
       request(app)
         .post(`${userUrl}/${user.id}/device`)
+        .set('Authorization', `Bearer ${token}`)
         .send({
           device: baseDevice,
           index: 0
@@ -277,6 +328,7 @@ describe('## User APIs', () => {
     it('should throw validation error if body is invalid', (done) => {
       request(app)
         .post(`${userUrl}/${user.id}/device`)
+        .set('Authorization', `Bearer ${token}`)
         .send({
           device: baseDevice
         })
@@ -292,10 +344,15 @@ describe('## User APIs', () => {
     context('when the user is in one or more group', () => {
       let user;
       let groups;
+
       before((done) => {
         buildUserAndGroups().then((values) => {
           user = values.user;
           groups = values.groups;
+          return authService.loginUser(user.email);
+        })
+        .then((authObject) => {
+          token = authObject.token;
           done();
         });
       });
@@ -303,6 +360,7 @@ describe('## User APIs', () => {
       it('returns all of the groups that a user is in', (done) => {
         request(app)
           .get(`${userUrl}/${user.id}/group`)
+          .set('Authorization', `Bearer ${token}`)
           .expect(httpStatus.OK)
           .then((res) => {
             const groupsResponse = res.body.groups;
@@ -320,6 +378,10 @@ describe('## User APIs', () => {
       before((done) => {
         build('user', baseUser).then((u) => {
           user = u;
+          return authService.loginUser(user.email);
+        })
+        .then((authObject) => {
+          token = authObject.token;
           done();
         });
       });
@@ -327,6 +389,7 @@ describe('## User APIs', () => {
       it('returns an empty array of groups', (done) => {
         request(app)
           .get(`${userUrl}/${user.id}/group`)
+          .set('Authorization', `Bearer ${token}`)
           .expect(httpStatus.OK)
           .then((res) => {
             expect(res.body.groups).to.be.empty;
@@ -341,6 +404,7 @@ describe('## User APIs', () => {
       it('returns a bad request', (done) => {
         request(app)
           .get(`${userUrl}/${badId}/group`)
+          .set('Authorization', `Bearer ${token}`)
           .expect(httpStatus.NOT_FOUND)
           .then((res) => {
             done();

@@ -2,11 +2,26 @@ import request from 'supertest-as-promised';
 import httpStatus from 'http-status';
 import app from '../../../index';
 import { fixtures, build } from '../../utils/factories';
+import authService from '../../services/auth';
+import userService from '../../services/user';
 import User from '../../models/user';
 
 const groupUrl = '/api/v1/group';
 
 describe('## Group API', () => {
+  let user;
+  let token;
+
+  beforeEach((done) => {
+    user = fixtures.user();
+    build('user', user)
+      .then(u => authService.loginUser(u.email))
+      .then((authObject) => {
+        token = authObject.token;
+        done();
+      });
+  });
+
   context('with no groups needed beforehand', () => {
     describe('# POST /api/v1/group', () => {
       context('with a valid group', () => {
@@ -15,6 +30,7 @@ describe('## Group API', () => {
         it('should create a new group', (done) => {
           request(app)
             .post(groupUrl)
+            .set('Authorization', `Bearer ${token}`)
             .send(group)
             .expect(httpStatus.OK)
             .then((res) => {
@@ -33,6 +49,7 @@ describe('## Group API', () => {
         it('should not create a new group', (done) => {
           request(app)
             .post(groupUrl)
+            .set('Authorization', `Bearer ${token}`)
             .send(group)
             .expect(httpStatus.BAD_REQUEST)
             .then(() => done());
@@ -57,6 +74,7 @@ describe('## Group API', () => {
         it('should get a group', (done) => {
           request(app)
             .get(`${groupUrl}/${group.name}`)
+            .set('Authorization', `Bearer ${token}`)
             .expect(httpStatus.OK)
             .then((res) => {
               expect(res.body.name).to.equal(group.name);
@@ -73,6 +91,7 @@ describe('## Group API', () => {
         it('should update the group details', (done) => {
           request(app)
             .put(`${groupUrl}/${group.name}`)
+            .set('Authorization', `Bearer ${token}`)
             .send(updateDetails)
             .expect(httpStatus.OK)
             .then((res) => {
@@ -87,6 +106,7 @@ describe('## Group API', () => {
         it('should report error with message for any invalid field', (done) => {
           request(app)
             .put(`${groupUrl}/${group.name}`)
+            .set('Authorization', `Bearer ${token}`)
             .send({ notakey: 'notavalue' })
             .expect(httpStatus.BAD_REQUEST)
             .then((res) => {
@@ -100,10 +120,12 @@ describe('## Group API', () => {
         it('deletes the group', (done) => {
           request(app)
             .delete(`${groupUrl}/${group.name}`)
+            .set('Authorization', `Bearer ${token}`)
             .expect(httpStatus.OK)
             .then(() => {
               request(app)
                 .get(`${groupUrl}/${group.name}`)
+                .set('Authorization', `Bearer ${token}`)
                 .expect(httpStatus.NOT_FOUND)
                 .then(() => done());
             });
@@ -124,6 +146,7 @@ describe('## Group API', () => {
         it('should add a user to the group', (done) => {
           request(app)
             .post(`${groupUrl}/${group.name}/user`)
+            .set('Authorization', `Bearer ${token}`)
             .send({ userId: user.id })
             .expect(httpStatus.OK)
             .then((res) => {
@@ -145,7 +168,8 @@ describe('## Group API', () => {
 
         it('should remove the user from the group', (done) => {
           request(app)
-            .delete(`${groupUrl}/${group.name}/user/${data.userId}`)
+            .delete(`${groupUrl}/${group.name}/user/${user.id}`)
+            .set('Authorization', `Bearer ${token}`)
             .expect(httpStatus.OK)
             .then((res) => {
               expect(res.body.name).to.equal(group.name);
@@ -157,10 +181,11 @@ describe('## Group API', () => {
         it('should not remove a user that does not exist', (done) => {
           request(app)
             .delete(`${groupUrl}/${group.name}/user/098765432109876543210987`)
+            .set('Authorization', `Bearer ${token}`)
             .expect(httpStatus.OK)
             .then((res) => {
               expect(res.body.name).to.equal(group.name);
-              expect(res.body.users).to.include(group.users[0]);
+              expect(res.body.users).to.include(group.users[0].toString());
               done();
             });
         });
@@ -177,6 +202,7 @@ describe('## Group API', () => {
         it('should fail with an error message', (done) => {
           request(app)
             .get(`${groupUrl}/doesNotExist`)
+            .set('Authorization', `Bearer ${token}`)
             .expect(httpStatus.NOT_FOUND)
             .then((res) => {
               expect(res.body.message).to.equal('Not Found');
@@ -190,6 +216,7 @@ describe('## Group API', () => {
         it('should report an error', (done) => {
           request(app)
             .delete(`${groupUrl}/doesNotExist`)
+            .set('Authorization', `Bearer ${token}`)
             .expect(httpStatus.NOT_FOUND)
             .then((res) => {
               expect(res.body.message).to.equal('Not Found');

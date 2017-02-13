@@ -63,8 +63,8 @@ function getGroupsForUser(req, res, next) {
     .catch(err => next(err));
 }
 
-function loadUser(req, res, next, userId) {
-  userService.getUser(userId)
+function loadUser(req, res, next) {
+  userService.getUser(req.user.id)
     .then((user) => {
       req.user = user; // eslint-disable-line no-param-reassign
       return next();
