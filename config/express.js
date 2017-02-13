@@ -47,9 +47,10 @@ if (config.env === 'development') {
   }));
 }
 
-if(process.env.NODE_ENV !== 'test') {
-  app.use(expressJWT({ secret: config.auth.jwt_secret }).unless({ path: ['/api/v1/auth/login', '/api/v1/auth/signup'] }));
-}
+app.use(expressJWT({ secret: config.auth.jwt_secret }).unless({
+  path: ['/api/v1/auth/login', '/api/v1/auth/signup', '/api/health-check', '/api/404']
+}));
+
 // mount all routes on /api path
 app.use('/api', routes);
 

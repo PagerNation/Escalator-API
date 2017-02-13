@@ -2,6 +2,7 @@ import httpStatus from 'http-status';
 import groupService from '../../services/group';
 import Group from '../../models/group';
 import { build, fixtures } from '../../utils/factories';
+import userService from '../../services/user';
 
 describe('## Group Service', () => {
   const groupObject = fixtures.group();
@@ -163,38 +164,65 @@ describe('## Group Service', () => {
     });
 
     describe('# removeUser()', () => {
-      const userId = '123456789098765432123456';
+      let userId = '123456789012345678901234';
 
       let group;
 
       beforeEach((done) => {
-        build('group', fixtures.group({ users: [`${userId}`] }))
-          .then((newGroup) => {
-            group = newGroup;
-            expect(newGroup).to.exist;
-            done();
+        build('user', fixtures.user())
+          .then((u) => {
+            userId = u.id;
+            return build('group', fixtures.group({ users: [`${userId}`] }));
           })
-          ;
-      });
-
-
-      it('should remove a user to the group by id', (done) => {
-        groupService.removeUser(group, userId)
-          .then((savedGroup) => {
-            expect(savedGroup).to.exist;
-            expect(savedGroup.name).to.equal(group.name);
-            expect(savedGroup.users).to.not.include(userId);
-            done();
+          .then((g) => {
+            group = g;
+            userService.addGroupByUserId(userId, group.name)
+              .then(() => done());
           });
       });
 
-      it('should throw an error if the user id is invalid', (done) => {
-        groupService.removeUser(group, 'invalid')
-          .catch((err) => {
-            expect(err).to.exist;
-            expect(err.name).to.equal('ValidationError');
-            done();
-          });
+      context('when the user exists', () => {
+        it('should remove a user from the group by id', (done) => {
+          groupService.removeUser(group, userId)
+            .then((savedGroup) => {
+              expect(savedGroup).to.exist;
+              expect(savedGroup.name).to.equal(group.name);
+              expect(savedGroup.users).to.not.include(userId);
+              done();
+            });
+        });
+
+        it('should remove the group from the user', (done) => {
+          groupService.removeUser(group, userId)
+            .then(() => userService.getUser(userId))
+            .then((user) => {
+              expect(user).to.exist;
+              expect(user.groups).to.not.include(group.name);
+              done();
+            });
+        });
+      });
+
+      context('when the user does not exist', () => {
+        userId = '098765432109876543210987';
+
+        it('should fail silently if the user does not exist', (done) => {
+          groupService.removeUser(group, userId)
+            .then((tmpGroup) => {
+              expect(tmpGroup).to.exist;
+              expect(tmpGroup.users).to.not.include(userId);
+              done();
+            });
+        });
+
+        it('should throw an error if the user id is formatted incorrectly', (done) => {
+          groupService.removeUser(group, 'tooshort')
+            .catch((err) => {
+              expect(err).to.exist;
+              expect(err.name).to.equal('ValidationError');
+              done();
+            });
+        });
       });
     });
 
