@@ -60,7 +60,7 @@ describe('## Group API', () => {
 
   context('with a group needed beforehand', () => {
     context('with a valid group', () => {
-      const group = fixtures.group({
+      let group = fixtures.group({
         users: ['5c15f987046b1686d22dbea1', 'ba421976ad9b71458d8b91ab']
       });
 
@@ -133,9 +133,7 @@ describe('## Group API', () => {
       });
 
       describe('# POST /api/v1/group/:groupName/user', () => {
-        let user;
-
-        before((done) => {
+        beforeEach((done) => {
           build('user', fixtures.user())
             .then((newUser) => {
               user = newUser;
@@ -162,9 +160,27 @@ describe('## Group API', () => {
       });
 
       describe('# DELETE /api/v1/group/:groupName/user/:userId', () => {
-        const data = {
-          userId: group.users[0]
-        };
+        const userObj = fixtures.user();
+
+        beforeEach((done) => {
+          build('user', userObj)
+          .then((u) => {
+            user = u;
+          })
+          .then(() => {
+            const groupObj = fixtures.group({ users: [user.id] });
+            return build('group', groupObj);
+          })
+          .then((g) => {
+            group = g;
+          })
+          .then(() => userService.addGroupByUserId(user.id, group.name))
+          .then(u => authService.loginUser(u.email))
+          .then((authObject) => {
+            token = authObject.token;
+            done();
+          });
+        });
 
         it('should remove the user from the group', (done) => {
           request(app)
@@ -173,7 +189,19 @@ describe('## Group API', () => {
             .expect(httpStatus.OK)
             .then((res) => {
               expect(res.body.name).to.equal(group.name);
-              expect(res.body.users).to.not.include(data.userId);
+              expect(res.body.users).to.not.include(user.id);
+              done();
+            });
+        });
+
+        it('should remove the group from the associated user', (done) => {
+          request(app)
+            .delete(`${groupUrl}/${group.name}/user/${user.id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .expect(httpStatus.OK)
+            .then(() => userService.getUser(user.id))
+            .then((receivedUser) => {
+              expect(receivedUser.groups).to.not.include(group.name);
               done();
             });
         });
