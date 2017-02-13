@@ -52,7 +52,12 @@ function removeUser(group, userId) {
   const userIdSchema = Joi.string().hex().length(24);
 
   return JoiHelper.validate(userId, userIdSchema)
-    .then(validatedUserObject => group.removeUser(validatedUserObject));
+    .then((validatedUserId) => {
+      const removeUserFromGroup = group.removeUser(validatedUserId);
+      const removeGroupFromUser = userService.removeGroupByUserId(validatedUserId, group.name);
+      return Promise.all([removeUserFromGroup, removeGroupFromUser])
+        .then(promiseResults => promiseResults[0]);
+    });
 }
 
 function updateEscalationPolicy(groupName, escalationPolicy) {

@@ -153,7 +153,7 @@ UserSchema.methods = {
   },
 
   removeGroup(groupName) {
-    _.remove(this.groups, { groupName });
+    _.remove(this.groups, n => n === groupName);
     this.markModified('groups');
 
     return new Promise((resolve, reject) => {

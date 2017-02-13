@@ -1,3 +1,4 @@
+import httpStatus from 'http-status';
 import Joi from 'joi';
 import JoiHelper from '../helpers/JoiHelper';
 import User from '../models/user';
@@ -84,6 +85,24 @@ function addGroupByUserId(userId, groupName) {
     });
 }
 
+function removeGroupByUserId(userId, groupName) {
+  const getUserPromise = getUser(userId);
+  const validatePromise = JoiHelper.validate(groupName, Joi.string());
+
+  let user;
+
+  return Promise.all([getUserPromise, validatePromise])
+    .then((promiseResults) => {
+      user = promiseResults[0];
+      const validatedName = promiseResults[1];
+      return user.removeGroup(validatedName);
+    })
+    .catch((err) => {
+      if (err.status === httpStatus.NOT_FOUND) return user;
+      throw err;
+    });
+}
+
 function removeGroup(user, groupName) {
   return JoiHelper.validate(groupName, Joi.string())
     .then(validatedName => user.removeGroup(validatedName));
@@ -112,5 +131,6 @@ export default {
   // User Group Modifications
   addGroupByUserId,
   getGroupsForUser,
-  removeGroup
+  removeGroup,
+  removeGroupByUserId
 };
