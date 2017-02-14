@@ -6,7 +6,9 @@ import groupService from '../services/group';
  * @returns {Group}
  */
 function getGroup(req, res) {
-  res.json(req.group);
+  req.group.populate('users')
+    .execPopulate()
+    .then(group => res.json(group));
 }
 
 /**

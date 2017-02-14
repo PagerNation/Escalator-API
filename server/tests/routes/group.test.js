@@ -60,15 +60,19 @@ describe('## Group API', () => {
 
   context('with a group needed beforehand', () => {
     context('with a valid group', () => {
-      let group = fixtures.group({
-        users: ['5c15f987046b1686d22dbea1', 'ba421976ad9b71458d8b91ab']
-      });
+      let group;
 
       beforeEach((done) => {
-        build('group', group)
-          .then(() => done());
+        build('user', fixtures.user())
+          .then((createdUser) => {
+            user = createdUser;
+            return build('group', fixtures.group({ users: [user.id] }));
+          })
+          .then((createdGroup) => {
+            group = createdGroup;
+            done();
+          });
       });
-
 
       describe('# GET /api/v1/group/:groupName', () => {
         it('should get a group', (done) => {
@@ -78,6 +82,7 @@ describe('## Group API', () => {
             .expect(httpStatus.OK)
             .then((res) => {
               expect(res.body.name).to.equal(group.name);
+              expect(res.body.users[0].name).to.equal(user.name);
               done();
             });
         });
