@@ -14,6 +14,7 @@ import winstonInstance from './winston';
 import routes from '../server/routes';
 import config from './env';
 import APIError from '../server/helpers/APIError';
+import userMiddleware from '../server/middlewares/user';
 
 const app = express();
 
@@ -50,6 +51,8 @@ if (config.env === 'development') {
 app.use(expressJWT({ secret: config.auth.jwt_secret }).unless({
   path: ['/api/v1/auth/login', '/api/v1/auth/signup', '/api/health-check', '/api/404']
 }));
+
+app.use(userMiddleware.loadUser);
 
 // mount all routes on /api path
 app.use('/api', routes);

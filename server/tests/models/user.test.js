@@ -15,7 +15,7 @@ describe('## User Model', () => {
         expect(err).to.not.exist;
         expect(u.name).to.equal(user.name);
         expect(u.email).to.equal(user.email);
-        expect(u.role).to.equal(user.role);
+        expect(u.isSysAdmin).to.equal(user.isSysAdmin);
         done();
       });
     });

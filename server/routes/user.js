@@ -2,6 +2,7 @@ import express from 'express';
 import validate from 'express-validation';
 import paramValidation from './validation/user';
 import userCtrl from '../controllers/user';
+import userMiddleware from '../middlewares/user';
 
 const router = express.Router();  // eslint-disable-line new-cap
 
@@ -10,7 +11,7 @@ router.route('/')
 
 router.route('/:userId')
   .get(validate(paramValidation.byId), userCtrl.getUser)
-  .put(validate(paramValidation.updateUser), userCtrl.updateUser)
+  .put(userMiddleware.validateByRole, userCtrl.updateUser)
   .delete(validate(paramValidation.byId), userCtrl.deleteUser);
 
 router.route('/:userId/device')
@@ -24,8 +25,5 @@ router.route('/:userId/device/:deviceId')
 
 router.route('/:userId/group')
   .get(validate(paramValidation.byId), userCtrl.getGroupsForUser);
-
-/** Load user when API with userId route parameter is hit */
-router.param('userId', userCtrl.loadUser);
 
 export default router;

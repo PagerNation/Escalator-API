@@ -2,6 +2,7 @@ import express from 'express';
 import validate from 'express-validation';
 import paramValidation from './validation/group';
 import groupCtrl from '../controllers/group';
+import middleware from '../middlewares/group';
 
 const router = express.Router(); // eslint-disable-line new-cap
 
@@ -18,6 +19,9 @@ router.route('/:groupName/user')
 
 router.route('/:groupName/user/:userId')
   .delete(validate(paramValidation.userById), groupCtrl.removeUser);
+
+router.route('/:groupName/user/:userId/admin')
+  .post(validate(paramValidation.userById), middleware.isGroupAdmin, groupCtrl.addAdmin);
 
 router.route('/:groupName/escalationpolicy')
   .put(validate(paramValidation.updateEscalationPolicy), groupCtrl.updateEscalationPolicy);

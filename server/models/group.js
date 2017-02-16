@@ -20,7 +20,12 @@ const GroupSchema = new mongoose.Schema({
   escalationPolicy: {
     type: EscalationPolicy.schema,
     default: EscalationPolicy.defaultEscalationPolicy()
-  }
+  },
+  admins: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: []
+  }]
 });
 
 GroupSchema.methods = {
@@ -85,7 +90,18 @@ GroupSchema.statics = {
         if (err) {
           reject(err);
         }
+        resolve(group);
+      });
+    });
+  },
 
+  addAdmin(name, userId) {
+    return new Promise((resolve, reject) => {
+      const update = { $push: { admins: userId } };
+      this.findOneAndUpdate({ name }, update, { new: true }, (err, group) => {
+        if (err) {
+          reject(err);
+        }
         resolve(group);
       });
     });

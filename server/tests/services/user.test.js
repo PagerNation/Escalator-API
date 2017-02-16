@@ -3,7 +3,7 @@ import config from '../../../config/env';
 import userService from '../../services/user';
 import User from '../../models/user';
 import Device from '../../models/device';
-import { build, fixtures } from '../../utils/factories';
+import { build, fixtures, uuid } from '../../utils/factories';
 import Group from '../../models/group';
 import { buildUserAndGroups } from '../helpers/user_helper';
 
@@ -27,7 +27,7 @@ describe('## User Service', () => {
             expect(createdUser).to.exist;
             expect(createdUser.name).to.equal('Jarryd');
             expect(createdUser.email).to.equal('abc@google.com');
-            expect(createdUser.role).to.equal(0);
+            expect(createdUser.isSysAdmin).to.equal(false);
             expect(createdUser.auth).to.be.null;
             expect(createdUser.groups).to.be.empty;
             expect(createdUser.devices).to.be.empty;
@@ -77,7 +77,7 @@ describe('## User Service', () => {
       const extraFieldUser = {
         name: 'Jarryd',
         email: 'abc@google.com',
-        role: 0
+        groups: []
       };
 
       it('should fail validation with a field not in the user model', (done) => {
@@ -93,7 +93,7 @@ describe('## User Service', () => {
         userService.createUser(extraFieldUser)
         .catch((err) => {
           expect(err.name).to.equal('ValidationError');
-          expect(err.details[0].message).to.equal('"role" is not allowed');
+          expect(err.details[0].message).to.equal('"groups" is not allowed');
           done();
         });
       });
@@ -118,7 +118,7 @@ describe('## User Service', () => {
           expect(user.id).to.equal(savedUserId);
           expect(user.name).to.equal('Jarryd');
           expect(user.email).to.equal('abc@google.com');
-          expect(user.role).to.equal(0);
+          expect(user.isSysAdmin).to.equal(false);
           expect(user.auth).to.be.null;
           expect(user.groups).to.be.empty;
           expect(user.devices).to.be.empty;
@@ -436,7 +436,7 @@ describe('## User Service', () => {
 
     let user;
 
-    before((done) => {
+    beforeEach((done) => {
       userService.createUser(baseUser)
         .then((createdUser) => {
           user = createdUser;
@@ -459,6 +459,15 @@ describe('## User Service', () => {
         .catch((err) => {
           expect(err).to.exist;
           expect(err.name).to.equal('ValidationError');
+          done();
+        });
+    });
+
+    it('should fail when a nonexistent user is added to a group', (done) => {
+      userService.addGroupByUserId(uuid.user, baseGroup.name)
+        .catch((err) => {
+          expect(err).to.exist;
+          expect(err.message).to.equal('No such user exists!');
           done();
         });
     });

@@ -29,6 +29,19 @@ export default {
     }
   },
 
+  updateUserAdmin: {
+    options: { allowUnknownBody: false },
+    body: {
+      name: Joi.string(),
+      email: Joi.string().email(),
+      delays: Joi.array().items(Joi.number()),
+      isSysAdmin: Joi.boolean()
+    },
+    params: {
+      userId: Joi.string().hex().length(24).required()
+    }
+  },
+
   // GET/POST/DELETE /api/v1/user/:userId/device/:deviceId
   deviceById: {
     params: {

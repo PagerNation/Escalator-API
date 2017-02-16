@@ -1,7 +1,7 @@
 import httpStatus from 'http-status';
 import groupService from '../../services/group';
 import Group from '../../models/group';
-import { build, fixtures } from '../../utils/factories';
+import { build, fixtures, uuid } from '../../utils/factories';
 import userService from '../../services/user';
 
 describe('## Group Service', () => {
@@ -273,6 +273,30 @@ describe('## Group Service', () => {
             });
         });
       });
+    });
+  });
+
+  describe('# addAdmin()', () => {
+    let group;
+    let user;
+
+    beforeEach((done) => {
+      const groupBuild = build('group', fixtures.group());
+      const userBuild = build('user', fixtures.user());
+      Promise.all([groupBuild, userBuild])
+        .then((values) => {
+          group = values[0];
+          user = values[1];
+          done();
+        });
+    });
+
+    it('adds a new admin', (done) => {
+      groupService.addAdmin(group.name, user.id)
+        .then((updatedGroup) => {
+          expect(updatedGroup.admins).to.include(user.id);
+          done();
+        });
     });
   });
 });

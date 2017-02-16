@@ -2,7 +2,7 @@ import request from 'supertest-as-promised';
 import httpStatus from 'http-status';
 import app from '../../../index';
 import authService from '../../services/auth';
-import { build, fixtures } from '../../utils/factories';
+import { build, buildAndAuth, fixtures } from '../../utils/factories';
 import Device from '../../models/device';
 import { buildUserAndGroups } from '../helpers/user_helper';
 
@@ -94,9 +94,10 @@ describe('## User APIs', () => {
 
   describe('# PUT /api/v1/user/:userId', () => {
     let user;
+    let userAndToken;
 
     const newEmail = {
-      email: 'update@email.com'
+      email: 'update@email.com',
     };
 
     beforeEach((done) => {
@@ -162,6 +163,50 @@ describe('## User APIs', () => {
           .then((res) => {
             expect(res.body.delays[0]).to.equal(delays[0]);
             expect(res.body.delays[1]).to.equal(delays[1]);
+            done();
+          });
+      });
+    });
+
+    context('with an admin user', () => {
+      before((done) => {
+        buildAndAuth('user', fixtures.user({ isSysAdmin: true }))
+          .then((u) => {
+            userAndToken = u;
+            done();
+          });
+      });
+
+      it('should update a user\'s role', (done) => {
+        request(app)
+          .put(`${userUrl}/${userAndToken.user.id}`)
+          .set('Authorization', `Bearer ${userAndToken.token}`)
+          .send({ isSysAdmin: false })
+          .expect(httpStatus.OK)
+          .then((res) => {
+            expect(res.body.isSysAdmin).to.equal(false);
+            done();
+          });
+      });
+    });
+
+    context('without an admin user', () => {
+      before((done) => {
+        buildAndAuth('user', fixtures.user())
+          .then((u) => {
+            userAndToken = u;
+            done();
+          });
+      });
+
+      it('should fail fail to update a users role', (done) => {
+        request(app)
+          .put(`${userUrl}/${userAndToken.user.id}`)
+          .set('Authorization', `Bearer ${userAndToken.token}`)
+          .send({ isSysAdmin: false })
+          .expect(httpStatus.BAD_REQUEST)
+          .then((res) => {
+            expect(res.body.message).to.equal('"isSysAdmin" is not allowed');
             done();
           });
       });

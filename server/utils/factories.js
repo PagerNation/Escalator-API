@@ -4,6 +4,7 @@ import Device from '../models/device';
 import Group from '../models/group';
 import Ticket, { actionTypes } from '../models/ticket';
 import EscalationPolicy from '../models/escalationPolicy';
+import authService from '../services/auth';
 
 const uuid = {
   user: '123456789012345678901234'
@@ -12,10 +13,10 @@ const uuid = {
 const fixtures = {
   user(user = {}) {
     return {
-      id: user.id,
       name: user.name || Faker.internet.userName(),
       email: user.email || Faker.internet.email(),
-      groups: user.groups
+      groups: user.groups,
+      isSysAdmin: user.isSysAdmin || false
     };
   },
   emailDevice(device = {}) {
@@ -43,7 +44,8 @@ const fixtures = {
     return {
       name: group.name || Faker.lorem.word(),
       users: group.users,
-      escalationPolicy: group.escalationPolicy || EscalationPolicy.defaultEscalationPolicy()
+      escalationPolicy: group.escalationPolicy || EscalationPolicy.defaultEscalationPolicy(),
+      admins: group.admins
     };
   },
   ticket(ticket = {}) {
@@ -95,5 +97,18 @@ function build(model, object) {
   });
 }
 
-export default { uuid, fixtures, build };
+function buildAndAuth(model, object) {
+  const response = {};
+  return build(model, object)
+    .then((u) => {
+      response.user = u;
+      return authService.loginUser(u.email);
+    })
+    .then((authObject) => {
+      response.token = authObject.token;
+      return response;
+    });
+}
+
+export default { uuid, fixtures, build, buildAndAuth };
 

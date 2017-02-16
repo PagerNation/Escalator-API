@@ -34,9 +34,9 @@ const UserSchema = new mongoose.Schema({
     type: [Number],
     default: []
   },
-  role: {
-    type: Number, // This can be an enum, should we make this an enum?
-    default: 0,
+  isSysAdmin: {
+    type: Boolean,
+    default: false,
     required: true
   },
   createdAt: {
@@ -168,6 +168,22 @@ UserSchema.methods = {
 };
 
 UserSchema.statics = {
+  exists(id) {
+    return new Promise((resolve, reject) => {
+      this.count({ _id: id }, (err, count) => {
+        if (err) {
+          reject(err);
+        }
+
+        if (count === 0) {
+          const error = new APIError('No such user exists!', httpStatus.BAD_REQUEST);
+          reject(error);
+        }
+        resolve();
+      });
+    });
+  },
+
   get(id) {
     return new Promise((resolve, reject) => {
       this.findById(id, (err, user) => {

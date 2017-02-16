@@ -1,7 +1,7 @@
 import request from 'supertest-as-promised';
 import httpStatus from 'http-status';
 import app from '../../../index';
-import { fixtures, build } from '../../utils/factories';
+import { fixtures, build, buildAndAuth, uuid } from '../../utils/factories';
 import authService from '../../services/auth';
 import userService from '../../services/user';
 import User from '../../models/user';
@@ -256,6 +256,76 @@ describe('## Group API', () => {
               done();
             });
         });
+      });
+    });
+  });
+
+
+  describe('# POST /api/v1/group/:groupName/user/:userId/admin', () => {
+    let groupAdminUserAndToken;
+    let adminUserAndToken;
+    let userAndToken;
+    let group;
+
+    beforeEach((done) => {
+      const groupAdminUserBuild = buildAndAuth('user', fixtures.user())
+        .then(createdUserAndToken => (groupAdminUserAndToken = createdUserAndToken));
+      const adminUserBuild = buildAndAuth('user', fixtures.user({ isSysAdmin: true }))
+        .then(createdUserAndToken => (adminUserAndToken = createdUserAndToken));
+      const userBuild = buildAndAuth('user', fixtures.user())
+        .then(createdUserAndToken => (userAndToken = createdUserAndToken));
+
+      Promise.all([groupAdminUserBuild, adminUserBuild, userBuild])
+        .then(values => build('group', fixtures.group({ admins: [values[0].user.id] })))
+        .then((g) => {
+          group = g;
+          done();
+        });
+    });
+
+    context('with group admin permissions', () => {
+      it('adds a new admin', (done) => {
+        request(app)
+          .post(`${groupUrl}/${group.name}/user/${userAndToken.user.id}/admin`)
+          .set('Authorization', `Bearer ${groupAdminUserAndToken.token}`)
+          .expect(httpStatus.OK)
+          .then((res) => {
+            expect(res.body.admins).to.include(userAndToken.user.id);
+            done();
+          });
+      });
+    });
+
+    context('with admin permissions', () => {
+      it('adds a new admin', (done) => {
+        request(app)
+          .post(`${groupUrl}/${group.name}/user/${userAndToken.user.id}/admin`)
+          .set('Authorization', `Bearer ${adminUserAndToken.token}`)
+          .expect(httpStatus.OK)
+          .then((res) => {
+            expect(res.body.admins).to.include(userAndToken.user.id);
+            done();
+          });
+      });
+    });
+
+    context('without group admin permissions', () => {
+      it('doesn\'t add an admin', (done) => {
+        request(app)
+          .post(`${groupUrl}/${group.name}/user/${userAndToken.user.id}/admin`)
+          .set('Authorization', `Bearer ${userAndToken.token}`)
+          .expect(httpStatus.UNAUTHORIZED)
+          .then(() => done());
+      });
+    });
+
+    context('without a nonexistent user', () => {
+      it('doesn\'t add an admin', (done) => {
+        request(app)
+          .post(`${groupUrl}/${group.name}/user/${uuid.user}/admin`)
+          .set('Authorization', `Bearer ${adminUserAndToken.token}`)
+          .expect(httpStatus.BAD_REQUEST)
+          .then(() => done());
       });
     });
   });

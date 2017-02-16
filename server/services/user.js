@@ -10,10 +10,15 @@ const DEVICE_SCHEMA = Joi.object().keys({
   contactInformation: Joi.string()
 });
 
+function exists(userId) {
+  return User.exists(userId);
+}
+
 function createUser(userObject) {
   const userSchema = Joi.object().keys({
     name: Joi.string().required(),
-    email: Joi.string().email().required()
+    email: Joi.string().email().required(),
+    isSysAdmin: Joi.boolean()
   });
 
   return JoiHelper.validate(userObject, userSchema)
@@ -28,7 +33,8 @@ function updateUser(userId, userObject) {
   const userSchema = Joi.object().keys({
     name: Joi.string(),
     email: Joi.string().email(),
-    delays: Joi.array().items(Joi.number())
+    delays: Joi.array().items(Joi.number()),
+    isSysAdmin: Joi.boolean()
   });
 
   return JoiHelper.validate(userObject, userSchema)
@@ -77,7 +83,8 @@ function addGroupByUserId(userId, groupName) {
   const validatePromise = JoiHelper.validate(groupName, Joi.string());
   const getUserPromise = getUser(userId);
 
-  return Promise.all([getUserPromise, validatePromise])
+  return exists(userId)
+    .then(() => Promise.all([getUserPromise, validatePromise]))
     .then((promiseResults) => {
       const user = promiseResults[0];
       const validatedName = promiseResults[1];
@@ -118,6 +125,7 @@ function getGroupsForUser(user) {
 
 export default {
   // User CRUD
+  exists,
   createUser,
   getUser,
   updateUser,

@@ -58,6 +58,12 @@ function updateEscalationPolicy(req, res, next) {
     .catch(err => next(err));
 }
 
+function addAdmin(req, res, next) {
+  groupService.addAdmin(req.group.name, req.params.userId)
+    .then(updatedGroup => res.json(updatedGroup))
+    .catch(err => next(err));
+}
+
 /**
  * Loads a group into the request based on group name
  */
@@ -75,6 +81,7 @@ export default {
   deleteGroup,
   createGroup,
   updateGroup,
+  addAdmin,
   addUser,
   removeUser,
   updateEscalationPolicy,

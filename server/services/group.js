@@ -16,7 +16,8 @@ function createGroup(groupObject) {
   const groupSchema = Joi.object().keys({
     name: Joi.string().required(),
     users: Joi.array().items(Joi.string().hex().length(24)),
-    escalationPolicy: Joi.object()
+    escalationPolicy: Joi.object(),
+    admins: Joi.array().items(Joi.string().hex().length(24))
   });
 
   return JoiHelper.validate(groupObject, groupSchema)
@@ -39,7 +40,8 @@ function addUser(group, userId) {
 
   let tmpGroup;
 
-  return JoiHelper.validate(userId, userIdSchema)
+  return userService.exists(userId)
+    .then(() => JoiHelper.validate(userId, userIdSchema))
     .then(validatedUserObject => group.addUser(validatedUserObject))
     .then((updatedGroup) => {
       tmpGroup = updatedGroup;
@@ -79,12 +81,21 @@ function updateEscalationPolicy(groupName, escalationPolicy) {
     });
 }
 
+function addAdmin(groupName, userId) {
+  const userIdSchema = Joi.string().hex().length(24);
+
+  return userService.exists(userId)
+    .then(() => JoiHelper.validate(userId, userIdSchema))
+    .then(validatedUserId => Group.addAdmin(groupName, validatedUserId));
+}
+
 export default {
   // Group CRUD
   getGroup,
   deleteGroup,
   createGroup,
   updateGroup,
+  addAdmin,
   // Group User Modifications
   addUser,
   removeUser,

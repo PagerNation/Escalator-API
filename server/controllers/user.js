@@ -63,15 +63,6 @@ function getGroupsForUser(req, res, next) {
     .catch(err => next(err));
 }
 
-function loadUser(req, res, next) {
-  userService.getUser(req.user.id)
-    .then((user) => {
-      req.user = user; // eslint-disable-line no-param-reassign
-      return next();
-    })
-    .catch(err => next(err));
-}
-
 export default {
   // User CRUD
   getUser,
@@ -85,7 +76,5 @@ export default {
   sortDevices,
   removeDevice,
   // User Groups
-  getGroupsForUser,
-  // User helpers
-  loadUser
+  getGroupsForUser
 };
