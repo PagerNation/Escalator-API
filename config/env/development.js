@@ -13,6 +13,6 @@ export default {
   twilio: {
     accountSid: process.env.PHONE_SID,
     token: process.env.PHONE_TOKEN,
-    fromPhone: '+15854818574'
+    fromPhone: '+16176740884'
   }
 };
