@@ -57,7 +57,8 @@ describe('## User APIs', () => {
     let user;
 
     before((done) => {
-      build('user', baseUser)
+      build('group', fixtures.group())
+        .then(group => build('user', fixtures.user({ groups: [group.name] })))
         .then((u) => {
           user = u;
           return authService.loginUser(u.email);
@@ -76,6 +77,7 @@ describe('## User APIs', () => {
         .then((res) => {
           expect(res.body.name).to.equal(user.name);
           expect(res.body.email).to.equal(user.email);
+          expect(res.body.groups[0].name).to.equal(user.groups[0]);
           done();
         });
     });

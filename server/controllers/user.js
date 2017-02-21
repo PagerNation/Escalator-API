@@ -2,7 +2,9 @@ import httpStatus from 'http-status';
 import userService from '../services/user';
 
 function getUser(req, res) {
-  return res.json(req.user);
+  req.user.populate('activeGroups')
+    .execPopulate()
+    .then(user => res.json(user));
 }
 
 function createUser(req, res, next) {
