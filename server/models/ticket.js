@@ -16,7 +16,10 @@ const TicketSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  metadata: mongoose.Schema.Types.Mixed,
+  metadata: {
+    title: String,
+    description: String
+  },
   actions: {
     type: [{
       actionTaken: {

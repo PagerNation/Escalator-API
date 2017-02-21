@@ -52,11 +52,8 @@ const fixtures = {
     return {
       groupName: ticket.groupName || 'testGroupName',
       metadata: ticket.metadata || {
-        message: Faker.hacker.phrase(),
-        metrics: {
-          foo: 'bar',
-          jiggawatts: 42
-        }
+        title: Faker.lorem.word(),
+        description: Faker.hacker.phrase()
       },
       isOpen: ticket.isOpen,
       createdAt: ticket.createdAt || Date.now()

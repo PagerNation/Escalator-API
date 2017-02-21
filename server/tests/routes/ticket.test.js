@@ -12,7 +12,7 @@ describe('## Ticket APIs', () => {
 
   const invalidTicket = {
     metadata: {
-      message: 'Something bad!',
+      description: 'Something bad!',
     }
   };
 
@@ -34,7 +34,7 @@ describe('## Ticket APIs', () => {
         .expect(httpStatus.OK)
         .then((res) => {
           expect(res.body.groupName).to.equal(ticket.groupName);
-          expect(res.body.metadata.message).to.equal(ticket.metadata.message);
+          expect(res.body.metadata.description).to.equal(ticket.metadata.description);
           done();
         });
     });
@@ -70,7 +70,7 @@ describe('## Ticket APIs', () => {
         .expect(httpStatus.OK)
         .then((res) => {
           expect(res.body.groupName).to.equal(ticket.groupName);
-          expect(res.body.metadata.message).to.equal(ticket.metadata.message);
+          expect(res.body.metadata.description).to.equal(ticket.metadata.description);
           done();
         });
     });
@@ -90,7 +90,7 @@ describe('## Ticket APIs', () => {
   describe('# PUT /api/v1/ticket/:ticketId', () => {
     const updateDetails = fixtures.ticket({
       metadata: {
-        message: 'Something else!',
+        title: 'Something else!',
       }
     });
 
@@ -110,7 +110,7 @@ describe('## Ticket APIs', () => {
         .send(updateDetails)
         .expect(httpStatus.OK)
         .then((res) => {
-          expect(res.body.metadata.message).to.equal(updateDetails.metadata.message);
+          expect(res.body.metadata.title).to.equal(updateDetails.metadata.title);
           done();
         });
     });

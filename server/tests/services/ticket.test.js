@@ -12,10 +12,8 @@ describe('## Ticket Service', () => {
           .then((createdTicket) => {
             expect(createdTicket).to.exist;
             expect(createdTicket.groupName).to.equal(ticketObject.groupName);
-            expect(createdTicket.metadata.message).to.equal(ticketObject.metadata.message);
-            expect(createdTicket.metadata.metrics.foo).to.equal(ticketObject.metadata.metrics.foo);
-            expect(createdTicket.metadata.metrics.jiggawatts).to
-              .equal(ticketObject.metadata.metrics.jiggawatts);
+            expect(createdTicket.metadata.title).to.equal(ticketObject.metadata.title);
+            expect(createdTicket.metadata.description).to.equal(ticketObject.metadata.description);
             done();
           })
           .catch(err => done(err));
@@ -25,11 +23,8 @@ describe('## Ticket Service', () => {
     context('with missing ticket details', () => {
       const missingGroupIdTicket = {
         metadata: {
-          message: 'Something bad!',
-          metrics: {
-            foo: 'bar',
-            jiggawatts: 420
-          }
+          title: 'Something bad!',
+          description: "This is something bad"
         }
       };
 
@@ -73,9 +68,8 @@ describe('## Ticket Service', () => {
         expect(ticket).to.exist;
         expect(ticket.groupName).to.equal(ticketObject.groupName);
         expect(ticket.metadata.message).to.equal(ticketObject.metadata.message);
-        expect(ticket.metadata.metrics.foo).to.equal(ticketObject.metadata.metrics.foo);
-        expect(ticket.metadata.metrics.jiggawatts)
-          .to.equal(ticketObject.metadata.metrics.jiggawatts);
+        expect(ticket.metadata.title).to.equal(ticketObject.metadata.title);
+        expect(ticket.metadata.description).to.equal(ticketObject.metadata.description);
         done();
       });
     });
@@ -96,7 +90,7 @@ describe('## Ticket Service', () => {
     const updateDetails = {
       groupName: 'updateTestGroupName',
       metadata: {
-        foo: 'baz'
+        title: 'baz'
       }
     };
 
@@ -114,8 +108,8 @@ describe('## Ticket Service', () => {
           expect(ticket).to.exist;
           expect(ticket.id).to.equal(savedTicket.id);
           expect(ticket.groupName).to.equal(updateDetails.groupName);
-          expect(ticket.metadata.foo).to.equal('baz');
-          expect(ticket.metadata.jiggawatts).to.not.exist;
+          expect(ticket.metadata.title).to.equal(updateDetails.metadata.title);
+          expect(ticket.metadata.description).to.not.exist;
           done();
         });
     });
@@ -144,13 +138,11 @@ describe('## Ticket Service', () => {
 
     it('should delete a ticket', (done) => {
       ticketService.deleteById(savedTicketId)
-        .then(() => {
-          ticketService.getById(savedTicketId)
-            .catch((err, user) => {
-              expect(err).to.exist;
-              expect(err.status).to.equal(httpStatus.NOT_FOUND);
-              done();
-            });
+        .then(() => ticketService.getById(savedTicketId))
+        .catch((err, user) => {
+          expect(err).to.exist;
+          expect(err.status).to.equal(httpStatus.NOT_FOUND);
+          done();
         });
     });
   });
