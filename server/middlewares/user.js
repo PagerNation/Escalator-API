@@ -1,4 +1,5 @@
 import validate from 'express-validation';
+import httpStatus from 'http-status';
 import userService from '../services/user';
 import paramValidation from '../routes/validation/user';
 
@@ -23,7 +24,15 @@ function validateByRole(req, res, next) {
   validate(schema)(req, res, next);
 }
 
+function isSysAdmin(req, res, next) {
+  if (req.user.isSysAdmin) {
+    return next();
+  }
+  res.status(httpStatus.UNAUTHORIZED).send();
+}
+
 export default {
   loadUser,
-  validateByRole
+  validateByRole,
+  isSysAdmin
 };
