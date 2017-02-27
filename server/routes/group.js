@@ -8,12 +8,12 @@ import userMiddleware from '../middlewares/user';
 const router = express.Router(); // eslint-disable-line new-cap
 
 router.route('/')
-  .post(validate(paramValidation.createGroup), groupCtrl.createGroup);
+  .post(validate(paramValidation.createGroup), userMiddleware.isSysAdmin, groupCtrl.createGroup);
 
 router.route('/:groupName')
   .get(validate(paramValidation.byName), groupCtrl.getGroup)
-  .put(validate(paramValidation.updateGroup), groupCtrl.updateGroup)
-  .delete(validate(paramValidation.byName), groupCtrl.deleteGroup);
+  .put(validate(paramValidation.updateGroup), groupMiddleware.isGroupAdmin, groupCtrl.updateGroup)
+  .delete(validate(paramValidation.byName), groupMiddleware.isGroupAdmin, groupCtrl.deleteGroup);
 
 router.route('/:groupName/request')
   .post(validate(paramValidation.makeJoinRequest), groupCtrl.makeJoinRequest)
@@ -21,16 +21,17 @@ router.route('/:groupName/request')
     groupMiddleware.isGroupAdmin, groupCtrl.processJoinRequest);
 
 router.route('/:groupName/user')
-  .post(validate(paramValidation.addUser), groupCtrl.addUser);
+  .post(validate(paramValidation.addUser), groupMiddleware.isGroupAdmin, groupCtrl.addUser);
 
 router.route('/:groupName/user/:userId')
-  .delete(validate(paramValidation.userById), groupCtrl.removeUser);
+  .delete(validate(paramValidation.userById), groupMiddleware.isGroupAdmin, groupCtrl.removeUser);
 
 router.route('/:groupName/user/:userId/admin')
   .post(validate(paramValidation.userById), groupMiddleware.isGroupAdmin, groupCtrl.addAdmin);
 
 router.route('/:groupName/escalationpolicy')
-  .put(validate(paramValidation.updateEscalationPolicy), groupCtrl.updateEscalationPolicy)
+  .put(validate(paramValidation.updateEscalationPolicy),
+    groupMiddleware.isGroupAdmin, groupCtrl.updateEscalationPolicy)
   .post(validate(paramValidation.byName), groupCtrl.scheduleEPRotation);
 
 router.route('/:groupName/listSchedule')
@@ -40,3 +41,4 @@ router.route('/:groupName/listSchedule')
 router.param('groupName', groupCtrl.load);
 
 export default router;
+
