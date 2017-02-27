@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import _env from './dotenv'; // eslint-disable-line no-unused-vars
 import config from './config/env';
 import app from './config/express';
+import groupLoader from './server/utils/groupLoader';
 
 mongoose.Promise = Promise;
 
@@ -12,6 +13,8 @@ mongoose.connection.on('error', () => {
 });
 
 const debug = require('debug')('escalator-api:index');
+
+groupLoader.bulkScheduleEPRotation();
 
 // listen on port config.port
 app.listen(config.port, () => {
