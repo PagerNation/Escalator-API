@@ -15,13 +15,15 @@ router.route('/:userId')
   .delete(validate(paramValidation.byId), userCtrl.deleteUser);
 
 router.route('/:userId/device')
-  .put(validate(paramValidation.deviceById), userCtrl.sortDevices)
   .post(validate(paramValidation.addDevice), userCtrl.addDevice);
 
 router.route('/:userId/device/:deviceId')
   .get(validate(paramValidation.deviceById), userCtrl.getDevice)
   .put(validate(paramValidation.updateDevice), userCtrl.updateDevice)
   .delete(validate(paramValidation.deviceById), userCtrl.removeDevice);
+
+router.route('/:userId/devices')
+  .put(validate(paramValidation.deviceById), userCtrl.sortDevices);
 
 router.route('/:userId/group')
   .get(validate(paramValidation.byId), userCtrl.getGroupsForUser);
