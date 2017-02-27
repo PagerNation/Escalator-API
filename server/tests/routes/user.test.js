@@ -4,7 +4,7 @@ import app from '../../../index';
 import authService from '../../services/auth';
 import { build, buildAndAuth, fixtures } from '../../utils/factories';
 import Device from '../../models/device';
-import { buildUserAndGroups } from '../helpers/user_helper';
+import { buildUserAndGroups } from '../helpers/userHelper';
 
 const userUrl = '/api/v1/user';
 

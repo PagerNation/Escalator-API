@@ -5,7 +5,7 @@ import User from '../../models/user';
 import Device from '../../models/device';
 import { build, fixtures, uuid } from '../../utils/factories';
 import Group from '../../models/group';
-import { buildUserAndGroups } from '../helpers/user_helper';
+import { buildUserAndGroups } from '../helpers/userHelper';
 
 describe('## User Service', () => {
   const baseUser = {
