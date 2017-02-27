@@ -34,6 +34,21 @@ describe('## Group Model', () => {
         expect(newGroupEP.pagingIntervalInMinutes).to.equal(compareEP.pagingIntervalInMinutes);
         expect(newGroupEP.rotationIntervalInDays).to.equal(compareEP.rotationIntervalInDays);
         expect(newGroupEP.subscribers).to.be.empty;
+        expect(equalDates(newGroup.lastRotated, new Date())).to.eq(true);
+        done();
+      });
+    });
+  });
+
+  context('# with a passed in date', () => {
+    const date = new Date(2018, 8, 15, 18, 56, 30);
+
+    const groupObj = fixtures.group({ lastRotated: date });
+
+    it('should create a new group with that date', (done) => {
+      new Group(groupObj).save((err, newGroup) => {
+        expect(newGroup.name).to.equal(groupObj.name);
+        expect(equalDates(newGroup.lastRotated, date)).to.eq(true);
         done();
       });
     });

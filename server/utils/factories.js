@@ -46,7 +46,8 @@ const fixtures = {
       users: group.users,
       escalationPolicy: group.escalationPolicy || EscalationPolicy.defaultEscalationPolicy(),
       admins: group.admins,
-      joinRequests: group.joinRequests
+      joinRequests: group.joinRequests,
+      lastRotated: group.lastRotated || Date.now()
     };
   },
   ticket(ticket = {}) {
