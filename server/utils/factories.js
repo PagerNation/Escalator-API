@@ -63,7 +63,7 @@ const fixtures = {
   escalationPolicy(escalationPolicy = {}) {
     return {
       rotationIntervalInDays: escalationPolicy.rotationIntervalInDays || 7,
-      pagingIntervalInDays: escalationPolicy.pagingIntervalInDays || 15,
+      pagingIntervalInMinutes: escalationPolicy.pagingIntervalInMinutes || 15,
       subscribers: escalationPolicy.subscribers || ['57e590a0140ebf1cc48bb1bf']
     };
   },

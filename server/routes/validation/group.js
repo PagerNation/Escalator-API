@@ -47,7 +47,7 @@ export default {
     options: { allowUnknownBody: false },
     body: {
       rotationIntervalInDays: Joi.number(),
-      pagingIntervalInDays: Joi.number(),
+      pagingIntervalInMinutes: Joi.number(),
       subscribers: Joi.array().items(Joi.string().hex().length(24))
     },
     params: {

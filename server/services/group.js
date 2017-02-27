@@ -10,6 +10,10 @@ function getGroup(groupName) {
   return Group.get(groupName);
 }
 
+function getAllGroups() {
+  return Group.getAllGroups();
+}
+
 function deleteGroup(groupName) {
   return Group.delete(groupName);
 }
@@ -80,7 +84,7 @@ function processJoinRequest(group, userId, isAccepted) {
 function updateEscalationPolicy(groupName, escalationPolicy) {
   const escalationPolicySchema = Joi.object().keys({
     rotationIntervalInDays: Joi.number(),
-    pagingIntervalInDays: Joi.number(),
+    pagingIntervalInMinutes: Joi.number(),
     subscribers: Joi.array().items(ID_SCHEMA)
   });
 

@@ -1,16 +1,17 @@
 import Group from '../../models/group';
 import User from '../../models/user';
 import EscalationPolicy from '../../models/escalationPolicy';
+import { equalDates } from '../helpers/dateHelper';
 import { build, fixtures } from '../../utils/factories';
 
 describe('## Group Model', () => {
   const subscriberRotationIntervalInDays = 7;
-  const subscriberPagingIntervalInDays = 15;
+  const subscriberPagingIntervalInMinutes = 15;
   const subscriberObjectId = '57e590a0140ebf1cc48bb1bf';
 
   const escPolicy = {
     rotationIntervalInDays: subscriberRotationIntervalInDays,
-    pagingIntervalInDays: subscriberPagingIntervalInDays,
+    pagingIntervalInMinutes: subscriberPagingIntervalInMinutes,
     subscribers: [subscriberObjectId]
   };
 
@@ -30,7 +31,7 @@ describe('## Group Model', () => {
         expect(err).to.not.exist;
         expect(newGroup.name).to.equal(groupData.name);
         expect(newGroup.users[0].toString()).to.equal(groupData.users[0]);
-        expect(newGroupEP.pagingIntervalInDays).to.equal(compareEP.pagingIntervalInDays);
+        expect(newGroupEP.pagingIntervalInMinutes).to.equal(compareEP.pagingIntervalInMinutes);
         expect(newGroupEP.rotationIntervalInDays).to.equal(compareEP.rotationIntervalInDays);
         expect(newGroupEP.subscribers).to.be.empty;
         done();

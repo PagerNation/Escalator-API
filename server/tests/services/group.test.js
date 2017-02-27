@@ -41,7 +41,7 @@ describe('## Group Service', () => {
   context('with a group in the database beforehand', () => {
     beforeEach((done) => {
       groupService.createGroup(groupObject)
-        .then((createdGroup) => {
+        .then(() => {
           done();
         });
     });
@@ -242,7 +242,7 @@ describe('## Group Service', () => {
 
       context('with correct body fields', () => {
         const newEscalationPolicy = {
-          pagingIntervalInDays: 1111,
+          pagingIntervalInMinutes: 1111,
           rotationIntervalInDays: 2222
         };
 
@@ -250,8 +250,8 @@ describe('## Group Service', () => {
           groupService.updateEscalationPolicy(group.name, newEscalationPolicy)
             .then((savedGroup) => {
               expect(savedGroup).to.exist;
-              expect(savedGroup.escalationPolicy.pagingIntervalInDays)
-                .to.equal(newEscalationPolicy.pagingIntervalInDays);
+              expect(savedGroup.escalationPolicy.pagingIntervalInMinutes)
+                .to.equal(newEscalationPolicy.pagingIntervalInMinutes);
               expect(savedGroup.escalationPolicy.rotationIntervalInDays)
                 .to.equal(newEscalationPolicy.rotationIntervalInDays);
               done();
@@ -261,14 +261,14 @@ describe('## Group Service', () => {
 
       context('with incorrect body fields', () => {
         const newEscalationPolicy = {
-          pagingIntervalInDaysssss: 1111
+          pagingIntervalInMinutesssss: 1111
         };
 
         it('should not update escalation policy with incorrect fields', (done) => {
           groupService.updateEscalationPolicy(group.name, newEscalationPolicy)
             .catch((err) => {
               expect(err).to.exist;
-              expect(err.message).to.equal('"pagingIntervalInDaysssss" is not allowed');
+              expect(err.message).to.equal('"pagingIntervalInMinutesssss" is not allowed');
               done();
             });
         });
