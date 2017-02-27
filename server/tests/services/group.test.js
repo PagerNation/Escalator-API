@@ -1,8 +1,10 @@
 import httpStatus from 'http-status';
+import scheduler from 'node-schedule';
 import groupService from '../../services/group';
 import Group from '../../models/group';
 import { build, fixtures, uuid } from '../../utils/factories';
 import userService from '../../services/user';
+import { equalDates } from '../helpers/dateHelper';
 
 describe('## Group Service', () => {
   const groupObject = fixtures.group();
@@ -15,6 +17,7 @@ describe('## Group Service', () => {
             .then((createdGroup) => {
               expect(createdGroup).to.exist;
               expect(createdGroup.name).to.equal(groupObject.name);
+              expect(equalDates(createdGroup.lastRotated, new Date())).to.equal(true);
               done();
             })
             .catch(err => done(err));
@@ -297,6 +300,64 @@ describe('## Group Service', () => {
           expect(updatedGroup.admins).to.include(user.id);
           done();
         });
+    });
+  });
+
+  describe('# scheduleEPRotation()', () => {
+    let group;
+
+    beforeEach((done) => {
+      build('group', fixtures.group())
+        .then((g) => {
+          group = g;
+          done();
+        });
+    });
+
+    it('should schedule the next job', (done) => {
+      groupService.scheduleEPRotation(group)
+        .then((returnObj) => {
+          const jobs = scheduler.scheduledJobs;
+          const nextJob = jobs[Object.keys(jobs)[0]];
+          expect(returnObj.nextRotateDate).to.exist;
+          expect(equalDates(returnObj.nextRotateDate, nextJob.nextInvocation())).to.equal(true);
+          done();
+        })
+        .catch(err => done(err));
+    });
+  });
+
+  describe('# rotateEscalationPolicy()', () => {
+    let group;
+    const subscribers = ['123456789012345678901234', '121212121212121212121212', '098765432109876543210987'];
+    const escalationPolicy = { subscribers };
+    const lastRotated = new Date(2015, 11, 10, 0, 0, 0);
+
+    beforeEach((done) => {
+      build('group', fixtures.group({ escalationPolicy, lastRotated }))
+        .then((g) => {
+          group = g;
+          done();
+        });
+    });
+
+    it('moves the last user to the beginning of the list, updates lastRotated date', (done) => {
+      const schedulerLength = Object.keys(scheduler.scheduledJobs).length;
+
+      groupService.rotateEscalationPolicy(group)
+        .then((updatedGroup) => {
+          const ep = updatedGroup.escalationPolicy;
+          expect(ep.subscribers.length).to.eq(subscribers.length);
+          expect(ep.subscribers[0].toString()).to.eq(subscribers[2]);
+          expect(ep.subscribers[1].toString()).to.eq(subscribers[0]);
+          expect(ep.subscribers[2].toString()).to.eq(subscribers[1]);
+
+          expect(equalDates(updatedGroup.lastRotated, new Date())).to.eq(true);
+
+          expect(Object.keys(scheduler.scheduledJobs).length).to.eq(schedulerLength + 1);
+          done();
+        })
+        .catch(err => done(err));
     });
   });
 
