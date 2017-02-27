@@ -14,16 +14,24 @@ describe('## Group API', () => {
 
   beforeEach((done) => {
     user = fixtures.user();
-    build('user', user)
-      .then(u => authService.loginUser(u.email))
+    buildAndAuth('user', user)
       .then((authObject) => {
         token = authObject.token;
         done();
       });
   });
 
-  context('with no groups needed beforehand', () => {
-    describe('# POST /api/v1/group', () => {
+  context('with a required admin user', () => {
+    beforeEach((done) => {
+      const authUser = fixtures.user({ isSysAdmin: true });
+      buildAndAuth('user', authUser)
+        .then((authObject) => {
+          token = authObject.token;
+          done();
+        });
+    });
+
+    describe('#POST /api/v1/group', () => {
       context('with a valid group', () => {
         const group = fixtures.group();
 
@@ -58,18 +66,23 @@ describe('## Group API', () => {
     });
   });
 
-  context('with a group needed beforehand', () => {
-    context('with a valid group', () => {
-      let group;
+  context('with a normal user', () => {
+    let group;
 
+    beforeEach((done) => {
+      buildAndAuth('user', fixtures.user())
+        .then((authObject) => {
+          token = authObject.token;
+          user = authObject.user;
+          done();
+        });
+    });
+
+    context('with a valid group', () => {
       beforeEach((done) => {
-        build('user', fixtures.user())
-          .then((createdUser) => {
-            user = createdUser;
-            return build('group', fixtures.group({ users: [user.id] }));
-          })
-          .then((createdGroup) => {
-            group = createdGroup;
+        build('group', fixtures.group())
+          .then((g) => {
+            group = g;
             done();
           });
       });
@@ -82,11 +95,56 @@ describe('## Group API', () => {
             .expect(httpStatus.OK)
             .then((res) => {
               expect(res.body.name).to.equal(group.name);
-              expect(res.body.users[0].name).to.equal(user.name);
               done();
             });
         });
       });
+    });
+
+    context('with an invalid group', () => {
+      group = {
+        name: 1,
+        users: []
+      };
+
+      describe('# GET /api/v1/group/:groupName', () => {
+        it('should fail with an error message', (done) => {
+          request(app)
+            .get(`${groupUrl}/doesNotExist`)
+            .set('Authorization', `Bearer ${token}`)
+            .expect(httpStatus.NOT_FOUND)
+            .then((res) => {
+              expect(res.body.message).to.equal('Not Found');
+              done();
+            });
+        });
+      });
+    });
+  });
+
+  context('with a group admin', () => {
+    let group;
+
+    beforeEach((done) => {
+      buildAndAuth('user', fixtures.user())
+        .then((authObject) => {
+          token = authObject.token;
+          user = authObject.user;
+          done();
+        });
+    });
+
+    context('with a valid group', () => {
+      beforeEach((done) => {
+        build('group', fixtures.group({
+          admins: [user]
+        }))
+        .then((createdGroup) => {
+          group = createdGroup;
+          done();
+        });
+      });
+
 
       describe('# PUT /api/v1/group/:groupName', () => {
         const updateDetails = {
@@ -138,14 +196,6 @@ describe('## Group API', () => {
       });
 
       describe('# POST /api/v1/group/:groupName/user', () => {
-        beforeEach((done) => {
-          build('user', fixtures.user())
-            .then((newUser) => {
-              user = newUser;
-              done();
-            });
-        });
-
         it('should add a user to the group', (done) => {
           request(app)
             .post(`${groupUrl}/${group.name}/user`)
@@ -165,46 +215,41 @@ describe('## Group API', () => {
       });
 
       describe('# DELETE /api/v1/group/:groupName/user/:userId', () => {
-        const userObj = fixtures.user();
+        let userToBeDeleted;
 
         beforeEach((done) => {
-          build('user', userObj)
-          .then((u) => {
-            user = u;
-          })
-          .then(() => {
-            const groupObj = fixtures.group({ users: [user.id] });
-            return build('group', groupObj);
-          })
-          .then((g) => {
-            group = g;
-          })
-          .then(() => userService.addGroupByUserId(user.id, group.name))
-          .then(u => authService.loginUser(u.email))
-          .then((authObject) => {
-            token = authObject.token;
-            done();
-          });
+          build('user', fixtures.user())
+            .then((u) => {
+              userToBeDeleted = u;
+              return build('group', fixtures.group({
+                users: [userToBeDeleted.id],
+                admins: [user.id]
+              }));
+            })
+            .then((g) => {
+              group = g;
+              done();
+            });
         });
 
         it('should remove the user from the group', (done) => {
           request(app)
-            .delete(`${groupUrl}/${group.name}/user/${user.id}`)
+            .delete(`${groupUrl}/${group.name}/user/${userToBeDeleted.id}`)
             .set('Authorization', `Bearer ${token}`)
             .expect(httpStatus.OK)
             .then((res) => {
               expect(res.body.name).to.equal(group.name);
-              expect(res.body.users).to.not.include(user.id);
+              expect(res.body.users).to.not.include(userToBeDeleted.id);
               done();
             });
         });
 
         it('should remove the group from the associated user', (done) => {
           request(app)
-            .delete(`${groupUrl}/${group.name}/user/${user.id}`)
+            .delete(`${groupUrl}/${group.name}/user/${userToBeDeleted.id}`)
             .set('Authorization', `Bearer ${token}`)
             .expect(httpStatus.OK)
-            .then(() => userService.getUser(user.id))
+            .then(() => userService.getUser(userToBeDeleted.id))
             .then((receivedUser) => {
               expect(receivedUser.groups).to.not.include(group.name);
               done();
@@ -226,24 +271,10 @@ describe('## Group API', () => {
     });
 
     context('with an invalid group', () => {
-      const group = {
+      group = {
         name: 1,
         users: []
       };
-
-      describe('# GET /api/v1/group/:groupName', () => {
-        it('should fail with an error message', (done) => {
-          request(app)
-            .get(`${groupUrl}/doesNotExist`)
-            .set('Authorization', `Bearer ${token}`)
-            .expect(httpStatus.NOT_FOUND)
-            .then((res) => {
-              expect(res.body.message).to.equal('Not Found');
-              done();
-            });
-        });
-      });
-
 
       describe('# DELETE /api/v1/group/:groupName', () => {
         it('should report an error', (done) => {
