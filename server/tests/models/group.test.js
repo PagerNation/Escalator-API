@@ -1,16 +1,17 @@
 import Group from '../../models/group';
 import User from '../../models/user';
 import EscalationPolicy from '../../models/escalationPolicy';
+import { equalDates } from '../helpers/dateHelper';
 import { build, fixtures } from '../../utils/factories';
 
 describe('## Group Model', () => {
   const subscriberRotationIntervalInDays = 7;
-  const subscriberPagingIntervalInDays = 15;
+  const subscriberPagingIntervalInMinutes = 15;
   const subscriberObjectId = '57e590a0140ebf1cc48bb1bf';
 
   const escPolicy = {
     rotationIntervalInDays: subscriberRotationIntervalInDays,
-    pagingIntervalInDays: subscriberPagingIntervalInDays,
+    pagingIntervalInMinutes: subscriberPagingIntervalInMinutes,
     subscribers: [subscriberObjectId]
   };
 
@@ -30,9 +31,24 @@ describe('## Group Model', () => {
         expect(err).to.not.exist;
         expect(newGroup.name).to.equal(groupData.name);
         expect(newGroup.users[0].toString()).to.equal(groupData.users[0]);
-        expect(newGroupEP.pagingIntervalInDays).to.equal(compareEP.pagingIntervalInDays);
+        expect(newGroupEP.pagingIntervalInMinutes).to.equal(compareEP.pagingIntervalInMinutes);
         expect(newGroupEP.rotationIntervalInDays).to.equal(compareEP.rotationIntervalInDays);
         expect(newGroupEP.subscribers).to.be.empty;
+        expect(equalDates(newGroup.lastRotated, new Date())).to.eq(true);
+        done();
+      });
+    });
+  });
+
+  context('# with a passed in date', () => {
+    const date = new Date(2018, 8, 15, 18, 56, 30);
+
+    const groupObj = fixtures.group({ lastRotated: date });
+
+    it('should create a new group with that date', (done) => {
+      new Group(groupObj).save((err, newGroup) => {
+        expect(newGroup.name).to.equal(groupObj.name);
+        expect(equalDates(newGroup.lastRotated, date)).to.eq(true);
         done();
       });
     });

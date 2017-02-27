@@ -30,7 +30,11 @@ const GroupSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     default: []
-  }]
+  }],
+  lastRotated: {
+    type: mongoose.Schema.Types.Date,
+    default: Date.now()
+  }
 });
 
 GroupSchema.methods = {
@@ -100,6 +104,14 @@ GroupSchema.statics = {
         }
         const error = new APIError('No such group exists', httpStatus.NOT_FOUND);
         reject(error);
+      });
+    });
+  },
+
+  getAllGroups() {
+    return new Promise((resolve) => {
+      this.find({}, (groups) => {
+        resolve(groups);
       });
     });
   },

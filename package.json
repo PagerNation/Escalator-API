@@ -53,6 +53,7 @@
     "mongoose": "4.6.2",
     "mongoose-findorcreate": "^0.1.2",
     "morgan": "1.7.0",
+    "node-schedule": "^1.2.0",
     "nodemailer": "^2.6.4",
     "twilio": "^3.0.0-rc.14",
     "winston": "2.2.0"

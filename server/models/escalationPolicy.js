@@ -5,7 +5,7 @@ const EscalationPolicySchema = new mongoose.Schema({
     type: Number,
     default: 7
   },
-  pagingIntervalInDays: {
+  pagingIntervalInMinutes: {
     type: Number,
     default: 10,
   },

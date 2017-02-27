@@ -4,13 +4,13 @@ import EscalationPolicy from '../../models/escalationPolicy';
 describe('## EscalationPolicy: models', () => {
   it('should create a new EscalationPolicy', (done) => {
     const subscriberRotationIntervalInDays = 7;
-    const subscriberPagingIntervalInDays = 15;
+    const subscriberPagingIntervalInMinutes = 15;
     const subscriberObjectId = '57e590a0140ebf1cc48bb1bf';
 
     // Create EscalationPolicy object to pass to EscalationPolicy.create()
     const escalationPolicy = new EscalationPolicy({
       rotationIntervalInDays: subscriberRotationIntervalInDays, // 7 days
-      pagingIntervalInDays: subscriberPagingIntervalInDays, // 15 minutes
+      pagingIntervalInMinutes: subscriberPagingIntervalInMinutes, // 15 minutes
       subscribers: [subscriberObjectId]
     });
 
@@ -22,7 +22,7 @@ describe('## EscalationPolicy: models', () => {
       expect(createdEP.subscribers.length).to.equal(1);
       expect(createdEP.subscribers[0].toString())
         .to.equal(subscriberObjectId);
-      expect(createdEP.pagingIntervalInDays).to.equal(subscriberPagingIntervalInDays);
+      expect(createdEP.pagingIntervalInMinutes).to.equal(subscriberPagingIntervalInMinutes);
       done();
     });
   });

@@ -46,7 +46,8 @@ const fixtures = {
       users: group.users,
       escalationPolicy: group.escalationPolicy || EscalationPolicy.defaultEscalationPolicy(),
       admins: group.admins,
-      joinRequests: group.joinRequests
+      joinRequests: group.joinRequests,
+      lastRotated: group.lastRotated || Date.now()
     };
   },
   ticket(ticket = {}) {
@@ -63,7 +64,7 @@ const fixtures = {
   escalationPolicy(escalationPolicy = {}) {
     return {
       rotationIntervalInDays: escalationPolicy.rotationIntervalInDays || 7,
-      pagingIntervalInDays: escalationPolicy.pagingIntervalInDays || 15,
+      pagingIntervalInMinutes: escalationPolicy.pagingIntervalInMinutes || 15,
       subscribers: escalationPolicy.subscribers || ['57e590a0140ebf1cc48bb1bf']
     };
   },
