@@ -48,7 +48,7 @@ function updateDevice(req, res, next) {
 }
 
 function sortDevices(req, res, next) {
-  userService.sortDevices(req.user, req.params.sortOrder)
+  userService.sortDevices(req.user, req.body.sortOrder)
     .then(user => res.json(user))
     .catch(err => next(err));
 }
