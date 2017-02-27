@@ -64,6 +64,18 @@ function addAdmin(req, res, next) {
     .catch(err => next(err));
 }
 
+function makeJoinRequest(req, res, next) {
+  groupService.makeJoinRequest(req.group.name, req.body.userId)
+    .then(updatedGroup => res.json(updatedGroup))
+    .catch(err => next(err));
+}
+
+function processJoinRequest(req, res, next) {
+  groupService.processJoinRequest(req.group, req.body.userId, req.body.isAccepted)
+    .then(updatedGroup => res.json(updatedGroup))
+    .catch(err => next(err));
+}
+
 /**
  * Loads a group into the request based on group name
  */
@@ -82,6 +94,8 @@ export default {
   createGroup,
   updateGroup,
   addAdmin,
+  makeJoinRequest,
+  processJoinRequest,
   addUser,
   removeUser,
   updateEscalationPolicy,

@@ -24,7 +24,7 @@ describe('## Ticket Service', () => {
       const missingGroupIdTicket = {
         metadata: {
           title: 'Something bad!',
-          description: "This is something bad"
+          description: 'This is something bad'
         }
       };
 

@@ -299,4 +299,83 @@ describe('## Group Service', () => {
         });
     });
   });
+
+  describe('# makeJoinRequest()', () => {
+    let group;
+    let user;
+
+    beforeEach((done) => {
+      const groupBuild = build('group', fixtures.group());
+      const userBuild = build('user', fixtures.user());
+      Promise.all([groupBuild, userBuild])
+        .then((values) => {
+          group = values[0];
+          user = values[1];
+          done();
+        });
+    });
+
+    it('makes a join request for a user to join a group', (done) => {
+      groupService.makeJoinRequest(group.name, user.id)
+        .then((updatedGroup) => {
+          expect(updatedGroup.joinRequests).to.include(user.id);
+          done();
+        });
+    });
+
+    it('fails to create a join request for a user that doesn\'t exist', (done) => {
+      groupService.makeJoinRequest(group.name, uuid.user)
+        .catch((err) => {
+          expect(err.message).to.equal('No such user exists!');
+          done();
+        });
+    });
+  });
+
+  describe('# processJoinRequest()', () => {
+    let group;
+    let user;
+
+    beforeEach((done) => {
+      build('user', fixtures.user())
+        .then((newUser) => {
+          user = newUser;
+          return build('group', fixtures.group({ joinRequests: [newUser.id] }));
+        })
+        .then((newGroup) => {
+          group = newGroup;
+          done();
+        });
+    });
+
+    context('with a valid request', () => {
+      it('accepts a group join request', (done) => {
+        groupService.processJoinRequest(group, user.id, true)
+          .then((updatedGroup) => {
+            expect(updatedGroup.joinRequests).to.be.empty;
+            expect(updatedGroup.users).to.include(user.id);
+            done();
+          });
+      });
+
+      it('denies a group join request', (done) => {
+        groupService.processJoinRequest(group, user.id, false)
+          .then((updatedGroup) => {
+            expect(updatedGroup.joinRequests).to.be.empty;
+            expect(updatedGroup.users).to.not.include(user.id);
+            done();
+          });
+      });
+    });
+
+    context('with an invalid request', () => {
+      it('throws an error for invalid request', (done) => {
+        groupService.processJoinRequest(group, uuid.user, true)
+          .catch((err) => {
+            expect(err.message).to.equal('No request for user to join group');
+            done();
+          });
+      });
+    });
+  });
 });

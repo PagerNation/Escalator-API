@@ -14,6 +14,11 @@ router.route('/:groupName')
   .put(validate(paramValidation.updateGroup), groupCtrl.updateGroup)
   .delete(validate(paramValidation.byName), groupCtrl.deleteGroup);
 
+router.route('/:groupName/request')
+  .post(validate(paramValidation.makeJoinRequest), groupCtrl.makeJoinRequest)
+  .put(validate(paramValidation.processJoinRequest),
+    middleware.isGroupAdmin, groupCtrl.processJoinRequest);
+
 router.route('/:groupName/user')
   .post(validate(paramValidation.addUser), groupCtrl.addUser);
 

@@ -329,4 +329,94 @@ describe('## Group API', () => {
       });
     });
   });
+
+  describe('# POST /api/v1/group/:groupName/joinRequests', () => {
+    let groupAdminUserAndToken;
+    let adminUserAndToken;
+    let userAndToken;
+    let group;
+
+    beforeEach((done) => {
+      const groupAdminUserBuild = buildAndAuth('user', fixtures.user())
+        .then(createdUserAndToken => (groupAdminUserAndToken = createdUserAndToken));
+      const adminUserBuild = buildAndAuth('user', fixtures.user({ isSysAdmin: true }))
+        .then(createdUserAndToken => (adminUserAndToken = createdUserAndToken));
+      const userBuild = buildAndAuth('user', fixtures.user())
+        .then(createdUserAndToken => (userAndToken = createdUserAndToken));
+
+      Promise.all([groupAdminUserBuild, adminUserBuild, userBuild])
+        .then(values => build('group', fixtures.group({
+          joinRequests: [values[2].user.id],
+          admins: [values[0].user.id]
+        })))
+        .then((g) => {
+          group = g;
+          done();
+        });
+    });
+
+    context('with group admin permissions', () => {
+      it('accepts a join request', (done) => {
+        request(app)
+          .put(`${groupUrl}/${group.name}/request`)
+          .set('Authorization', `Bearer ${groupAdminUserAndToken.token}`)
+          .send({
+            userId: userAndToken.user.id,
+            isAccepted: true
+          })
+          .expect(httpStatus.OK)
+          .then((res) => {
+            expect(res.body.joinRequests).to.be.empty;
+            expect(res.body.users).to.include(userAndToken.user.id);
+            done();
+          });
+      });
+    });
+
+    context('with admin permissions', () => {
+      it('accepts a join request', (done) => {
+        request(app)
+          .put(`${groupUrl}/${group.name}/request`)
+          .set('Authorization', `Bearer ${adminUserAndToken.token}`)
+          .send({
+            userId: userAndToken.user.id,
+            isAccepted: true
+          })
+          .expect(httpStatus.OK)
+          .then((res) => {
+            expect(res.body.joinRequests).to.be.empty;
+            expect(res.body.users).to.include(userAndToken.user.id);
+            done();
+          });
+      });
+    });
+
+    context('without group admin permissions', () => {
+      it('throws UNAUTHORIZED', (done) => {
+        request(app)
+          .put(`${groupUrl}/${group.name}/request`)
+          .set('Authorization', `Bearer ${userAndToken.token}`)
+          .send({
+            userId: userAndToken.user.id,
+            isAccepted: true
+          })
+          .expect(httpStatus.UNAUTHORIZED)
+          .then(() => done());
+      });
+    });
+
+    context('with a nonexistent user', () => {
+      it('throws for nonexistent user', (done) => {
+        request(app)
+          .put(`${groupUrl}/${group.name}/user/${uuid.user}/admin`)
+          .set('Authorization', `Bearer ${adminUserAndToken.token}`)
+          .send({
+            userId: userAndToken.user.id,
+            isAccepted: true
+          })
+          .expect(httpStatus.NOT_FOUND)
+          .then(() => done());
+      });
+    });
+  });
 });

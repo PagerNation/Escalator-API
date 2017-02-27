@@ -53,5 +53,26 @@ export default {
     params: {
       groupName: Joi.string().required()
     }
+  },
+
+  makeJoinRequest: {
+    options: { allowUnknownBody: false },
+    body: {
+      userId: Joi.string().hex().length(24).required()
+    },
+    params: {
+      groupName: Joi.string().required()
+    }
+  },
+
+  processJoinRequest: {
+    options: { allowUnknownBody: false },
+    body: {
+      userId: Joi.string().hex().length(24).required(),
+      isAccepted: Joi.boolean().required()
+    },
+    params: {
+      groupName: Joi.string().required()
+    }
   }
 };

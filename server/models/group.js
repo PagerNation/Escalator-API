@@ -21,6 +21,11 @@ const GroupSchema = new mongoose.Schema({
     type: EscalationPolicy.schema,
     default: EscalationPolicy.defaultEscalationPolicy()
   },
+  joinRequests: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: []
+  }],
   admins: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -56,6 +61,33 @@ GroupSchema.methods = {
         resolve(group);
       });
     });
+  },
+
+  processJoinRequest(userId, isAccepted) {
+    return new Promise((resolve, reject) => {
+      if (!_.includes(this.joinRequests.map(id => id.toString()), userId)) {
+        const error = new APIError('No request for user to join group', httpStatus.BAD_REQUEST);
+        return reject(error);
+      }
+
+      let maybeAddUser = Promise.resolve();
+      if (isAccepted) {
+        maybeAddUser = this.addUser(userId);
+      }
+
+      maybeAddUser.then(() => {
+        _.remove(this.joinRequests, id => id.toString() === userId);
+        this.markModified('users');
+
+        this.save((err, savedGroup) => {
+          if (err) {
+            reject(err);
+          }
+
+          resolve(savedGroup);
+        });
+      });
+    });
   }
 };
 
@@ -87,6 +119,18 @@ GroupSchema.statics = {
   updateEscalationPolicy(name, updates) {
     return new Promise((resolve, reject) => {
       this.findOneAndUpdate({ name }, { $set: updates }, { new: true }, (err, group) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(group);
+      });
+    });
+  },
+
+  makeJoinRequest(name, userId) {
+    return new Promise((resolve, reject) => {
+      const update = { $push: { joinRequests: userId } };
+      this.findOneAndUpdate({ name }, update, { new: true }, (err, group) => {
         if (err) {
           reject(err);
         }
