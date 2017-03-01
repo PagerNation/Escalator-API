@@ -239,6 +239,7 @@ describe('## Ticket Service', () => {
 
   describe('# addAction()', () => {
     let ticketId;
+    const device = fixtures.emailDevice();
 
     beforeEach((done) => {
       build('ticket', fixtures.ticket())
@@ -250,9 +251,10 @@ describe('## Ticket Service', () => {
 
     context('with valid input parameters', () => {
       it('adds an action successfully', (done) => {
-        ticketService.addAction(ticketId, actionTypes.CREATED, userId)
+        ticketService.addAction(ticketId, actionTypes.CREATED, userId, device)
           .then((ticket) => {
             expect(ticket.actions[0].actionTaken).to.equal(actionTypes.CREATED);
+            expect(ticket.actions[0].device.name).to.equal(device.name);
             expect(ticket.actions[0].userId.toString()).to.equal(userId);
             done();
           });

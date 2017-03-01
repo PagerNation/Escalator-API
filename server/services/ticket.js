@@ -42,14 +42,15 @@ function getTicketsByDate(filterOpts) {
   return Ticket.getTicketsByDate(filterOpts);
 }
 
-function addAction(ticketId, actionType, userId) {
+function addAction(ticketId, actionType, userId, device) {
   const schema = {
     ticketId: Joi.string().hex().length(24).required(),
     actionType: Joi.any().only(_.keys(actionTypes)).required(),
-    userId: Joi.string().hex().length(24)
+    userId: Joi.string().hex().length(24),
+    device: Joi.object()
   };
-  return JoiHelper.validate({ ticketId, actionType, userId }, schema)
-    .then(values => Ticket.addAction(values.ticketId, values.actionType, values.userId));
+  return JoiHelper.validate({ ticketId, actionType, userId, device }, schema)
+    .then(values => Ticket.addAction(values.ticketId, values.actionType, values.userId, values.device));
 }
 
 function removeAction(ticketId, actionType, timestamp, userId) {
