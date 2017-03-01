@@ -288,8 +288,8 @@ describe('## Ticket Service', () => {
       build('ticket', fixtures.ticket())
         .then((ticket) => {
           ticketId = ticket.id;
-          Ticket.findByIdAndUpdate(ticketId, updates, { new: true }, (err, ticket) => {
-            if (ticket) {
+          Ticket.findByIdAndUpdate(ticketId, updates, { new: true }, (err, updatedTicket) => {
+            if (updatedTicket) {
               done();
             }
           });

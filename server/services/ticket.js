@@ -50,7 +50,8 @@ function addAction(ticketId, actionType, userId, device) {
     device: Joi.object()
   };
   return JoiHelper.validate({ ticketId, actionType, userId, device }, schema)
-    .then(values => Ticket.addAction(values.ticketId, values.actionType, values.userId, values.device));
+    .then(values =>
+      Ticket.addAction(values.ticketId, values.actionType, values.userId, values.device));
 }
 
 function removeAction(ticketId, actionType, timestamp, userId) {

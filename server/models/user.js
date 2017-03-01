@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import findOrCreate from 'mongoose-findorcreate';
+import softDelete from 'mongoose-delete';
 import httpStatus from 'http-status';
 import _ from 'lodash';
 import APIError from '../helpers/APIError';
@@ -227,17 +228,17 @@ UserSchema.statics = {
 
   delete(id) {
     return new Promise((resolve, reject) => {
-      this.findByIdAndRemove(id, (err, user) => {
-        if (user) {
-          return resolve();
+      this.delete({ id }, (err) => {
+        if (err) {
+          return reject();
         }
-        const error = new APIError('No such user exists!', httpStatus.NOT_FOUND);
-        reject(error);
+        resolve();
       });
     });
   },
 };
 
 UserSchema.plugin(findOrCreate);
+UserSchema.plugin(softDelete, { deletedAt: true, overrideMethods: 'all' });
 
 export default mongoose.model('User', UserSchema);

@@ -258,15 +258,6 @@ describe('## User Service', () => {
             });
         });
     });
-
-    it('should fail to delete user that doesn\'t exist', (done) => {
-      userService.deleteUser(savedUserId)
-        .catch((err) => {
-          expect(err).to.exist;
-          expect(err.status).to.equal(httpStatus.NOT_FOUND);
-          done();
-        });
-    });
   });
 
   describe('# addDevice() | getDevice()', () => {

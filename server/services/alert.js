@@ -19,7 +19,7 @@ function createAlert(ticket) {
 }
 
 function sendPage(ticket, user, device) {
-  ticketService.addAction(ticket.id, actionTypes.PAGE_SENT, user.id);
+  ticketService.addAction(ticket.id, actionTypes.PAGE_SENT, user.id, device);
 
   switch (device.type) {
     case ('email'):
