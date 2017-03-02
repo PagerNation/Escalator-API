@@ -120,8 +120,7 @@ function scheduleEPRotation(group) {
 
 function rotateEscalationPolicy(group) {
   let subscribers = group.escalationPolicy.subscribers;
-  const newFirstUser = subscribers.pop();
-  subscribers.unshift(newFirstUser);
+  subscribers.push(subscribers.shift());
   subscribers = subscribers.map(s => s.toString());
   const groupUpdates = { lastRotated: new Date() };
   return scheduleEPRotation(group)

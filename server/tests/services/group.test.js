@@ -348,9 +348,9 @@ describe('## Group Service', () => {
         .then((updatedGroup) => {
           const ep = updatedGroup.escalationPolicy;
           expect(ep.subscribers.length).to.eq(subscribers.length);
-          expect(ep.subscribers[0].toString()).to.eq(subscribers[2]);
-          expect(ep.subscribers[1].toString()).to.eq(subscribers[0]);
-          expect(ep.subscribers[2].toString()).to.eq(subscribers[1]);
+          expect(ep.subscribers[0].toString()).to.eq(subscribers[1]);
+          expect(ep.subscribers[1].toString()).to.eq(subscribers[2]);
+          expect(ep.subscribers[2].toString()).to.eq(subscribers[0]);
 
           expect(equalDates(updatedGroup.lastRotated, new Date())).to.eq(true);
 
