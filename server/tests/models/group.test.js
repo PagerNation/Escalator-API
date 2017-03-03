@@ -16,7 +16,7 @@ describe('## Group Model', () => {
   };
 
   const userObjectId = '67e590a0140ebf1cc48bb1bf';
-  let group = null;
+  let group;
 
   context('# with a valid group', () => {
     const groupData = {
@@ -108,6 +108,26 @@ describe('## Group Model', () => {
         .then((receivedGroup) => {
           expect(receivedGroup).to.exist;
           expect(receivedGroup.users).to.be.empty;
+          done();
+        });
+    });
+  });
+
+  describe('# get all groups', () => {
+    const baseGroup = fixtures.group();
+
+    beforeEach((done) => {
+      build('group', baseGroup)
+        .then(() => build('group', baseGroup))
+        .then(() => build('group', baseGroup))
+        .then(() => done());
+    });
+
+    it('should return 3 groups', (done) => {
+      Group.getAllGroups()
+        .then((groups) => {
+          expect(groups).to.exist;
+          expect(groups).to.have.lengthOf(3);
           done();
         });
     });
