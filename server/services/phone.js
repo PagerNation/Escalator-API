@@ -7,21 +7,23 @@ const twilioToken = config.twilio.token;
 const twilio = new Twilio(twilioSid, twilioToken);
 
 function sendMessage(ticket, user, device) {
-  return twilio.messages
+  const smsMessage = twilio.messages
     .create({
       to: device.contactInformation,
       from: config.twilio.fromPhone,
       body: 'This is the ship that made the Kessel Run in fourteen parsecs?',
     });
+    return Promise.resolve(smsMessage);
 }
 
 function makeCall(ticket, user, device) {
-  return twilio.calls
+  const phoneCall = twilio.calls
     .create({
       url: 'http://demo.twilio.com/docs/voice.xml',
       to: device.contactInformation,
       from: config.twilio.fromPhone,
     });
+  return Promise.resolve(phoneCall);
 }
 
 export default {

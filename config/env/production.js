@@ -3,7 +3,8 @@ export default {
   db: process.env.DB_URI,
   port: process.env.PORT || 3000,
   auth: {
-    jwt_secret: process.env.JWT_SECRET
+    jwtSecret: process.env.JWT_SECRET,
+    queueSecret: process.env.QUEUE_SECRET
   },
   default_delay: 10,
   email: {
