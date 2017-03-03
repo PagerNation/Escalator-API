@@ -12,9 +12,11 @@ mongoose.connection.on('error', () => {
   throw new Error(`unable to connect to database: ${config.db}`);
 });
 
-const debug = require('debug')('escalator-api:index');
+mongoose.connection.on('connected', () => {
+  groupLoader.bulkScheduleEPRotation();
+});
 
-groupLoader.bulkScheduleEPRotation();
+const debug = require('debug')('escalator-api:index');
 
 // listen on port config.port
 app.listen(config.port, () => {

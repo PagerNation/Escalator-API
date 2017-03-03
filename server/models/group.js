@@ -109,9 +109,12 @@ GroupSchema.statics = {
   },
 
   getAllGroups() {
-    return new Promise((resolve) => {
-      this.find({}, (groups) => {
-        resolve(groups);
+    return new Promise((resolve, reject) => {
+      this.find({}, (err, groups) => {
+        if (groups) {
+          resolve(groups);
+        }
+        reject(err);
       });
     });
   },
