@@ -101,11 +101,9 @@ TicketSchema.statics = {
     });
   },
 
-  removeAction(id, action, timestamp, userId) {
+  removeAction(id, actionId) {
     const builtActionObject = {
-      actionTaken: action,
-      userId,
-      timestamp
+      _id: actionId
     };
 
     return new Promise((resolve, reject) => {

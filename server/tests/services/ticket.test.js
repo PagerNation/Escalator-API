@@ -1,7 +1,7 @@
 import httpStatus from 'http-status';
 import ticketService from '../../services/ticket';
 import Ticket, { actionTypes } from '../../models/ticket';
-import { build, fixtures } from '../../utils/factories';
+import { build, fixtures, uuid } from '../../utils/factories';
 
 describe('## Ticket Service', () => {
   const ticketObject = fixtures.ticket();
@@ -275,6 +275,7 @@ describe('## Ticket Service', () => {
 
   describe('# removeAction()', () => {
     let ticketId;
+    let actionId;
 
     const action = {
       actionTaken: actionTypes.CREATED,
@@ -290,6 +291,7 @@ describe('## Ticket Service', () => {
           ticketId = ticket.id;
           Ticket.findByIdAndUpdate(ticketId, updates, { new: true }, (err, updatedTicket) => {
             if (updatedTicket) {
+              actionId = updatedTicket.actions[0]._id.toString();
               done();
             }
           });
@@ -298,7 +300,7 @@ describe('## Ticket Service', () => {
 
     context('with valid input parameters', () => {
       it('removes an action successfully', (done) => {
-        ticketService.removeAction(ticketId, action.actionTaken, action.timestamp, action.userId)
+        ticketService.removeAction(ticketId, actionId)
           .then((ticket) => {
             expect(ticket.actions).to.be.empty;
             done();
@@ -306,22 +308,11 @@ describe('## Ticket Service', () => {
       });
 
       it('doesn\'t remove actions that don\'t match the search criteria', (done) => {
-        ticketService.removeAction(ticketId, actionTypes.CLOSED, action.timestamp, action.userId)
+        ticketService.removeAction(ticketId, uuid.user)
           .then((ticket) => {
             expect(ticket.actions).to.have.length(1);
             expect(ticket.actions[0].actionTaken).to.equal(actionTypes.CREATED);
             expect(ticket.actions[0].userId.toString()).to.equal(userId);
-            done();
-          });
-      });
-    });
-
-    context('with invalid input parameters', () => {
-      it('fails to remove an action', (done) => {
-        ticketService.removeAction(ticketId, 'testing', action.timestamp)
-          .catch((err) => {
-            expect(err.details[0].message)
-              .to.equal('"actionType" must be one of [CREATED, PAGE_SENT, ACKNOWLEDGED, REJECTED, CLOSED]');
             done();
           });
       });
