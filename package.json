@@ -51,6 +51,7 @@
     "lodash": "^4.16.4",
     "method-override": "^2.3.5",
     "mongoose": "4.6.2",
+    "mongoose-delete": "^0.3.4",
     "mongoose-findorcreate": "^0.1.2",
     "morgan": "1.7.0",
     "node-schedule": "^1.2.0",

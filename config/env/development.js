@@ -3,7 +3,8 @@ export default {
   db: 'mongodb://localhost/escalator-api-development',
   port: 3000,
   auth: {
-    jwt_secret: process.env.JWT_SECRET
+    jwtSecret: process.env.JWT_SECRET,
+    queueSecret: process.env.QUEUE_SECRET
   },
   default_delay: 10,
   email: {
@@ -13,6 +14,6 @@ export default {
   twilio: {
     accountSid: process.env.PHONE_SID,
     token: process.env.PHONE_TOKEN,
-    fromPhone: '+15854818574'
+    fromPhone: process.env.PHONE_OUT
   }
 };

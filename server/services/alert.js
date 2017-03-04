@@ -1,6 +1,8 @@
 import User from '../models/user';
+import { actionTypes } from '../models/ticket';
 import emailService from './email';
 import phoneService from './phone';
+import ticketService from './ticket';
 
 function createAlert(ticket) {
   // THIS IS ALL GETTING DELETED, JUST FOR THE SENDPAGE FUNCTION TESTING
@@ -12,10 +14,13 @@ function createAlert(ticket) {
     .then((user) => {
       const firstDevice = user.devices[0];
       sendPage(ticket, user, firstDevice);
-    });
+    })
+    .then(() => ticketService.addAction(ticket.id, actionTypes.CREATED));
 }
 
 function sendPage(ticket, user, device) {
+  ticketService.addAction(ticket.id, actionTypes.PAGE_SENT, user.id, device);
+
   switch (device.type) {
     case ('email'):
       return emailService.sendEmail(ticket, user, device);
