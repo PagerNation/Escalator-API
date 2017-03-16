@@ -86,6 +86,10 @@ function processJoinRequest(group, userId, isAccepted) {
     .then(v => group.processJoinRequest(v.userId, v.isAccepted));
 }
 
+function searchByName(partialGroupName) {
+  return Group.searchByName(partialGroupName);
+}
+
 function updateEscalationPolicy(groupName, escalationPolicy) {
   const escalationPolicySchema = Joi.object().keys({
     rotationIntervalInDays: Joi.number(),
@@ -145,6 +149,7 @@ export default {
   deleteGroup,
   createGroup,
   updateGroup,
+  searchByName,
   addAdmin,
   makeJoinRequest,
   processJoinRequest,
