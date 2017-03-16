@@ -7,7 +7,8 @@ import EscalationPolicy from '../models/escalationPolicy';
 import authService from '../services/auth';
 
 const uuid = {
-  user: '123456789012345678901234'
+  user: '123456789012345678901234',
+  ticket: '123456789012345678909999'
 };
 
 const fixtures = {

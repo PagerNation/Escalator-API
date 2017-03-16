@@ -1,5 +1,4 @@
 import request from 'request-promise-native';
-import User from '../models/user';
 import { actionTypes } from '../models/ticket';
 import config from '../../config/env';
 import emailService from './email';
@@ -22,9 +21,10 @@ function createAlert(ticket) {
 function generateAllPageRequests(group, ticket) {
   let pageRequests = [];
   let currentDelay = 0;
+  const title = ticket.metadata.title;
 
-  for (let user of group.escalationPolicy.subscribers) {
-    let userPages = generateUserPageRequests(ticket.id, user, currentDelay, ticket.metadata.title);
+  for (const user of group.escalationPolicy.subscribers) {
+    const userPages = generateUserPageRequests(ticket.id, user, currentDelay, title);
     pageRequests = pageRequests.concat(userPages);
     currentDelay += group.escalationPolicy.pagingIntervalInMinutes;
   }
@@ -35,7 +35,7 @@ function generateUserPageRequests(ticketId, user, delay, title) {
   const userPageRequests = [];
   let currUserDelay = 0;
 
-  for (var i = 0; i < user.devices.length; i++) {
+  for (let i = 0; i < user.devices.length; i++) {
     if (i !== 0) {
       currUserDelay += user.delays[i - 1] || config.defaultDelay;
     }
@@ -98,5 +98,6 @@ function sendPage(ticketId, userId, device) {
 
 export default {
   createAlert,
-  sendPage
+  sendPage,
+  generateUserPageRequests
 };
