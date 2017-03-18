@@ -10,4 +10,4 @@ function isQueue(req, res, next) {
 
 export default {
   isQueue
-}
+};

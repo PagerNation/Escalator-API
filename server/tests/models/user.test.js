@@ -40,21 +40,12 @@ describe('## User Model', () => {
   });
 
   describe('# user devices modifications', () => {
-    const baseUser = {
-      name: 'Kaleb Davis',
-      email: 'abc@google.com'
-    };
-
-    const newDevice = new Device({
-      name: 'home phone',
-      type: 'phone',
-      contactInformation: '5555555555'
-    });
+    const newDevice = new Device(fixtures.smsDevice());
 
     let user;
 
     beforeEach((done) => {
-      build('user', baseUser)
+      build('user', fixtures.user())
         .then((createdUser) => {
           expect(createdUser).to.exist;
           user = createdUser;
@@ -126,18 +117,8 @@ describe('## User Model', () => {
     });
 
     it('should sort a users devices by a given order', (done) => {
-      const sortDevice1 = new Device({
-        name: 'mobile',
-        type: 'sms',
-        contactInformation: '5555555555'
-      });
-
-      const sortDevice2 = new Device({
-        name: 'home email',
-        type: 'email',
-        contactInformation: 'j@l.com'
-      });
-
+      const sortDevice1 = new Device(fixtures.smsDevice());
+      const sortDevice2 = new Device(fixtures.smsDevice());
       const sortOrder = [newDevice.id, sortDevice2.id, sortDevice1.id];
 
       user.addDevice(sortDevice1)
@@ -168,11 +149,7 @@ describe('## User Model', () => {
   });
 
   describe('# user group modifications', () => {
-    const userDetails = {
-      name: 'Bryon Wilkins',
-      email: '123@google.com'
-    };
-
+    const userDetails = fixtures.user();
     const group = {
       name: 'Wondertwins'
     };

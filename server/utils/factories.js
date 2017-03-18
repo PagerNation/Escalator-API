@@ -12,12 +12,17 @@ const uuid = {
 
 const fixtures = {
   user(user = {}) {
-    return {
+    const obj = {
       name: user.name || Faker.internet.userName(),
       email: user.email || Faker.internet.email(),
-      groups: user.groups,
       isSysAdmin: user.isSysAdmin || false
     };
+
+    if (user.groups) {
+      obj.groups = user.groups;
+    }
+
+    return obj;
   },
   emailDevice(device = {}) {
     return {

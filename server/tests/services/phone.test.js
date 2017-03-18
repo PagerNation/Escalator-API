@@ -12,7 +12,6 @@ describe('## Phone Service', () => {
     let phoneDevice;
 
     before((done) => {
-
       build('device', fixtures.phoneDevice({ contactInformation: VALID_TO_NUMBER }))
         .then((device) => {
           phoneDevice = device;
@@ -58,7 +57,7 @@ describe('## Phone Service', () => {
       Promise.all([pProm, tProm])
         .then((results) => {
           smsDevice = results[0];
-          ticket = results[1]
+          ticket = results[1];
           done();
         });
     });

@@ -13,7 +13,7 @@ function sendMessage(ticket, user, device) {
       from: config.twilio.fromPhone,
       body: ticket.metadata.description
     });
-    return Promise.resolve(smsMessage);
+  return Promise.resolve(smsMessage);
 }
 
 function makeCall(ticket, user, device) {
