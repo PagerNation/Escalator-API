@@ -54,15 +54,13 @@ function addAction(ticketId, actionType, userId, device) {
       Ticket.addAction(values.ticketId, values.actionType, values.userId, values.device));
 }
 
-function removeAction(ticketId, actionType, timestamp, userId) {
+function removeAction(ticketId, actionId) {
   const schema = {
     ticketId: Joi.string().hex().length(24).required(),
-    actionType: Joi.any().only(_.keys(actionTypes)).required(),
-    timestamp: Joi.number(),
-    userId: Joi.string().hex().length(24)
+    actionId: Joi.string().hex().length(24)
   };
-  return JoiHelper.validate({ ticketId, actionType, timestamp, userId }, schema)
-    .then(v => Ticket.removeAction(v.ticketId, v.actionType, v.timestamp, v.userId));
+  return JoiHelper.validate({ ticketId, actionId }, schema)
+    .then(v => Ticket.removeAction(v.ticketId, v.actionId));
 }
 
 export default {
