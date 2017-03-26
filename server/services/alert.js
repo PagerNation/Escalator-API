@@ -73,8 +73,6 @@ function sendPageRequestsToQueue(userPageRequests) {
 }
 
 function sendPage(ticketId, userId, device) {
-  ticketService.addAction(ticketId, actionTypes.PAGE_SENT, userId, device);
-
   const userPromise = userService.getUser(userId);
   const ticketPromise = ticketService.getById(ticketId);
 
@@ -93,7 +91,8 @@ function sendPage(ticketId, userId, device) {
         default:
           return Promise.reject(new Error(`Invalid device type: ${device.type} on User: "${user.id}"`));
       }
-    });
+    })
+    .then(() => ticketService.addAction(ticketId, actionTypes.PAGE_SENT, userId, device));
 }
 
 export default {
