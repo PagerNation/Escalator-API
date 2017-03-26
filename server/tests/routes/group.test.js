@@ -147,19 +147,14 @@ describe('## Group API', () => {
 
 
       describe('# PUT /api/v1/group/:groupName', () => {
-        const updateDetails = {
-          users: ['a403e1675e8bc2b1cb409a1b', '16092d4636c645db67a61f83']
-        };
-
         it('should update the group details', (done) => {
           request(app)
             .put(`${groupUrl}/${group.name}`)
             .set('Authorization', `Bearer ${token}`)
-            .send(updateDetails)
+            .send({ users: [user.id] })
             .expect(httpStatus.OK)
             .then((res) => {
-              expect(res.body.users[0].toString()).to.equal(updateDetails.users[0]);
-              expect(res.body.users[1].toString()).to.equal(updateDetails.users[1]);
+              expect(res.body.users[0]._id).to.equal(user.id);
               done();
             });
         });
