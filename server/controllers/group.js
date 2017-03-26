@@ -22,6 +22,7 @@ function createGroup(req, res, next) {
 
 function updateGroup(req, res, next) {
   groupService.updateGroup(req.params.groupName, req.body)
+    .then(updatedGroup => updatedGroup.populate('users').execPopulate())
     .then(updatedGroup => res.json(updatedGroup))
     .catch(err => next(err));
 }
