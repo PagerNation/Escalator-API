@@ -59,12 +59,14 @@ function addAdmin(req, res, next) {
 
 function makeJoinRequest(req, res, next) {
   groupService.makeJoinRequest(req.group.name, req.body.userId)
+    .then(updatedGroup => updatedGroup.populate('users').execPopulate())
     .then(updatedGroup => res.json(updatedGroup))
     .catch(err => next(err));
 }
 
 function processJoinRequest(req, res, next) {
   groupService.processJoinRequest(req.group, req.body.userId, req.body.isAccepted)
+    .then(updatedGroup => updatedGroup.populate('users').execPopulate())
     .then(updatedGroup => res.json(updatedGroup))
     .catch(err => next(err));
 }

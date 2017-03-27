@@ -393,7 +393,7 @@ describe('## Group API', () => {
           .expect(httpStatus.OK)
           .then((res) => {
             expect(res.body.joinRequests).to.be.empty;
-            expect(res.body.users).to.include(userAndToken.user.id);
+            expect(res.body.users[0]._id).to.eq(userAndToken.user.id.toString());
             done();
           });
       });
@@ -411,7 +411,7 @@ describe('## Group API', () => {
           .expect(httpStatus.OK)
           .then((res) => {
             expect(res.body.joinRequests).to.be.empty;
-            expect(res.body.users).to.include(userAndToken.user.id);
+            expect(res.body.users[0]._id).to.eq(userAndToken.user.id.toString());
             done();
           });
       });
