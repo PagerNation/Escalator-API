@@ -10,6 +10,9 @@ const router = express.Router(); // eslint-disable-line new-cap
 router.route('/')
   .post(validate(paramValidation.createGroup), userMiddleware.isSysAdmin, groupCtrl.createGroup);
 
+router.route('/searchByName')
+  .get(groupCtrl.searchByName);
+
 router.route('/:groupName')
   .get(validate(paramValidation.byName), groupCtrl.getGroup)
   .put(validate(paramValidation.updateGroup), groupMiddleware.isGroupAdmin, groupCtrl.updateGroup)

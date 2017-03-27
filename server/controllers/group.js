@@ -27,6 +27,12 @@ function updateGroup(req, res, next) {
     .catch(err => next(err));
 }
 
+function searchByName(req, res, next) {
+  groupService.searchByName(req.params.groupName)
+    .then(groups => res.json(groups))
+    .catch(err => next(err));
+}
+
 function addUser(req, res, next) {
   groupService.addUser(req.group, req.body.userId)
     .then(updatedGroup => res.json(updatedGroup))
@@ -90,6 +96,7 @@ export default {
   deleteGroup,
   createGroup,
   updateGroup,
+  searchByName,
   addAdmin,
   makeJoinRequest,
   processJoinRequest,

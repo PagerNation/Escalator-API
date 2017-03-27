@@ -119,6 +119,20 @@ GroupSchema.statics = {
     });
   },
 
+  searchByName(name) {
+    return new Promise((resolve, reject) => {
+      const query = new RegExp(name, 'i');
+      this.find({ name: query })
+        .limit(20)
+        .exec((err, groups) => {
+          if (groups) {
+            resolve(groups);
+          }
+          reject(err);
+        });
+    });
+  },
+
   delete(name) {
     return new Promise((resolve, reject) => {
       this.findOneAndRemove({ name }, (err, group) => {
