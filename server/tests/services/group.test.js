@@ -110,13 +110,11 @@ describe('## Group Service', () => {
       context('with a group that exists', () => {
         it('deletes the group', (done) => {
           groupService.deleteGroup(groupObject.name)
-            .then(() => {
-              groupService.getGroup(groupObject.name)
-                .catch((err, group) => {
-                  expect(err).to.exist;
-                  expect(err.status).to.equal(httpStatus.NOT_FOUND);
-                  done();
-                });
+            .then(() => groupService.getGroup(groupObject.name))
+            .catch((err, group) => {
+              expect(err).to.exist;
+              expect(err.status).to.equal(httpStatus.NOT_FOUND);
+              done();
             });
         });
       });
@@ -145,12 +143,10 @@ describe('## Group Service', () => {
             group = receivedGroup;
             expect(receivedGroup).to.exist;
           })
-          .then(() => {
-            build('user', userObject)
-              .then((u) => {
-                user = u;
-                done();
-              });
+          .then(() => build('user', userObject))
+          .then((u) => {
+            user = u;
+            done();
           });
       });
 
@@ -179,9 +175,9 @@ describe('## Group Service', () => {
           })
           .then((g) => {
             group = g;
-            userService.addGroupByUserId(userId, group.name)
-              .then(() => done());
-          });
+            return userService.addGroupByUserId(userId, group.name);
+          })
+          .then(() => done());
       });
 
       context('when the user exists', () => {

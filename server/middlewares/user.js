@@ -28,7 +28,7 @@ function isSysAdmin(req, res, next) {
   if (req.user.isSysAdmin) {
     return next();
   }
-  res.status(httpStatus.UNAUTHORIZED).send();
+  res.sendStatus(httpStatus.UNAUTHORIZED);
 }
 
 export default {

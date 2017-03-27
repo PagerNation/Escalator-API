@@ -25,10 +25,6 @@ function deleteUser(req, res, next) {
     .catch(err => next(err));
 }
 
-/**
- * Device modifications
- */
-
 function getDevice(req, res, next) {
   userService.getDevice(req.user, req.params.deviceId)
     .then(device => res.json(device))

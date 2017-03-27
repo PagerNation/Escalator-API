@@ -65,9 +65,9 @@ function removeUser(group, userId) {
     .then((validatedUserId) => {
       const removeUserFromGroup = group.removeUser(validatedUserId);
       const removeGroupFromUser = userService.removeGroupByUserId(validatedUserId, group.name);
-      return Promise.all([removeUserFromGroup, removeGroupFromUser])
-        .then(promiseResults => promiseResults[0]);
-    });
+      return Promise.all([removeUserFromGroup, removeGroupFromUser]);
+    })
+    .then(promiseResults => promiseResults[0]);
 }
 
 function makeJoinRequest(groupName, userId) {

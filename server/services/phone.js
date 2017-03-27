@@ -11,9 +11,9 @@ function sendMessage(ticket, user, device) {
     .create({
       to: device.contactInformation,
       from: config.twilio.fromPhone,
-      body: 'This is the ship that made the Kessel Run in fourteen parsecs?',
+      body: ticket.metadata.description
     });
-    return Promise.resolve(smsMessage);
+  return Promise.resolve(smsMessage);
 }
 
 function makeCall(ticket, user, device) {

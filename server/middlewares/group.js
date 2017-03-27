@@ -7,7 +7,7 @@ function isGroupAdmin(req, res, next) {
     || req.user.isSysAdmin) {
     return next();
   }
-  res.status(httpStatus.UNAUTHORIZED).send();
+  res.sendStatus(httpStatus.UNAUTHORIZED);
 }
 
 export default {

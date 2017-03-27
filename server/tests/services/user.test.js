@@ -8,16 +8,8 @@ import Group from '../../models/group';
 import { buildUserAndGroups } from '../helpers/userHelper';
 
 describe('## User Service', () => {
-  const baseUser = {
-    name: 'Jarryd',
-    email: 'abc@google.com'
-  };
-
-  const baseDevice = {
-    name: 'email',
-    type: 'email',
-    contactInformation: '1234567890'
-  };
+  const baseUser = fixtures.user();
+  const baseDevice = fixtures.smsDevice();
 
   describe('# createUser()', () => {
     context('with valid user details', () => {
@@ -25,8 +17,8 @@ describe('## User Service', () => {
         userService.createUser(baseUser)
           .then((createdUser) => {
             expect(createdUser).to.exist;
-            expect(createdUser.name).to.equal('Jarryd');
-            expect(createdUser.email).to.equal('abc@google.com');
+            expect(createdUser.name).to.equal(baseUser.name);
+            expect(createdUser.email).to.equal(baseUser.email);
             expect(createdUser.isSysAdmin).to.equal(false);
             expect(createdUser.auth).to.be.null;
             expect(createdUser.groups).to.be.empty;
@@ -101,23 +93,23 @@ describe('## User Service', () => {
   });
 
   describe('# getUser()', () => {
-    let savedUserId;
+    let savedUser;
 
     before((done) => {
       userService.createUser(baseUser)
         .then((createdUser) => {
-          savedUserId = createdUser.id;
+          savedUser = createdUser;
           done();
         });
     });
 
     it('gets an existing user', (done) => {
-      userService.getUser(savedUserId)
+      userService.getUser(savedUser.id)
         .then((user) => {
           expect(user).to.exist;
-          expect(user.id).to.equal(savedUserId);
-          expect(user.name).to.equal('Jarryd');
-          expect(user.email).to.equal('abc@google.com');
+          expect(user.id).to.equal(savedUser.id);
+          expect(user.name).to.equal(savedUser.name);
+          expect(user.email).to.equal(savedUser.email);
           expect(user.isSysAdmin).to.equal(false);
           expect(user.auth).to.be.null;
           expect(user.groups).to.be.empty;

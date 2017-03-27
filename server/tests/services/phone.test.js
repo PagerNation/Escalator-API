@@ -49,17 +49,21 @@ describe('## Phone Service', () => {
     const CANT_ROUTE_NUMBER_ERROR_CODE = 21612;
 
     let smsDevice;
+    let ticket;
 
     before((done) => {
-      build('device', fixtures.smsDevice({ contactInformation: VALID_TO_NUMBER }))
-        .then((device) => {
-          smsDevice = device;
+      const pProm = build('device', fixtures.phoneDevice({ contactInformation: VALID_TO_NUMBER }));
+      const tProm = build('ticket', fixtures.ticket());
+      Promise.all([pProm, tProm])
+        .then((results) => {
+          smsDevice = results[0];
+          ticket = results[1];
           done();
         });
     });
 
     it('should successfully send a sms message', (done) => {
-      phoneService.sendMessage(null, null, smsDevice)
+      phoneService.sendMessage(ticket, null, smsDevice)
         .then((messageInfo) => {
           expect(messageInfo).to.exist;
           expect(messageInfo.status).to.equal('queued');
@@ -71,7 +75,7 @@ describe('## Phone Service', () => {
       const invalidNumberDevice = smsDevice;
       invalidNumberDevice.contactInformation = INVALID_NUMBER;
 
-      phoneService.sendMessage(null, null, invalidNumberDevice)
+      phoneService.sendMessage(ticket, null, invalidNumberDevice)
         .catch((err) => {
           expect(err.code).to.equal(INVALID_NUMBER_ERROR_CODE);
           expect(err.message).to.equal(`The \'To\' number ${INVALID_NUMBER} is not a valid phone number.`);
@@ -83,7 +87,7 @@ describe('## Phone Service', () => {
       const routeNumberDevice = smsDevice;
       routeNumberDevice.contactInformation = CANT_ROUTE_NUMBER;
 
-      phoneService.sendMessage(null, null, routeNumberDevice)
+      phoneService.sendMessage(ticket, null, routeNumberDevice)
         .catch((err) => {
           expect(err.code).to.equal(CANT_ROUTE_NUMBER_ERROR_CODE);
           expect(err.message).to.equal(
