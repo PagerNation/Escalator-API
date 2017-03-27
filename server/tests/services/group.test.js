@@ -299,6 +299,31 @@ describe('## Group Service', () => {
     });
   });
 
+  describe('# removeAdmin()', () => {
+    let group;
+    let user;
+
+    beforeEach((done) => {
+      build('user', fixtures.user())
+        .then((userB) => {
+          user = userB;
+          return build('group', fixtures.group({ admins: [user.id] }));
+        })
+        .then((groupB) => {
+          group = groupB;
+          done();
+        });
+    });
+
+    it('removes an admin', (done) => {
+      groupService.removeAdmin(group.name, user.id)
+        .then((updatedGroup) => {
+          expect(updatedGroup.admins).to.be.empty;
+          done();
+        });
+    });
+  });
+
   describe('# scheduleEPRotation()', () => {
     let group;
 
@@ -437,35 +462,35 @@ describe('## Group Service', () => {
   });
 
   describe('# searchByName()', () => {
-      beforeEach((done) => {
-        build('group', fixtures.group({ name: 'test' }))
+    beforeEach((done) => {
+      build('group', fixtures.group({ name: 'test' }))
           .then(() => build('group', fixtures.group({ name: 'nothing' })))
           .then(() => done());
-      });
+    });
 
-      it('should find one group', (done) => {
-        groupService.searchByName('tes')
+    it('should find one group', (done) => {
+      groupService.searchByName('tes')
           .then((groups) => {
             expect(groups).to.have.length(1);
             expect(groups[0].name).to.equal('test');
             done();
           });
-      });
+    });
 
-      it('should find two groups', (done) => {
-        groupService.searchByName('t')
+    it('should find two groups', (done) => {
+      groupService.searchByName('t')
           .then((groups) => {
             expect(groups).to.have.length(2);
             done();
           });
-      });
+    });
 
-      it('should find zero groups', (done) => {
-        groupService.searchByName('please do not exist')
+    it('should find zero groups', (done) => {
+      groupService.searchByName('please do not exist')
           .then((groups) => {
             expect(groups).to.have.length(0);
             done();
           });
-      });
     });
+  });
 });

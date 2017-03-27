@@ -30,7 +30,8 @@ router.route('/:groupName/user/:userId')
   .delete(validate(paramValidation.userById), groupMiddleware.isGroupAdmin, groupCtrl.removeUser);
 
 router.route('/:groupName/user/:userId/admin')
-  .post(validate(paramValidation.userById), groupMiddleware.isGroupAdmin, groupCtrl.addAdmin);
+  .post(validate(paramValidation.userById), groupMiddleware.isGroupAdmin, groupCtrl.addAdmin)
+  .delete(validate(paramValidation.userById), groupMiddleware.isGroupAdmin, groupCtrl.removeAdmin);
 
 router.route('/:groupName/escalationpolicy')
   .put(validate(paramValidation.updateEscalationPolicy),

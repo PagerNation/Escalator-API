@@ -178,6 +178,18 @@ GroupSchema.statics = {
         resolve(group);
       });
     });
+  },
+
+  removeAdmin(name, userId) {
+    return new Promise((resolve, reject) => {
+      const update = { $pull: { admins: userId } };
+      this.findOneAndUpdate({ name }, update, { new: true }, (err, group) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(group);
+      });
+    });
   }
 };
 

@@ -115,6 +115,12 @@ function addAdmin(groupName, userId) {
     .then(validatedUserId => Group.addAdmin(groupName, validatedUserId));
 }
 
+function removeAdmin(groupName, userId) {
+  return userService.exists(userId)
+    .then(() => JoiHelper.validate(userId, ID_SCHEMA))
+    .then(validatedUserId => Group.removeAdmin(groupName, validatedUserId));
+}
+
 function scheduleEPRotation(group) {
   const rotationInterval = group.escalationPolicy.rotationIntervalInDays;
   const nextRotateDate = buildRotateDate(group.lastRotated, rotationInterval);
@@ -151,6 +157,7 @@ export default {
   updateGroup,
   searchByName,
   addAdmin,
+  removeAdmin,
   makeJoinRequest,
   processJoinRequest,
   // Group User Modifications
