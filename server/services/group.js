@@ -1,9 +1,11 @@
 import Joi from 'joi';
 import _ from 'lodash';
+import httpStatus from 'http-status';
 import scheduler from 'node-schedule';
 import JoiHelper from '../helpers/JoiHelper';
 import Group from '../models/group';
 import userService from './user';
+import APIError from '../helpers/APIError';
 
 const ID_SCHEMA = Joi.string().hex().length(24);
 
@@ -17,6 +19,17 @@ function getAllGroups() {
 
 function deleteGroup(groupName) {
   return Group.delete(groupName);
+}
+
+function canRemoveAdmin(groupName) {
+  return getGroup(groupName)
+    .then(group => {
+      if (group.admins.length <= 1) {
+        const error = new APIError('Cannot remove only remaining admin', httpStatus.BAD_REQUEST);
+        return Promise.reject(error);
+      }
+      return group;
+    });
 }
 
 function createGroup(groupObject) {
@@ -116,7 +129,8 @@ function addAdmin(groupName, userId) {
 }
 
 function removeAdmin(groupName, userId) {
-  return userService.exists(userId)
+  return canRemoveAdmin(groupName)
+    .then(() => userService.exists(userId))
     .then(() => JoiHelper.validate(userId, ID_SCHEMA))
     .then(validatedUserId => Group.removeAdmin(groupName, validatedUserId));
 }

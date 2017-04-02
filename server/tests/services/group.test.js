@@ -307,7 +307,7 @@ describe('## Group Service', () => {
       build('user', fixtures.user())
         .then((userB) => {
           user = userB;
-          return build('group', fixtures.group({ admins: [user.id] }));
+          return build('group', fixtures.group({ admins: [user.id, uuid.user] }));
         })
         .then((groupB) => {
           group = groupB;
@@ -318,7 +318,16 @@ describe('## Group Service', () => {
     it('removes an admin', (done) => {
       groupService.removeAdmin(group.name, user.id)
         .then((updatedGroup) => {
-          expect(updatedGroup.admins).to.be.empty;
+          expect(updatedGroup.admins).to.include(uuid.user);
+          done();
+        });
+    });
+
+    it('does not remove last admin', (done) => {
+      groupService.removeAdmin(group.name, user.id)
+        .then(updatedGroup => groupService.removeAdmin(group.name, uuid))
+        .catch((err) => {
+          expect(err.message).to.equal('Cannot remove only remaining admin');
           done();
         });
     });
