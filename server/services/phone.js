@@ -19,14 +19,21 @@ function sendMessage(ticket, user, device) {
 function makeCall(ticket, user, device) {
   const phoneCall = twilio.calls
     .create({
-      url: 'http://demo.twilio.com/docs/voice.xml',
+      url: 'http://localhost:3000/api/v1/twilio',
       to: device.contactInformation,
       from: config.twilio.fromPhone,
     });
   return Promise.resolve(phoneCall);
 }
 
+function buildTwiml() {
+  const twiml = new Twilio.TwimlResponse();
+  twiml.say('Hello Kaleb', { voice: 'alice' });
+  return twiml;
+}
+
 export default {
   sendMessage,
-  makeCall
+  makeCall,
+  buildTwiml
 };

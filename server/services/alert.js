@@ -19,6 +19,9 @@ function createAlert(ticket) {
 }
 
 function sendPage(ticket, user, device) {
+  console.log("SENDING PAGE", ticket);
+  console.log("USER", user);
+  console.log("DEVICE", device);
   ticketService.addAction(ticket.id, actionTypes.PAGE_SENT, user.id, device);
 
   switch (device.type) {
