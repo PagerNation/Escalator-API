@@ -437,35 +437,35 @@ describe('## Group Service', () => {
   });
 
   describe('# searchByName()', () => {
-      beforeEach((done) => {
-        build('group', fixtures.group({ name: 'test' }))
+    beforeEach((done) => {
+      build('group', fixtures.group({ name: 'test' }))
           .then(() => build('group', fixtures.group({ name: 'nothing' })))
           .then(() => done());
-      });
+    });
 
-      it('should find one group', (done) => {
-        groupService.searchByName('tes')
+    it('should find one group', (done) => {
+      groupService.searchByName('tes')
           .then((groups) => {
             expect(groups).to.have.length(1);
             expect(groups[0].name).to.equal('test');
             done();
           });
-      });
+    });
 
-      it('should find two groups', (done) => {
-        groupService.searchByName('t')
+    it('should find two groups', (done) => {
+      groupService.searchByName('t')
           .then((groups) => {
             expect(groups).to.have.length(2);
             done();
           });
-      });
+    });
 
-      it('should find zero groups', (done) => {
-        groupService.searchByName('please do not exist')
+    it('should find zero groups', (done) => {
+      groupService.searchByName('please do not exist')
           .then((groups) => {
             expect(groups).to.have.length(0);
             done();
           });
-      });
     });
+  });
 });
