@@ -13,6 +13,7 @@
     "start": "gulp serve",
     "build": "gulp",
     "lint": "eslint --fix *.js server/** config/**/*.js && echo Lint Passed ❤",
+    "ci-lint": "eslint *.js server/** config/**/*.js && echo Lint Passed ❤",
     "test": "gulp mocha",
     "commit": "git-cz",
     "report-coverage": "coveralls < ./coverage/lcov.info"

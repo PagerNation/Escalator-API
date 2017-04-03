@@ -19,7 +19,7 @@ before_script:
   - chmod +x deploy.sh
 
 script:
-  - npm run lint
+  - npm run ci-lint
   - npm test
 
 after_success:
