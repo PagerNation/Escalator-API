@@ -32,7 +32,7 @@ const GroupSchema = new mongoose.Schema({
       ref: 'User',
     }],
     validate: {
-      validator: function(array) {
+      validator(array) {
         return array.length >= 1;
       },
       message: 'Group must have at least one admin'
@@ -193,19 +193,15 @@ GroupSchema.statics = {
         _.remove(group.admins, n => n.toString() === userId);
         group.markModified('admins');
 
-        group.save((err, group) => {
-          if (err) {
-            reject(err);
+        group.save((e, savedGroup) => {
+          if (e) {
+            reject(e);
           }
-          resolve(group);
+          resolve(savedGroup);
         });
-      })
+      });
     });
   }
 };
-
-const validateNotEmpty = function(array) {
-  return array.length !== 0;
-}
 
 export default mongoose.model('Group', GroupSchema);

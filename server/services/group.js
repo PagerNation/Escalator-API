@@ -1,11 +1,9 @@
 import Joi from 'joi';
 import _ from 'lodash';
-import httpStatus from 'http-status';
 import scheduler from 'node-schedule';
 import JoiHelper from '../helpers/JoiHelper';
 import Group from '../models/group';
 import userService from './user';
-import APIError from '../helpers/APIError';
 
 const ID_SCHEMA = Joi.string().hex().length(24);
 
