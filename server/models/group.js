@@ -26,11 +26,18 @@ const GroupSchema = new mongoose.Schema({
     ref: 'User',
     default: []
   }],
-  admins: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    default: []
-  }],
+  admins: {
+    type: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    }],
+    validate: {
+      validator: function(array) {
+        return array.length >= 1;
+      },
+      message: 'Group must have at least one admin'
+    }
+  },
   lastRotated: {
     type: mongoose.Schema.Types.Date,
     default: Date.now()
@@ -182,15 +189,23 @@ GroupSchema.statics = {
 
   removeAdmin(name, userId) {
     return new Promise((resolve, reject) => {
-      const update = { $pull: { admins: userId } };
-      this.findOneAndUpdate({ name }, update, { new: true }, (err, group) => {
-        if (err) {
-          reject(err);
-        }
-        resolve(group);
-      });
+      this.findOne({ name }, (err, group) => {
+        _.remove(group.admins, n => n.toString() === userId);
+        group.markModified('admins');
+
+        group.save((err, group) => {
+          if (err) {
+            reject(err);
+          }
+          resolve(group);
+        });
+      })
     });
   }
 };
+
+const validateNotEmpty = function(array) {
+  return array.length !== 0;
+}
 
 export default mongoose.model('Group', GroupSchema);

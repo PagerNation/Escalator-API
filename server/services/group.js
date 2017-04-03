@@ -21,17 +21,6 @@ function deleteGroup(groupName) {
   return Group.delete(groupName);
 }
 
-function canRemoveAdmin(groupName) {
-  return getGroup(groupName)
-    .then(group => {
-      if (group.admins.length <= 1) {
-        const error = new APIError('Cannot remove only remaining admin', httpStatus.BAD_REQUEST);
-        return Promise.reject(error);
-      }
-      return group;
-    });
-}
-
 function createGroup(groupObject) {
   const groupSchema = Joi.object().keys({
     name: Joi.string().required(),
@@ -129,8 +118,7 @@ function addAdmin(groupName, userId) {
 }
 
 function removeAdmin(groupName, userId) {
-  return canRemoveAdmin(groupName)
-    .then(() => userService.exists(userId))
+  return userService.exists(userId)
     .then(() => JoiHelper.validate(userId, ID_SCHEMA))
     .then(validatedUserId => Group.removeAdmin(groupName, validatedUserId));
 }
