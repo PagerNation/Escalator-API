@@ -3,7 +3,7 @@ import httpStatus from 'http-status';
 import groupService from '../services/group';
 
 function getGroup(req, res) {
-  req.group.populate('users')
+  req.group.populate('users joinRequests')
     .execPopulate()
     .then(group => res.json(group));
 }
