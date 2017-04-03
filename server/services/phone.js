@@ -19,7 +19,7 @@ function sendMessage(ticket, user, device) {
 function makeCall(ticket, user, device) {
   const phoneCall = twilio.calls
     .create({
-      url: 'http://localhost:3000/api/v1/twilio',
+      url: 'https://e2f4798c.ngrok.io/api/v1/twilio/',
       to: device.contactInformation,
       from: config.twilio.fromPhone,
     });
@@ -28,7 +28,7 @@ function makeCall(ticket, user, device) {
 
 function buildTwiml() {
   const twiml = new Twilio.TwimlResponse();
-  twiml.say('Hello Kaleb', { voice: 'alice' });
+  twiml.say('Hello Bryon', { voice: 'alice' });
   return twiml;
 }
 

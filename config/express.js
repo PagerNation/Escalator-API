@@ -51,6 +51,7 @@ if (config.env === 'development') {
 app.use(expressJWT({ secret: config.auth.jwtSecret }).unless({
   path: ['/api/v1/auth/login',
          '/api/v1/auth/signup',
+         '/api/v1/twilio/',
          '/api/v1/alert',
          '/api/health-check',
          '/api/404']
