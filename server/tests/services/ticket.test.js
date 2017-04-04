@@ -21,37 +21,6 @@ describe('## Ticket Service', () => {
           .catch(err => done(err));
       });
     });
-
-    context('with missing ticket details', () => {
-      const missingGroupIdTicket = {
-        metadata: {
-          title: 'Something bad!',
-          description: 'This is something bad'
-        }
-      };
-
-      const missingMetadataTicket = {
-        groupName: 'testGroupName'
-      };
-
-      it('should fail validation due to the ticket missing a groupName', (done) => {
-        ticketService.createTicket(missingGroupIdTicket)
-          .catch((err) => {
-            expect(err.name).to.equal('ValidationError');
-            expect(err.details[0].message).to.equal('"groupName" is required');
-            done();
-          });
-      });
-
-      it('should fail validation due to the ticket missing metadata', (done) => {
-        ticketService.createTicket(missingMetadataTicket)
-          .catch((err) => {
-            expect(err.name).to.equal('ValidationError');
-            expect(err.details[0].message).to.equal('"metadata" is required');
-            done();
-          });
-      });
-    });
   });
 
   describe('# getTicket()', () => {
@@ -112,16 +81,6 @@ describe('## Ticket Service', () => {
           expect(ticket.groupName).to.equal(updateDetails.groupName);
           expect(ticket.metadata.title).to.equal(updateDetails.metadata.title);
           expect(ticket.metadata.description).to.not.exist;
-          done();
-        });
-    });
-
-    it('fails to update a ticket with invalid fields', (done) => {
-      ticketService.updateTicket(savedTicket.id, { metadata: 0 })
-        .catch((err, ticket) => {
-          expect(err).to.exist;
-          expect(err.name).to.equal('ValidationError');
-          expect(err.details[0].message).to.equal('"groupName" is required');
           done();
         });
     });
@@ -217,20 +176,6 @@ describe('## Ticket Service', () => {
         ticketService.getTicketsByDate(filters)
           .then((tickets) => {
             expect(tickets).to.have.lengthOf(1);
-            done();
-          });
-      });
-    });
-
-    context('with invalid filters', () => {
-      it('ignores nil filters', (done) => {
-        const filters = {
-          groupName: null
-        };
-
-        ticketService.getTicketsByDate(filters)
-          .then((tickets) => {
-            expect(tickets).to.have.lengthOf(4);
             done();
           });
       });

@@ -18,6 +18,12 @@ function update(req, res, next) {
     .catch(e => next(e));
 }
 
+function close(req, res, next) {
+  ticketService.close(req.params.id)
+    .then(ticket => res.json(ticket))
+    .catch(e => next(e));
+}
+
 function deleteById(req, res, next) {
   ticketService.deleteById(req.params.id)
     .then(ticket => res.json(ticket))
@@ -34,6 +40,7 @@ export default {
   create,
   getById,
   update,
+  close,
   deleteById,
   getTicketsByDate
 };

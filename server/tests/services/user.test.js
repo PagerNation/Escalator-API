@@ -278,7 +278,7 @@ describe('## User Service', () => {
       userService.addDevice(user, baseDevice, 0)
         .then((savedUser) => {
           expect(savedUser.delays.length).to.equal(savedUser.devices.length);
-          expect(savedUser.delays[savedUser.delays.length - 1]).to.equal(config.default_delay);
+          expect(savedUser.delays[savedUser.delays.length - 1]).to.equal(config.defaultDelay);
           done();
         });
     });

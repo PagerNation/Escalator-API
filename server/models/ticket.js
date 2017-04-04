@@ -44,6 +44,10 @@ const TicketSchema = new mongoose.Schema({
     default: true,
     required: true
   },
+  pageIds: {
+    type: Array,
+    default: []
+  },
   createdAt: {
     type: Number,
     default: Date.now()

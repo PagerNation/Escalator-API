@@ -1,14 +1,17 @@
+import request from 'request-promise-native';
 import Joi from 'joi';
 import _ from 'lodash';
+import config from '../../config/env';
 import Ticket, { actionTypes } from '../models/ticket';
 import JoiHelper from '../helpers/JoiHelper';
 import alertService from './alert';
 
 const ticketSchema = {
-  groupName: Joi.string().required(),
-  metadata: Joi.object().required(),
+  groupName: Joi.string(),
+  metadata: Joi.object(),
   isOpen: Joi.boolean(),
-  createdAt: Joi.number()
+  createdAt: Joi.number(),
+  pageIds: Joi.array().items(Joi.number())
 };
 
 const idPattern = Joi.string().hex().length(24).required();
@@ -31,6 +34,24 @@ function createTicket(ticketDetails) {
 function updateTicket(id, ticketDetails) {
   return JoiHelper.validate(ticketDetails, ticketSchema)
     .then(validatedDetails => Ticket.findByIdAndUpdate(id, validatedDetails, { new: true }));
+}
+
+function close(id) {
+  return updateTicket(id, { isOpen: false })
+    .then(ticket => cancelFuturePages(ticket.pageIds));
+}
+
+function cancelFuturePages(pageIds) {
+  const options = {
+    method: 'DELETE',
+    uri: `${config.queueHost}/${config.queuePath}`,
+    body: {
+      pageIds
+    },
+    json: true
+  };
+
+  return request(options);
 }
 
 function deleteById(id) {
@@ -67,6 +88,7 @@ export default {
   createTicket,
   getById,
   updateTicket,
+  close,
   deleteById,
   getTicketsByDate,
   addAction,
