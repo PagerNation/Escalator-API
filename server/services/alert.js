@@ -1,36 +1,99 @@
+import request from 'request-promise-native';
 import User from '../models/user';
 import { actionTypes } from '../models/ticket';
+import config from '../../config/env';
 import emailService from './email';
 import phoneService from './phone';
 import ticketService from './ticket';
+import userService from './user';
+
+const ONE_MINUTE_MILLISECONDS = 60 * 1000;
 
 function createAlert(ticket) {
-  // THIS IS ALL GETTING DELETED, JUST FOR THE SENDPAGE FUNCTION TESTING
   return ticket
     .populate('group')
     .execPopulate()
-    .then(pTicket => pTicket.group.escalationPolicy.subscribers[0].subId)
-    .then(userId => User.findById(userId))
-    .then((user) => {
-      const firstDevice = user.devices[0];
-      sendPage(ticket, user, firstDevice);
-    })
+    .then(pTicket => pTicket.group.populate('escalationPolicy.subscribers').execPopulate())
+    .then(group => generateAllPageRequests(group, ticket))
+    .then(pageRequests => sendPageRequestsToQueue(pageRequests))
     .then(() => ticketService.addAction(ticket.id, actionTypes.CREATED));
 }
 
-function sendPage(ticket, user, device) {
-  ticketService.addAction(ticket.id, actionTypes.PAGE_SENT, user.id, device);
+function generateAllPageRequests(group, ticket) {
+  let pageRequests = [];
+  let currentDelay = 0;
 
-  switch (device.type) {
-    case ('email'):
-      return emailService.sendEmail(ticket, user, device);
-    case ('sms'):
-      return phoneService.sendMessage(ticket, user, device);
-    case ('phone'):
-      return phoneService.makeCall(ticket, user, device);
-    default:
-      return Promise.reject(new Error(`Invalid device type: ${device.type} on User: "${user.id}"`));
+  for (let user of group.escalationPolicy.subscribers) {
+    let userPages = generateUserPageRequests(ticket.id, user, currentDelay, ticket.metadata.title);
+    pageRequests = pageRequests.concat(userPages);
+    currentDelay += group.escalationPolicy.pagingIntervalInMinutes;
   }
+  return pageRequests;
+}
+
+function generateUserPageRequests(ticketId, user, delay, title) {
+  const userPageRequests = [];
+  let currUserDelay = 0;
+
+  for (var i = 0; i < user.devices.length; i++) {
+    if (i !== 0) {
+      currUserDelay += user.delays[i - 1] || config.defaultDelay;
+    }
+
+    userPageRequests.push({
+      ticketId,
+      userId: user.id,
+      device: user.devices[i],
+      delay: (delay + currUserDelay) * ONE_MINUTE_MILLISECONDS,
+      title
+    });
+  }
+  return userPageRequests;
+}
+
+function sendPageRequestsToQueue(userPageRequests) {
+  const options = {
+    method: 'POST',
+    uri: `${config.queueHost}/${config.queuePath}`,
+    body: {
+      pages: userPageRequests
+    },
+    json: true
+  };
+
+  return request(options)
+    .then((futurePages) => {
+      if (!futurePages.length) {
+        return;
+      }
+      const ticketId = futurePages[0].data.ticketId;
+      const pageIds = futurePages.map(page => page.id);
+      ticketService.updateTicket(ticketId, { pageIds });
+    });
+}
+
+function sendPage(ticketId, userId, device) {
+  ticketService.addAction(ticketId, actionTypes.PAGE_SENT, userId, device);
+
+  const userPromise = userService.getUser(userId);
+  const ticketPromise = ticketService.getById(ticketId);
+
+  return Promise.all([userPromise, ticketPromise])
+    .then((results) => {
+      const user = results[0];
+      const ticket = results[1];
+
+      switch (device.type) {
+        case ('email'):
+          return emailService.sendEmail(ticket, user, device);
+        case ('sms'):
+          return phoneService.sendMessage(ticket, user, device);
+        case ('phone'):
+          return phoneService.makeCall(ticket, user, device);
+        default:
+          return Promise.reject(new Error(`Invalid device type: ${device.type} on User: "${user.id}"`));
+      }
+    });
 }
 
 export default {

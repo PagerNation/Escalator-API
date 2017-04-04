@@ -57,6 +57,8 @@
     "morgan": "1.7.0",
     "node-schedule": "^1.2.0",
     "nodemailer": "^2.6.4",
+    "request": "^2.80.0",
+    "request-promise-native": "^1.0.3",
     "twilio": "^3.0.0-rc.14",
     "winston": "2.2.0"
   },

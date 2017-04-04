@@ -69,7 +69,7 @@ UserSchema.methods = {
     });
   },
 
-  addDevice(deviceModel, index = -1, delay = config.default_delay) {
+  addDevice(deviceModel, index = -1, delay = config.defaultDelay) {
     this.devices.splice(index, 0, deviceModel);
     // Anytime a device is added, a new delay should be added
     // This keeps the delays and devices arrays the same size, since they are tied together

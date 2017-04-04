@@ -11,8 +11,8 @@ function generateMailOptions(ticket, user, device) {
     from: `"Escalator" <${emailUser}>`,
     to: `"${user.name}" <${device.contactInformation}>`,
     subject: `🐴 ${ticket.metadata.title} 🐴`,
-    text: `${ticket.metadata.body}`,
-    html: `${ticket.metadata.body}`
+    text: `${ticket.metadata.description}`,
+    html: `${ticket.metadata.description}`
   };
 }
 
