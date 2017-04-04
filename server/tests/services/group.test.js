@@ -171,9 +171,9 @@ describe('## Group Service', () => {
         build('user', fixtures.user())
           .then((u) => {
             userId = u.id;
-            return build('escalationPolicy', fixtures.escalationPolicy({ subscribers: [userId] }))
+            return build('escalationPolicy', fixtures.escalationPolicy({ subscribers: [userId] }));
           })
-          .then((escalationPolicy) =>
+          .then(escalationPolicy =>
             build('group', fixtures.group({ users: [userId], escalationPolicy })))
           .then((g) => {
             group = g;
@@ -186,7 +186,6 @@ describe('## Group Service', () => {
         it('should remove a user from the group by id', (done) => {
           groupService.removeUser(group, userId)
             .then((savedGroup) => {
-              console.log(savedGroup);
               expect(savedGroup).to.exist;
               expect(savedGroup.name).to.equal(group.name);
               expect(savedGroup.users).to.not.include(userId);

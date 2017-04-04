@@ -165,13 +165,13 @@ GroupSchema.statics = {
 
   removeUserFromEscalationPolicy(name, userId) {
     return new Promise((resolve, reject) => {
-      this.findOneAndUpdate({ name }, { $pull: { 'escalationPolicy.subscribers': userId} },
+      this.findOneAndUpdate({ name }, { $pull: { 'escalationPolicy.subscribers': userId } },
         { new: true }, (err, group) => {
-        if (err) {
-          reject(err);
-        }
-        resolve(group);
-      });
+          if (err) {
+            reject(err);
+          }
+          resolve(group);
+        });
     });
   },
 
