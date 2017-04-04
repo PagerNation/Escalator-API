@@ -255,10 +255,8 @@ describe('## Group API', () => {
           request(app)
             .delete(`${groupUrl}/${group.name}/user/098765432109876543210987`)
             .set('Authorization', `Bearer ${token}`)
-            .expect(httpStatus.OK)
+            .expect(httpStatus.BAD_REQUEST)
             .then((res) => {
-              expect(res.body.name).to.equal(group.name);
-              expect(res.body.users).to.include(group.users[0].toString());
               done();
             });
         });

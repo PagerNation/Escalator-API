@@ -163,6 +163,18 @@ GroupSchema.statics = {
     });
   },
 
+  removeUserFromEscalationPolicy(name, userId) {
+    return new Promise((resolve, reject) => {
+      this.findOneAndUpdate({ name }, { $pull: { 'escalationPolicy.subscribers': userId } },
+        { new: true }, (err, group) => {
+          if (err) {
+            reject(err);
+          }
+          resolve(group);
+        });
+    });
+  },
+
   makeJoinRequest(name, userId) {
     return new Promise((resolve, reject) => {
       const update = { $push: { joinRequests: userId } };

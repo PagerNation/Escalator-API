@@ -171,8 +171,10 @@ describe('## Group Service', () => {
         build('user', fixtures.user())
           .then((u) => {
             userId = u.id;
-            return build('group', fixtures.group({ users: [`${userId}`] }));
+            return build('escalationPolicy', fixtures.escalationPolicy({ subscribers: [userId] }));
           })
+          .then(escalationPolicy =>
+            build('group', fixtures.group({ users: [userId], escalationPolicy })))
           .then((g) => {
             group = g;
             return userService.addGroupByUserId(userId, group.name);
@@ -187,6 +189,7 @@ describe('## Group Service', () => {
               expect(savedGroup).to.exist;
               expect(savedGroup.name).to.equal(group.name);
               expect(savedGroup.users).to.not.include(userId);
+              expect(savedGroup.escalationPolicy.subscribers).to.be.empty;
               done();
             });
         });
@@ -242,7 +245,8 @@ describe('## Group Service', () => {
       context('with correct body fields', () => {
         const newEscalationPolicy = {
           pagingIntervalInMinutes: 1111,
-          rotationIntervalInDays: 2222
+          rotationIntervalInDays: 2222,
+          subscribers: []
         };
 
         it('should update a group\'s escalation policy', (done) => {
@@ -253,6 +257,8 @@ describe('## Group Service', () => {
                 .to.equal(newEscalationPolicy.pagingIntervalInMinutes);
               expect(savedGroup.escalationPolicy.rotationIntervalInDays)
                 .to.equal(newEscalationPolicy.rotationIntervalInDays);
+              expect(savedGroup.escalationPolicy.subscribers)
+                .to.be.empty;
               done();
             });
         });
