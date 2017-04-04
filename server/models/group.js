@@ -26,11 +26,18 @@ const GroupSchema = new mongoose.Schema({
     ref: 'User',
     default: []
   }],
-  admins: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    default: []
-  }],
+  admins: {
+    type: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    }],
+    validate: {
+      validator(array) {
+        return array.length >= 1;
+      },
+      message: 'Group must have at least one admin'
+    }
+  },
   lastRotated: {
     type: mongoose.Schema.Types.Date,
     default: Date.now()
@@ -176,6 +183,22 @@ GroupSchema.statics = {
           reject(err);
         }
         resolve(group);
+      });
+    });
+  },
+
+  removeAdmin(name, userId) {
+    return new Promise((resolve, reject) => {
+      this.findOne({ name }, (err, group) => {
+        _.remove(group.admins, n => n.toString() === userId);
+        group.markModified('admins');
+
+        group.save((e, savedGroup) => {
+          if (e) {
+            reject(e);
+          }
+          resolve(savedGroup);
+        });
       });
     });
   }

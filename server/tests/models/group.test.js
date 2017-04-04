@@ -22,6 +22,7 @@ describe('## Group Model', () => {
     const groupData = {
       name: 'Wondertwins',
       users: [userObjectId],
+      admins: [userObjectId]
     };
 
     it('should create a new group', (done) => {

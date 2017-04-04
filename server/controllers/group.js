@@ -57,6 +57,12 @@ function addAdmin(req, res, next) {
     .catch(err => next(err));
 }
 
+function removeAdmin(req, res, next) {
+  groupService.removeAdmin(req.group.name, req.params.userId)
+    .then(updatedGroup => res.json(updatedGroup))
+    .catch(err => next(err));
+}
+
 function makeJoinRequest(req, res, next) {
   groupService.makeJoinRequest(req.group.name, req.body.userId)
     .then(updatedGroup => updatedGroup.populate('users').execPopulate())
@@ -100,6 +106,7 @@ export default {
   updateGroup,
   searchByName,
   addAdmin,
+  removeAdmin,
   makeJoinRequest,
   processJoinRequest,
   addUser,

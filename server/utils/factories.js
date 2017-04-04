@@ -50,7 +50,7 @@ const fixtures = {
       name: group.name || Faker.lorem.word(),
       users: group.users,
       escalationPolicy: group.escalationPolicy || EscalationPolicy.defaultEscalationPolicy(),
-      admins: group.admins,
+      admins: group.admins || [uuid.user],
       joinRequests: group.joinRequests,
       lastRotated: group.lastRotated || Date.now()
     };

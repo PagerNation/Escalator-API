@@ -299,6 +299,42 @@ describe('## Group Service', () => {
     });
   });
 
+  describe('# removeAdmin()', () => {
+    let group;
+    let user;
+    let user2;
+
+    beforeEach((done) => {
+      Promise.all([build('user', fixtures.user()), build('user', fixtures.user())])
+        .then((results) => {
+          user = results[0];
+          user2 = results[1];
+          return build('group', fixtures.group({ admins: [user.id, user2.id] }));
+        })
+        .then((groupB) => {
+          group = groupB;
+          done();
+        });
+    });
+
+    it('removes an admin', (done) => {
+      groupService.removeAdmin(group.name, user.id)
+        .then((updatedGroup) => {
+          expect(updatedGroup.admins).to.include(user2.id);
+          done();
+        });
+    });
+
+    it('does not remove last admin', (done) => {
+      groupService.removeAdmin(group.name, user.id)
+        .then(updatedGroup => groupService.removeAdmin(group.name, user2.id))
+        .catch((err) => {
+          expect(err.errors.admins.message).to.equal('Group must have at least one admin');
+          done();
+        });
+    });
+  });
+
   describe('# scheduleEPRotation()', () => {
     let group;
 

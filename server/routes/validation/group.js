@@ -5,7 +5,8 @@ export default {
   createGroup: {
     body: {
       name: Joi.string().required(),
-      users: Joi.array().items(Joi.string().hex().length(24))
+      users: Joi.array().items(Joi.string().hex().length(24)),
+      admins: Joi.array().items(Joi.string().hex().length(24))
     }
   },
 
