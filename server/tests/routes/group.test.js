@@ -443,4 +443,89 @@ describe('## Group API', () => {
       });
     });
   });
+
+  describe('# POST /:groupName/escalationPolicy/:userId', () => {
+    context('deactivate valid user', () => {
+      let userToken;
+      let group;
+      const deactivateDate = new Date();
+      const reactivateDate = new Date(deactivateDate);
+      reactivateDate.setDate(reactivateDate.getDate() + 2);
+
+      beforeEach((done) => {
+        buildAndAuth('user', fixtures.user())
+          .then((createdUserAndToken) => {
+            user = createdUserAndToken.user;
+            userToken = createdUserAndToken.token;
+            const subscribers = [
+              { userId: user.id }
+            ];
+            const escalationPolicy = fixtures.escalationPolicy({ subscribers });
+            return build('group', fixtures.group({ escalationPolicy }));
+          })
+          .then((createdGroup) => {
+            group = createdGroup;
+            done();
+          })
+          .catch(err => done(err));
+      });
+
+      it('should deactivate the user', (done) => {
+        request(app)
+          .post(`${groupUrl}/${group.name}/escalationPolicy/${user.id}`)
+          .set('Authorization', `Bearer ${userToken}`)
+          .send({
+            deactivateDate,
+            reactivateDate,
+            deactivate: true
+          })
+          .expect(httpStatus.OK)
+          .then((res) => {
+            const userToBeDeactivated = res.body.escalationPolicy.subscribers[0];
+            expect(userToBeDeactivated.deactivateDate).to.eq(null);
+            expect(userToBeDeactivated.reactivateDate).to.not.eq(null);
+            expect(userToBeDeactivated.active).to.eq(false);
+            done();
+          })
+          .catch(err => done(err));
+      });
+    });
+
+    context('reactivate valid user', () => {
+      let userToken;
+      let group;
+
+      beforeEach((done) => {
+        buildAndAuth('user', fixtures.user())
+          .then((createdUserAndToken) => {
+            user = createdUserAndToken.user;
+            userToken = createdUserAndToken.token;
+            const subscribers = [
+              { userId: user.id, active: false, reactivateDate: new Date() }
+            ];
+            const escalationPolicy = fixtures.escalationPolicy({ subscribers });
+            return build('group', fixtures.group({ escalationPolicy }));
+          })
+          .then((createdGroup) => {
+            group = createdGroup;
+            done();
+          });
+      });
+
+      it('should reactivate the user', (done) => {
+        request(app)
+          .post(`${groupUrl}/${group.name}/escalationPolicy/${user.id}`)
+          .set('Authorization', `Bearer ${userToken}`)
+          .send({ deactivate: false })
+          .expect(httpStatus.OK)
+          .then((res) => {
+            const userToBeReactivated = res.body.escalationPolicy.subscribers[0];
+            expect(userToBeReactivated.reactivateDate).to.eq(null);
+            expect(userToBeReactivated.active).to.eq(true);
+            done();
+          })
+          .catch(err => done(err));
+      });
+    });
+  });
 });

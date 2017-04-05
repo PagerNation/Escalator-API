@@ -75,5 +75,18 @@ export default {
     params: {
       groupName: Joi.string().required()
     }
+  },
+
+  overrideUser: {
+    options: { allowUnknownBody: false },
+    body: {
+      deactivateDate: Joi.date(),
+      reactivateDate: Joi.date(),
+      deactivate: Joi.boolean()
+    },
+    params: {
+      groupName: Joi.string().required(),
+      userId: Joi.string().hex().length(24).required()
+    }
   }
 };

@@ -83,6 +83,20 @@ function scheduleEPRotation(req, res, next) {
     .catch(err => next(err));
 }
 
+function overrideUser(req, res, next) {
+  if (req.body.deactivate) {
+    groupService.scheduleDeactivateUser(req.group,
+                                        req.user.id,
+                                        req.body.deactivateDate,
+                                        req.body.reactivateDate)
+      .then(returnObj => res.json(returnObj.group))
+      .catch(err => next(err));
+  } else {
+    groupService.scheduleReactivateUser(req.group, req.user.id)
+      .then(returnObj => res.json(returnObj.group))
+      .catch(err => next(err));
+  }
+}
 function listSchedules(req, res) {
   return res.json(scheduler.scheduledJobs);
 }
@@ -113,6 +127,7 @@ export default {
   removeUser,
   updateEscalationPolicy,
   scheduleEPRotation,
+  overrideUser,
   listSchedules,
   load
 };

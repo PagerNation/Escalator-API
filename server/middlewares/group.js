@@ -3,13 +3,26 @@ import httpStatus from 'http-status';
 
 function isGroupAdmin(req, res, next) {
   const admins = req.group.admins.map(userId => userId.toString());
-  if (_.includes(admins, req.user.id)
-    || req.user.isSysAdmin) {
+  if (isAdmin(admins, req.user)) {
     return next();
   }
   res.sendStatus(httpStatus.UNAUTHORIZED);
 }
 
+function isAdminOrCurrentUser(req, res, next) {
+  const admins = req.group.admins.map(userId => userId.toString());
+  if (isAdmin(admins, req.user)
+    || req.params.userId === req.user.id.toString()) {
+    return next();
+  }
+  res.sendStatus(httpStatus.UNAUTHORIZED);
+}
+
+function isAdmin(admins, user) {
+  return _.includes(admins, user.id) || user.isSysAdmin;
+}
+
 export default {
-  isGroupAdmin
+  isGroupAdmin,
+  isAdminOrCurrentUser
 };
