@@ -171,7 +171,11 @@ describe('## Group Service', () => {
         build('user', fixtures.user())
           .then((u) => {
             userId = u.id;
-            return build('escalationPolicy', fixtures.escalationPolicy({ subscribers: [userId] }));
+            const subscribers = [
+              { userId }
+            ];
+
+            return build('escalationPolicy', fixtures.escalationPolicy({ subscribers }));
           })
           .then(escalationPolicy =>
             build('group', fixtures.group({ users: [userId], escalationPolicy })))
@@ -179,13 +183,17 @@ describe('## Group Service', () => {
             group = g;
             return userService.addGroupByUserId(userId, group.name);
           })
-          .then(() => done());
+          .then(() => done())
+          .catch(err => done(err));
       });
 
       context('when the user is an admin and in the escalation policy', () => {
         beforeEach((done) => {
           groupService.addAdmin(group.name, userId)
-            .then(() => done());
+            .then((g) => {
+              group = g;
+              done();
+            });
         });
 
         it('should remove the user from the EP and admin lists', (done) => {
@@ -247,12 +255,12 @@ describe('## Group Service', () => {
     });
 
     describe('# updateEscalationPolicy()', () => {
-      const userId = '123456789098765432123456';
+      const subscriber = { userId: '123456789098765432123456' };
 
       let group;
 
       beforeEach((done) => {
-        build('escalationPolicy', fixtures.escalationPolicy({ subscribers: [userId] }))
+        build('escalationPolicy', fixtures.escalationPolicy({ subscribers: [subscriber] }))
           .then(escalationPolicy => build('group', fixtures.group({ escalationPolicy })))
           .then((newGroup) => {
             group = newGroup;
@@ -278,7 +286,8 @@ describe('## Group Service', () => {
               expect(savedGroup.escalationPolicy.subscribers)
                 .to.be.empty;
               done();
-            });
+            })
+            .catch(err => done(err));
         });
       });
 
@@ -311,7 +320,8 @@ describe('## Group Service', () => {
           group = values[0];
           user = values[1];
           done();
-        });
+        })
+        .catch(err => done(err));
     });
 
     it('adds a new admin', (done) => {
@@ -385,7 +395,11 @@ describe('## Group Service', () => {
 
   describe('# rotateEscalationPolicy()', () => {
     let group;
-    const subscribers = ['123456789012345678901234', '121212121212121212121212', '098765432109876543210987'];
+    const subscribers = [
+      { userId: '123456789012345678901234' },
+      { userId: '121212121212121212121212' },
+      { userId: '098765432109876543210987' }
+    ];
     const escalationPolicy = { subscribers };
     const lastRotated = new Date(2015, 11, 10, 0, 0, 0);
 
@@ -404,9 +418,9 @@ describe('## Group Service', () => {
         .then((updatedGroup) => {
           const ep = updatedGroup.escalationPolicy;
           expect(ep.subscribers.length).to.eq(subscribers.length);
-          expect(ep.subscribers[0].toString()).to.eq(subscribers[1]);
-          expect(ep.subscribers[1].toString()).to.eq(subscribers[2]);
-          expect(ep.subscribers[2].toString()).to.eq(subscribers[0]);
+          expect(ep.subscribers[0].userId.toString()).to.eq(subscribers[1].userId);
+          expect(ep.subscribers[1].userId.toString()).to.eq(subscribers[2].userId);
+          expect(ep.subscribers[2].userId.toString()).to.eq(subscribers[0].userId);
 
           expect(equalDates(updatedGroup.lastRotated, new Date())).to.eq(true);
 

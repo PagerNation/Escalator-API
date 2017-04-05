@@ -95,7 +95,12 @@ function updateEscalationPolicy(groupName, escalationPolicy) {
   const escalationPolicySchema = Joi.object().keys({
     rotationIntervalInDays: Joi.number(),
     pagingIntervalInMinutes: Joi.number(),
-    subscribers: Joi.array().items(ID_SCHEMA)
+    subscribers: Joi.array().items(Joi.object().keys({
+      userId: ID_SCHEMA,
+      active: Joi.boolean(),
+      deactivateDate: Joi.any().allow(Joi.date(), null),
+      reactivateDate: Joi.any().allow(Joi.date(), null)
+    }))
   });
 
   return JoiHelper.validate(escalationPolicy, escalationPolicySchema)
