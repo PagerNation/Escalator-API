@@ -115,17 +115,6 @@ GroupSchema.statics = {
     });
   },
 
-  getAllGroups() {
-    return new Promise((resolve, reject) => {
-      this.find({}, (err, groups) => {
-        if (groups) {
-          resolve(groups);
-        }
-        reject(err);
-      });
-    });
-  },
-
   searchByName(name) {
     return new Promise((resolve, reject) => {
       const query = new RegExp(name, 'i');
@@ -137,6 +126,17 @@ GroupSchema.statics = {
           }
           reject(err);
         });
+    });
+  },
+
+  getGroups(query) {
+    return new Promise((resolve, reject) => {
+      this.find(query, (err, groups) => {
+        if (groups) {
+          resolve(groups);
+        }
+        reject(err);
+      });
     });
   },
 

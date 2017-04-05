@@ -2,7 +2,7 @@ import groupService from '../services/group';
 
 function bulkScheduleEPRotation() {
   const schedulePromises = [];
-  groupService.getAllGroups()
+  return groupService.getGroups({})
     .then((groups) => {
       for (let i = 0; i < groups.length; i++) {
         if (groups[i].escalationPolicy !== null) {
@@ -10,8 +10,7 @@ function bulkScheduleEPRotation() {
         }
       }
       return Promise.all(schedulePromises);
-    })
-    .then(() => console.log('Group rotation has been scheduled'));
+    });
 }
 
 export default { bulkScheduleEPRotation };
