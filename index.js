@@ -13,7 +13,11 @@ mongoose.connection.on('error', () => {
 });
 
 mongoose.connection.on('connected', () => {
-  groupLoader.bulkScheduleEPRotation();
+  if (config.env !== 'test') {
+    groupLoader.bulkScheduleEPRotation();
+    groupLoader.rescheduleDeactivation();
+    groupLoader.rescheduleReactivation();
+  }
 });
 
 const debug = require('debug')('escalator-api:index');
