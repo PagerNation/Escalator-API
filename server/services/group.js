@@ -67,13 +67,8 @@ function removeUser(group, userId) {
       const removeGroupFromUser = userService.removeGroupByUserId(validatedUserId, group.name);
       return Promise.all([removeUserFromGroup, removeGroupFromUser]);
     })
-    .then((promiseResults) => {
-      const groupR = promiseResults[0];
-      const removeFromEP = Group.removeUserFromEscalationPolicy(groupR.name, userId);
-      const removeAdminP = removeAdmin(groupR.name, userId);
-      return Promise.all([removeAdminP, removeFromEP]);
-    })
-    .then(results => results[0]);
+    .then(promiseResults => Group.removeUserFromEscalationPolicy(promiseResults[0].name, userId))
+    .then(g => removeAdmin(g.name, userId));
 }
 
 function makeJoinRequest(groupName, userId) {

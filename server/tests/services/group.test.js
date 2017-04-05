@@ -182,6 +182,24 @@ describe('## Group Service', () => {
           .then(() => done());
       });
 
+      context('when the user is an admin and in the escalation policy', () => {
+        beforeEach((done) => {
+          groupService.addAdmin(group.name, userId)
+            .then(() => done());
+        });
+
+        it('should remove the user from the EP and admin lists', (done) => {
+          groupService.removeUser(group, userId)
+            .then((savedGroup) => {
+              expect(savedGroup.name).to.equal(group.name);
+              expect(savedGroup.users).to.not.include(userId);
+              expect(savedGroup.admins).to.not.include(userId);
+              expect(savedGroup.escalationPolicy.subscribers).to.be.empty;
+              done();
+            });
+        });
+      });
+
       context('when the user exists', () => {
         it('should remove a user from the group by id', (done) => {
           groupService.removeUser(group, userId)
