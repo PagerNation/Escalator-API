@@ -38,6 +38,10 @@ router.route('/:groupName/escalationpolicy')
     groupMiddleware.isGroupAdmin, groupCtrl.updateEscalationPolicy)
   .post(validate(paramValidation.byName), groupCtrl.scheduleEPRotation);
 
+router.route('/:groupName/escalationPolicy/:userId')
+  .post(validate(paramValidation.overrideUser),
+        groupMiddleware.isAdminOrCurrentUser, groupCtrl.overrideUser);
+
 router.route('/:groupName/listSchedule')
   .get(validate(paramValidation.byName), userMiddleware.isSysAdmin, groupCtrl.listSchedules);
 

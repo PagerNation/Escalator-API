@@ -114,21 +114,31 @@ describe('## Group Model', () => {
     });
   });
 
-  describe('# get all groups', () => {
-    const baseGroup = fixtures.group();
-
+  describe('# get groups', () => {
     beforeEach((done) => {
-      build('group', baseGroup)
-        .then(() => build('group', baseGroup))
-        .then(() => build('group', baseGroup))
-        .then(() => done());
+      build('group', fixtures.group())
+        .then(() => build('group', fixtures.group()))
+        .then(() => build('group', fixtures.group()))
+        .then((g) => {
+          group = g;
+          done();
+        });
     });
 
     it('should return 3 groups', (done) => {
-      Group.getAllGroups()
+      Group.getGroups({})
         .then((groups) => {
           expect(groups).to.exist;
           expect(groups).to.have.lengthOf(3);
+          done();
+        });
+    });
+
+    it('should return 1 group', (done) => {
+      Group.getGroups({ name: group.name })
+        .then((groups) => {
+          expect(groups).to.have.lengthOf(1);
+          expect(groups[0].name).to.eq(group.name);
           done();
         });
     });

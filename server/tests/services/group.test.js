@@ -19,9 +19,7 @@ describe('## Group Service', () => {
               expect(createdGroup.name).to.equal(groupObject.name);
               expect(equalDates(createdGroup.lastRotated, new Date())).to.equal(true);
               done();
-            })
-            .catch(err => done(err));
-        });
+            }).catch(err => done(err)); });
       });
 
       context('with missing user details', () => {
@@ -171,7 +169,11 @@ describe('## Group Service', () => {
         build('user', fixtures.user())
           .then((u) => {
             userId = u.id;
-            return build('escalationPolicy', fixtures.escalationPolicy({ subscribers: [userId] }));
+            const subscribers = [
+              { userId }
+            ];
+
+            return build('escalationPolicy', fixtures.escalationPolicy({ subscribers }));
           })
           .then(escalationPolicy =>
             build('group', fixtures.group({ users: [userId], escalationPolicy })))
@@ -179,13 +181,17 @@ describe('## Group Service', () => {
             group = g;
             return userService.addGroupByUserId(userId, group.name);
           })
-          .then(() => done());
+          .then(() => done())
+          .catch(err => done(err));
       });
 
       context('when the user is an admin and in the escalation policy', () => {
         beforeEach((done) => {
           groupService.addAdmin(group.name, userId)
-            .then(() => done());
+            .then((g) => {
+              group = g;
+              done();
+            });
         });
 
         it('should remove the user from the EP and admin lists', (done) => {
@@ -247,12 +253,12 @@ describe('## Group Service', () => {
     });
 
     describe('# updateEscalationPolicy()', () => {
-      const userId = '123456789098765432123456';
+      const subscriber = { userId: '123456789098765432123456' };
 
       let group;
 
       beforeEach((done) => {
-        build('escalationPolicy', fixtures.escalationPolicy({ subscribers: [userId] }))
+        build('escalationPolicy', fixtures.escalationPolicy({ subscribers: [subscriber] }))
           .then(escalationPolicy => build('group', fixtures.group({ escalationPolicy })))
           .then((newGroup) => {
             group = newGroup;
@@ -278,7 +284,8 @@ describe('## Group Service', () => {
               expect(savedGroup.escalationPolicy.subscribers)
                 .to.be.empty;
               done();
-            });
+            })
+            .catch(err => done(err));
         });
       });
 
@@ -311,7 +318,8 @@ describe('## Group Service', () => {
           group = values[0];
           user = values[1];
           done();
-        });
+        })
+        .catch(err => done(err));
     });
 
     it('adds a new admin', (done) => {
@@ -385,7 +393,11 @@ describe('## Group Service', () => {
 
   describe('# rotateEscalationPolicy()', () => {
     let group;
-    const subscribers = ['123456789012345678901234', '121212121212121212121212', '098765432109876543210987'];
+    const subscribers = [
+      { userId: '123456789012345678901234' },
+      { userId: '121212121212121212121212' },
+      { userId: '098765432109876543210987' }
+    ];
     const escalationPolicy = { subscribers };
     const lastRotated = new Date(2015, 11, 10, 0, 0, 0);
 
@@ -404,9 +416,9 @@ describe('## Group Service', () => {
         .then((updatedGroup) => {
           const ep = updatedGroup.escalationPolicy;
           expect(ep.subscribers.length).to.eq(subscribers.length);
-          expect(ep.subscribers[0].toString()).to.eq(subscribers[1]);
-          expect(ep.subscribers[1].toString()).to.eq(subscribers[2]);
-          expect(ep.subscribers[2].toString()).to.eq(subscribers[0]);
+          expect(ep.subscribers[0].userId.toString()).to.eq(subscribers[1].userId);
+          expect(ep.subscribers[1].userId.toString()).to.eq(subscribers[2].userId);
+          expect(ep.subscribers[2].userId.toString()).to.eq(subscribers[0].userId);
 
           expect(equalDates(updatedGroup.lastRotated, new Date())).to.eq(true);
 
@@ -499,33 +511,278 @@ describe('## Group Service', () => {
   describe('# searchByName()', () => {
     beforeEach((done) => {
       build('group', fixtures.group({ name: 'test' }))
-          .then(() => build('group', fixtures.group({ name: 'nothing' })))
-          .then(() => done());
+        .then(() => build('group', fixtures.group({ name: 'nothing' })))
+        .then(() => done());
     });
 
     it('should find one group', (done) => {
       groupService.searchByName('tes')
-          .then((groups) => {
-            expect(groups).to.have.length(1);
-            expect(groups[0].name).to.equal('test');
-            done();
-          });
+        .then((groups) => {
+          expect(groups).to.have.length(1);
+          expect(groups[0].name).to.equal('test');
+          done();
+        });
     });
 
     it('should find two groups', (done) => {
       groupService.searchByName('t')
-          .then((groups) => {
-            expect(groups).to.have.length(2);
-            done();
-          });
+        .then((groups) => {
+          expect(groups).to.have.length(2);
+          done();
+        });
     });
 
     it('should find zero groups', (done) => {
       groupService.searchByName('please do not exist')
-          .then((groups) => {
-            expect(groups).to.have.length(0);
+        .then((groups) => {
+          expect(groups).to.have.length(0);
+          done();
+        });
+    });
+  });
+
+  describe('# scheduleDeactivateUser', () => {
+    let group;
+    let user1;
+    let user2;
+    let scheduledJobsCount;
+
+    beforeEach((done) => {
+      const buildUser1Promise = build('user', fixtures.user());
+      const buildUser2Promise = build('user', fixtures.user());
+
+      Promise.all([buildUser1Promise, buildUser2Promise])
+        .then((results) => {
+          user1 = results[0];
+          user2 = results[1];
+          const subscribers = [
+            { userId: user1.id },
+            { userId: user2.id }
+          ];
+          const escalationPolicy = fixtures.escalationPolicy({ subscribers });
+          return build('group', fixtures.group({ escalationPolicy }));
+        })
+        .then((newGroup) => {
+          group = newGroup;
+          scheduledJobsCount = Object.keys(scheduler.scheduledJobs).length;
+          done();
+        });
+    });
+
+    context('with immediate deactivation', () => {
+      const deactivateDate = new Date();
+      const reactivateDate = new Date(deactivateDate);
+      reactivateDate.setDate(reactivateDate.getDate() + 2);
+
+      it('should deactivate a user immediately', (done) => {
+        groupService.scheduleDeactivateUser(group, user1.id, deactivateDate, reactivateDate)
+          .then((returnObj) => {
+            const subscribers = returnObj.group.escalationPolicy.subscribers;
+            expect(subscribers[0].userId.toString()).to.eq(user1.id.toString());
+            expect(subscribers[0].active).to.eq(false);
+
+            expect(Object.keys(scheduler.scheduledJobs).length).to.eq(scheduledJobsCount + 1);
+            done();
+          })
+          .catch(err => done(err));
+      });
+    });
+
+    context('with scheduled deactivation', () => {
+      const deactivateDate = new Date();
+      deactivateDate.setDate(deactivateDate.getDate() + 2);
+      const reactivateDate = new Date(deactivateDate);
+      reactivateDate.setDate(reactivateDate.getDate() + 2);
+
+      it('should scheduled a job to deactivate the user', (done) => {
+        groupService.scheduleDeactivateUser(group, user1.id, deactivateDate, reactivateDate)
+          .then((returnObj) => {
+            expect(equalDates(returnObj.deactivateDate, deactivateDate)).to.eq(true);
+            expect(returnObj.group.name).to.eq(group.name);
+
+            const subscribers = returnObj.group.escalationPolicy.subscribers;
+            expect(subscribers[0].userId.toString()).to.eq(user1.id.toString());
+            expect(subscribers[0].active).to.eq(true);
+
+            expect(Object.keys(scheduler.scheduledJobs).length).to.eq(scheduledJobsCount + 1);
+            done();
+          })
+          .catch(err => done(err));
+      });
+    });
+  });
+
+  describe('# scheduleReactivateUser', () => {
+    let group;
+    let user1;
+    let user2;
+    let scheduledJobsCount;
+
+    beforeEach((done) => {
+      const buildUser1Promise = build('user', fixtures.user());
+      const buildUser2Promise = build('user', fixtures.user());
+
+      Promise.all([buildUser1Promise, buildUser2Promise])
+        .then((results) => {
+          user1 = results[0];
+          user2 = results[1];
+          done();
+        });
+    });
+
+    context('with immediate reactivation', () => {
+      beforeEach((done) => {
+        const subscribers = [
+          { userId: user1.id, active: false, deactivateDate: null, reactivateDate: new Date() },
+          { userId: user2.id }
+        ];
+
+        const escalationPolicy = fixtures.escalationPolicy({ subscribers });
+        build('group', fixtures.group({ escalationPolicy }))
+          .then((newGroup) => {
+            group = newGroup;
+            scheduledJobsCount = Object.keys(scheduler.scheduledJobs).length;
             done();
           });
+      });
+
+      it('should reactivate that user immediately', (done) => {
+        groupService.scheduleReactivateUser(group, user1.id)
+          .then((returnObj) => {
+            const subscribers = returnObj.group.escalationPolicy.subscribers;
+            expect(subscribers[0].userId.toString()).to.eq(user1.id.toString());
+            expect(subscribers[0].active).to.eq(true);
+
+            expect(Object.keys(scheduler.scheduledJobs).length).to.eq(scheduledJobsCount);
+            done();
+          })
+          .catch(err => done(err));
+      });
+    });
+
+    context('with scheduled reactivation', () => {
+      beforeEach((done) => {
+        const reactivateDate = new Date();
+        reactivateDate.setDate(reactivateDate.getDate() + 2);
+
+        const subscribers = [
+          { userId: user1.id, active: false, deactivateDate: null, reactivateDate },
+          { userId: user2.id }
+        ];
+
+        const escalationPolicy = fixtures.escalationPolicy({ subscribers });
+        build('group', fixtures.group({ escalationPolicy }))
+          .then((newGroup) => {
+            group = newGroup;
+            scheduledJobsCount = Object.keys(scheduler.scheduledJobs).length;
+            done();
+          });
+      });
+
+      it('should schedule the reactivation', (done) => {
+        groupService.scheduleReactivateUser(group, user1.id)
+          .then((returnObj) => {
+            const subscribers = returnObj.group.escalationPolicy.subscribers;
+            expect(subscribers[0].userId.toString()).to.eq(user1.id.toString());
+            expect(subscribers[0].active).to.eq(false);
+
+            expect(Object.keys(scheduler.scheduledJobs).length).to.eq(scheduledJobsCount + 1);
+            done();
+          })
+          .catch(err => done(err));
+      });
+    });
+  });
+
+  describe('# deactivateUser', () => {
+    let group;
+    let user1;
+    let user2;
+    const deactivateDate = new Date();
+    const reactivateDate = new Date(deactivateDate);
+    reactivateDate.setDate(reactivateDate.getDate() + 2);
+
+    beforeEach((done) => {
+      const buildUser1Promise = build('user', fixtures.user());
+      const buildUser2Promise = build('user', fixtures.user());
+
+      Promise.all([buildUser1Promise, buildUser2Promise])
+        .then((results) => {
+          user1 = results[0];
+          user2 = results[1];
+          const subscribers = [
+            { userId: user1.id, deactivateDate, reactivateDate },
+            { userId: user2.id }
+          ];
+          const escalationPolicy = fixtures.escalationPolicy({ subscribers });
+          return build('group', fixtures.group({ escalationPolicy }));
+        })
+        .then((newGroup) => {
+          group = newGroup;
+          done();
+        });
+    });
+
+    it('should deactivate the user', (done) => {
+      groupService.deactivateUser(group, user1.id, deactivateDate, reactivateDate)
+        .then((resultingGroup) => {
+          const subscribers = resultingGroup.escalationPolicy.subscribers;
+          expect(subscribers[0].userId.toString()).to.eq(user1.id.toString());
+          expect(subscribers[0].deactivateDate).to.eq(null);
+          expect(subscribers[0].active).to.eq(false);
+
+          expect(subscribers[1].userId.toString()).to.eq(user2.id.toString());
+          expect(subscribers[1].deactivateDate).to.eq(null);
+          expect(subscribers[1].active).to.eq(true);
+
+          done();
+        })
+        .catch(err => done(err));
+    });
+  });
+
+  describe('# reactivateUser', () => {
+    let group;
+    let user1;
+    let user2;
+    const reactivateDate = new Date();
+
+    beforeEach((done) => {
+      const buildUser1Promise = build('user', fixtures.user());
+      const buildUser2Promise = build('user', fixtures.user());
+
+      Promise.all([buildUser1Promise, buildUser2Promise])
+          .then((results) => {
+            user1 = results[0];
+            user2 = results[1];
+            const subscribers = [
+              { userId: user1.id, active: false, reactivateDate },
+              { userId: user2.id }
+            ];
+            const escalationPolicy = fixtures.escalationPolicy({ subscribers });
+            return build('group', fixtures.group({ escalationPolicy }));
+          })
+          .then((newGroup) => {
+            group = newGroup;
+            done();
+          });
+    });
+
+    it('should reactivate the user', (done) => {
+      groupService.reactivateUser(group, user1.id)
+          .then((resultingGroup) => {
+            const subscribers = resultingGroup.escalationPolicy.subscribers;
+
+            expect(subscribers[0].userId.toString()).to.eq(user1.id.toString());
+            expect(subscribers[0].reactivateDate).to.eq(null);
+            expect(subscribers[0].active).to.eq(true);
+
+            expect(subscribers[1].userId.toString()).to.eq(user2.id.toString());
+            expect(subscribers[1].reactivateDate).to.eq(null);
+            expect(subscribers[1].active).to.eq(true);
+            done();
+          })
+          .catch(err => done(err));
     });
   });
 });

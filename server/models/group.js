@@ -115,17 +115,6 @@ GroupSchema.statics = {
     });
   },
 
-  getAllGroups() {
-    return new Promise((resolve, reject) => {
-      this.find({}, (err, groups) => {
-        if (groups) {
-          resolve(groups);
-        }
-        reject(err);
-      });
-    });
-  },
-
   searchByName(name) {
     return new Promise((resolve, reject) => {
       const query = new RegExp(name, 'i');
@@ -137,6 +126,17 @@ GroupSchema.statics = {
           }
           reject(err);
         });
+    });
+  },
+
+  getGroups(query) {
+    return new Promise((resolve, reject) => {
+      this.find(query, (err, groups) => {
+        if (groups) {
+          resolve(groups);
+        }
+        reject(err);
+      });
     });
   },
 
@@ -165,13 +165,18 @@ GroupSchema.statics = {
 
   removeUserFromEscalationPolicy(name, userId) {
     return new Promise((resolve, reject) => {
-      this.findOneAndUpdate({ name }, { $pull: { 'escalationPolicy.subscribers': userId } },
-        { new: true }, (err, group) => {
-          if (err) {
-            reject(err);
+      this.findOne({ name }, (err, group) => {
+        _.remove(group.escalationPolicy.subscribers,
+          n => n.userId.toString() === userId.toString());
+        group.markModified('escalationPolicy');
+
+        group.save((e, savedGroup) => {
+          if (e) {
+            reject(e);
           }
-          resolve(group);
+          resolve(savedGroup);
         });
+      });
     });
   },
 

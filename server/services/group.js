@@ -15,6 +15,10 @@ function getAllGroups() {
   return Group.getAllGroups();
 }
 
+function getGroups(query) {
+  return Group.getGroups(query);
+}
+
 function deleteGroup(groupName) {
   return Group.delete(groupName);
 }
@@ -95,7 +99,12 @@ function updateEscalationPolicy(groupName, escalationPolicy) {
   const escalationPolicySchema = Joi.object().keys({
     rotationIntervalInDays: Joi.number(),
     pagingIntervalInMinutes: Joi.number(),
-    subscribers: Joi.array().items(ID_SCHEMA)
+    subscribers: Joi.array().items(Joi.object().keys({
+      userId: ID_SCHEMA,
+      active: Joi.boolean(),
+      deactivateDate: Joi.any().allow(Joi.date(), null),
+      reactivateDate: Joi.any().allow(Joi.date(), null)
+    }))
   });
 
   return JoiHelper.validate(escalationPolicy, escalationPolicySchema)
@@ -130,13 +139,63 @@ function scheduleEPRotation(group) {
 }
 
 function rotateEscalationPolicy(group) {
-  let subscribers = group.escalationPolicy.subscribers;
+  const subscribers = group.escalationPolicy.subscribers;
   subscribers.push(subscribers.shift());
-  subscribers = subscribers.map(s => s.toString());
   const groupUpdates = { lastRotated: new Date() };
   return scheduleEPRotation(group)
     .then(() => updateGroup(group.name, groupUpdates))
-    .then(() => updateEscalationPolicy(group.name, { subscribers }));
+    .then(() => updateEscalationPolicy(group.name, { subscribers: morphSubscribers(subscribers) }));
+}
+
+function scheduleDeactivateUser(group, userId, deactivateDate, reactivateDate) {
+  const subscribers = group.escalationPolicy.subscribers;
+  const subscriberToOverride = _.find(subscribers, s => s.userId.toString() === userId.toString());
+  subscriberToOverride.deactivateDate = deactivateDate;
+  subscriberToOverride.reactivateDate = reactivateDate;
+
+  return updateEscalationPolicy(group.name, { subscribers: morphSubscribers(subscribers) })
+    .then((updatedGroup) => {
+      if (deactivateDate <= new Date()) {
+        return deactivateUser(updatedGroup, userId, reactivateDate);
+      }
+      scheduler.scheduleJob(deactivateDate,
+                            deactivateUser.bind(null, updatedGroup, userId, reactivateDate));
+      return updatedGroup;
+    })
+    .then(gWithDeactivatedUser => ({ deactivateDate, group: gWithDeactivatedUser }));
+}
+
+function scheduleReactivateUser(group, userId) {
+  const subscribers = group.escalationPolicy.subscribers;
+  const toReactivate = _.find(subscribers, s => s.userId.toString() === userId.toString());
+  const reactivateDate = toReactivate.reactivateDate;
+
+  if (reactivateDate <= new Date()) {
+    return reactivateUser(group, userId)
+      .then(updatedGroup => Promise.resolve({ reactivateDate, group: updatedGroup }));
+  }
+  scheduler.scheduleJob(reactivateDate,
+                        reactivateUser.bind(null, group, userId));
+  return Promise.resolve({ reactivateDate, group });
+}
+
+function deactivateUser(group, userId) {
+  const subscribers = group.escalationPolicy.subscribers;
+  const userToDeactivate = _.find(subscribers, s => s.userId.toString() === userId.toString());
+  userToDeactivate.active = false;
+  userToDeactivate.deactivateDate = null;
+  return updateEscalationPolicy(group.name, { subscribers: morphSubscribers(subscribers) })
+    .then(updatedGroup => scheduleReactivateUser(updatedGroup, userId))
+    .then(returnObj => returnObj.group);
+}
+
+function reactivateUser(group, userId) {
+  const subscribers = group.escalationPolicy.subscribers;
+  const userToReactivate = _.find(subscribers, s => s.userId.toString() === userId.toString());
+  userToReactivate.active = true;
+  userToReactivate.reactivateDate = null;
+
+  return updateEscalationPolicy(group.name, { subscribers: morphSubscribers(subscribers) });
 }
 
 // Internal Helper Function
@@ -149,10 +208,24 @@ function buildRotateDate(currentDate, rotationInterval) {
   return nextRotateDate;
 }
 
+function morphSubscribers(subscribersArr) {
+  const subscribers = subscribersArr;
+  for (let i = 0; i < subscribers.length; i++) {
+    const s = {};
+    s.userId = subscribers[i].userId.toString();
+    s.active = subscribers[i].active;
+    s.deactivateDate = subscribers[i].deactivateDate;
+    s.reactivateDate = subscribers[i].reactivateDate;
+    subscribers[i] = s;
+  }
+  return subscribers;
+}
+
 export default {
   // Group CRUD
   getGroup,
   getAllGroups,
+  getGroups,
   deleteGroup,
   createGroup,
   updateGroup,
@@ -167,5 +240,9 @@ export default {
   // Escalation Policy Modifications
   updateEscalationPolicy,
   scheduleEPRotation,
-  rotateEscalationPolicy
+  rotateEscalationPolicy,
+  scheduleDeactivateUser,
+  scheduleReactivateUser,
+  deactivateUser,
+  reactivateUser
 };

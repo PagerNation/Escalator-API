@@ -71,7 +71,12 @@ const fixtures = {
     return {
       rotationIntervalInDays: escalationPolicy.rotationIntervalInDays || 7,
       pagingIntervalInMinutes: escalationPolicy.pagingIntervalInMinutes || 15,
-      subscribers: escalationPolicy.subscribers || ['57e590a0140ebf1cc48bb1bf']
+      subscribers: escalationPolicy.subscribers || [{
+        userId: '57e590a0140ebf1cc48bb1bf',
+        active: true,
+        deactivateDate: null,
+        reactivateDate: null
+      }]
     };
   },
   action(action = {}) {
