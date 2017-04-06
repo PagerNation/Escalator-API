@@ -1,5 +1,6 @@
 import httpStatus from 'http-status';
 import userService from '../services/user';
+import Group from '../models/group';
 
 function getUser(req, res) {
   req.user.populate('activeGroups')
@@ -57,6 +58,7 @@ function removeDevice(req, res, next) {
 
 function getGroupsForUser(req, res, next) {
   userService.getGroupsForUser(req.user)
+    .then(groups => Group.populate(groups, 'user'))
     .then(groups => res.json(groups))
     .catch(err => next(err));
 }

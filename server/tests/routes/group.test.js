@@ -155,6 +155,7 @@ describe('## Group API', () => {
             .expect(httpStatus.OK)
             .then((res) => {
               expect(res.body.users[0]._id).to.equal(user.id);
+              expect(res.body.users[0].name).to.equal(user.name);
               done();
             });
         });
@@ -199,7 +200,7 @@ describe('## Group API', () => {
             .expect(httpStatus.OK)
             .then((res) => {
               expect(res.body.name).to.equal(group.name);
-              expect(res.body.users).to.include(user.id);
+              expect(res.body.users[0].name).to.eq(user.name);
             })
             .then(() => User.get(user.id))
             .then((updatedUser) => {
