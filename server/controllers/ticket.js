@@ -1,4 +1,5 @@
 import ticketService from '../services/ticket';
+import Ticket from '../models/ticket';
 
 function getById(req, res, next) {
   ticketService.getById(req.params.id)
@@ -32,6 +33,7 @@ function deleteById(req, res, next) {
 
 function getTicketsByDate(req, res, next) {
   ticketService.getTicketsByDate(req.query)
+    .then(tickets => Ticket.populate(tickets, 'actions.userId'))
     .then(tickets => res.json(tickets))
     .catch(e => next(e));
 }
