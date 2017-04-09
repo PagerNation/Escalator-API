@@ -194,7 +194,9 @@ GroupSchema.statics = {
 
   addAdmin(name, userId) {
     return new Promise((resolve, reject) => {
-      const update = { $push: { admins: userId } };
+      const update = {
+        $addToSet: { admins: userId, users: userId }
+      };
       this.findOneAndUpdate({ name }, update, { new: true }, (err, group) => {
         if (err) {
           reject(err);
