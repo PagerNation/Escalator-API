@@ -29,7 +29,7 @@ function updateGroup(req, res, next) {
 }
 
 function searchByName(req, res, next) {
-  groupService.searchByName(req.params.groupName)
+  groupService.searchByName(req.params.partialGroupName)
     .then(groups => Group.populate(groups, 'users'))
     .then(groups => res.json(groups))
     .catch(err => next(err));
