@@ -8,6 +8,12 @@ function getUser(req, res) {
     .then(user => res.json(user));
 }
 
+function searchByName(req, res, next) {
+  userService.searchByName(req.params.partialUserName)
+    .then(users => res.json(users))
+    .catch(err => next(err));
+}
+
 function createUser(req, res, next) {
   userService.createUser(req.body)
     .then(createdUser => res.json(createdUser))
@@ -64,17 +70,15 @@ function getGroupsForUser(req, res, next) {
 }
 
 export default {
-  // User CRUD
   getUser,
+  searchByName,
   createUser,
   updateUser,
   deleteUser,
-  // User device modifications
   getDevice,
   addDevice,
   updateDevice,
   sortDevices,
   removeDevice,
-  // User Groups
   getGroupsForUser
 };
