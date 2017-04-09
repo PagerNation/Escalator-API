@@ -29,6 +29,10 @@ function getUser(userId) {
   return User.get(userId);
 }
 
+function searchByName(partialUserName) {
+  return User.searchByName(partialUserName);
+}
+
 function updateUser(userId, userObject) {
   const userSchema = Joi.object().keys({
     name: Joi.string(),
@@ -128,6 +132,7 @@ export default {
   exists,
   createUser,
   getUser,
+  searchByName,
   updateUser,
   deleteUser,
   // User Device Modifications

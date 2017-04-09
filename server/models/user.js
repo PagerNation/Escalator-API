@@ -209,6 +209,20 @@ UserSchema.statics = {
     });
   },
 
+  searchByName(name) {
+    return new Promise((resolve, reject) => {
+      const query = new RegExp(name, 'i');
+      this.find({ name: query })
+        .limit(20)
+        .exec((err, users) => {
+          if (users) {
+            resolve(users);
+          }
+          reject(err);
+        });
+    });
+  },
+
   findByEmailOrCreate(userObj) {
     return new Promise((resolve, reject) => {
       this.findOrCreate(userObj, (err, user, created) => {

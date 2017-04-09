@@ -130,6 +130,42 @@ describe('## User Service', () => {
     });
   });
 
+  describe('# searchByName()', () => {
+    beforeEach((done) => {
+      build('user', fixtures.user({ name: 'test' }))
+        .then(() => build('user', fixtures.user({ name: 'test2' })))
+        .then(() => done());
+    });
+
+    it('should find one user', (done) => {
+      userService.searchByName('test2')
+        .then((users) => {
+          expect(users).to.have.length(1);
+          expect(users[0].name).to.equal('test2');
+          done();
+        })
+        .catch(err => done(err));
+    });
+
+    it('should find two users', (done) => {
+      userService.searchByName('test')
+        .then((users) => {
+          expect(users).to.have.length(2);
+          done();
+        })
+        .catch(err => done(err));
+    });
+
+    it('should find no users', (done) => {
+      userService.searchByName('not a user name')
+        .then((users) => {
+          expect(users).to.have.length(0);
+          done();
+        })
+        .catch(err => done(err));
+    });
+  });
+
   describe('# updateUser()', () => {
     let savedUserId;
 

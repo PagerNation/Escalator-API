@@ -9,6 +9,9 @@ const router = express.Router();  // eslint-disable-line new-cap
 router.route('/')
   .post(validate(paramValidation.createUser), userCtrl.createUser);
 
+router.route('/searchByName/:partialUserName*?')
+  .get(userCtrl.searchByName);
+
 router.route('/:userId')
   .get(validate(paramValidation.byId), userCtrl.getUser)
   .put(userMiddleware.validateByRole, userCtrl.updateUser)
