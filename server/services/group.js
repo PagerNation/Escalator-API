@@ -77,8 +77,8 @@ function removeUser(group, userId) {
 
 function makeJoinRequest(groupName, userId) {
   return userService.exists(userId)
-    .then(() => JoiHelper.validate(userId, ID_SCHEMA))
-    .then(id => Group.makeJoinRequest(groupName, id));
+    .then(() => Promise.all([getGroup(groupName), JoiHelper.validate(userId, ID_SCHEMA)]))
+    .then(results => results[0].makeJoinRequest(results[1]));
 }
 
 function processJoinRequest(group, userId, isAccepted) {
