@@ -10,7 +10,7 @@ const router = express.Router(); // eslint-disable-line new-cap
 router.route('/')
   .post(validate(paramValidation.createGroup), userMiddleware.isSysAdmin, groupCtrl.createGroup);
 
-router.route('/searchByName')
+router.route('/searchByName/:partialGroupName*?')
   .get(groupCtrl.searchByName);
 
 router.route('/:groupName')
