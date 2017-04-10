@@ -325,6 +325,7 @@ describe('## Group Service', () => {
     it('adds a new admin', (done) => {
       groupService.addAdmin(group.name, user.id)
         .then((updatedGroup) => {
+          expect(updatedGroup.users).to.include(user.id);
           expect(updatedGroup.admins).to.include(user.id);
           done();
         });
