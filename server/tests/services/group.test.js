@@ -431,6 +431,7 @@ describe('## Group Service', () => {
 
   describe('# makeJoinRequest()', () => {
     let group;
+    let group2;
     let user;
 
     beforeEach((done) => {
@@ -440,6 +441,10 @@ describe('## Group Service', () => {
         .then((values) => {
           group = values[0];
           user = values[1];
+        })
+        .then(() => build('group', fixtures.group({ users: [user.id] })))
+        .then((builtGroup) => {
+          group2 = builtGroup;
           done();
         });
     });
@@ -456,6 +461,23 @@ describe('## Group Service', () => {
       groupService.makeJoinRequest(group.name, uuid.user)
         .catch((err) => {
           expect(err.message).to.equal('No such user exists!');
+          done();
+        });
+    });
+
+    it('can\'t create multiple requests for the same group', (done) => {
+      groupService.makeJoinRequest(group.name, user.id)
+        .then(() => groupService.makeJoinRequest(group.name, user.id))
+        .catch((err) => {
+          expect(err.message).to.equal('User has a pending request for this group');
+          done();
+        });
+    });
+
+    it('can\'t create a join requests for a group you are in', (done) => {
+      groupService.makeJoinRequest(group2.name, user.id)
+        .catch((err) => {
+          expect(err.message).to.equal('User is already in this group');
           done();
         });
     });

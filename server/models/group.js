@@ -74,6 +74,30 @@ GroupSchema.methods = {
     });
   },
 
+  makeJoinRequest(userId) {
+    return new Promise((resolve, reject) => {
+      if (_.includes(this.users.map(id => id.toString()), userId)) {
+        const error = new APIError('User is already in this group', httpStatus.BAD_REQUEST);
+        return reject(error);
+      }
+
+      if (_.includes(this.joinRequests.map(id => id.toString()), userId)) {
+        const error = new APIError('User has a pending request for this group', httpStatus.BAD_REQUEST);
+        return reject(error);
+      }
+
+      this.joinRequests.push(userId);
+      this.markModified('joinRequests');
+      this.save((err, savedGroup) => {
+        if (err) {
+          reject(err);
+        }
+
+        resolve(savedGroup);
+      });
+    });
+  },
+
   processJoinRequest(userId, isAccepted) {
     return new Promise((resolve, reject) => {
       if (!_.includes(this.joinRequests.map(id => id.toString()), userId)) {
@@ -88,7 +112,6 @@ GroupSchema.methods = {
 
       maybeAddUser.then(() => {
         _.remove(this.joinRequests, id => id.toString() === userId);
-        this.markModified('users');
 
         this.save((err, savedGroup) => {
           if (err) {
@@ -176,18 +199,6 @@ GroupSchema.statics = {
           }
           resolve(savedGroup);
         });
-      });
-    });
-  },
-
-  makeJoinRequest(name, userId) {
-    return new Promise((resolve, reject) => {
-      const update = { $push: { joinRequests: userId } };
-      this.findOneAndUpdate({ name }, update, { new: true }, (err, group) => {
-        if (err) {
-          reject(err);
-        }
-        resolve(group);
       });
     });
   },
