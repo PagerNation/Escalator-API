@@ -31,7 +31,7 @@ const TicketSchema = new mongoose.Schema({
         type: Number,
         required: true
       },
-      userId: {
+      user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
       },
@@ -86,10 +86,10 @@ TicketSchema.statics = {
     });
   },
 
-  addAction(id, action, userId, device) {
+  addAction(id, action, user, device) {
     const builtActionObject = {
       actionTaken: action,
-      userId,
+      user,
       device,
       timestamp: Date.now()
     };
