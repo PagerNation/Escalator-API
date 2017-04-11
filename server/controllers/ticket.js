@@ -33,7 +33,7 @@ function deleteById(req, res, next) {
 
 function getTicketsByDate(req, res, next) {
   ticketService.getTicketsByDate(req.query)
-    .then(tickets => Ticket.populate(tickets, 'actions.userId'))
+    .then(tickets => Ticket.populate(tickets, 'actions.user'))
     .then(tickets => res.json(tickets))
     .catch(e => next(e));
 }

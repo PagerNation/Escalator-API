@@ -200,7 +200,7 @@ describe('## Ticket Service', () => {
           .then((ticket) => {
             expect(ticket.actions[0].actionTaken).to.equal(actionTypes.CREATED);
             expect(ticket.actions[0].device.name).to.equal(device.name);
-            expect(ticket.actions[0].userId.toString()).to.equal(userId);
+            expect(ticket.actions[0].user.toString()).to.equal(userId);
             done();
           });
       });
@@ -224,7 +224,7 @@ describe('## Ticket Service', () => {
 
     const action = {
       actionTaken: actionTypes.CREATED,
-      userId,
+      user: userId,
       timestamp: Date.now()
     };
 
@@ -257,7 +257,7 @@ describe('## Ticket Service', () => {
           .then((ticket) => {
             expect(ticket.actions).to.have.length(1);
             expect(ticket.actions[0].actionTaken).to.equal(actionTypes.CREATED);
-            expect(ticket.actions[0].userId.toString()).to.equal(userId);
+            expect(ticket.actions[0].user.toString()).to.equal(userId);
             done();
           });
       });

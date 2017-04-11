@@ -63,16 +63,16 @@ function getTicketsByDate(filterOpts) {
   return Ticket.getTicketsByDate(filterOpts);
 }
 
-function addAction(ticketId, actionType, userId, device) {
+function addAction(ticketId, actionType, user, device) {
   const schema = {
     ticketId: Joi.string().hex().length(24).required(),
     actionType: Joi.any().only(_.keys(actionTypes)).required(),
-    userId: Joi.string().hex().length(24),
+    user: Joi.string().hex().length(24),
     device: Joi.object()
   };
-  return JoiHelper.validate({ ticketId, actionType, userId, device }, schema)
+  return JoiHelper.validate({ ticketId, actionType, user, device }, schema)
     .then(values =>
-      Ticket.addAction(values.ticketId, values.actionType, values.userId, values.device));
+      Ticket.addAction(values.ticketId, values.actionType, values.user, values.device));
 }
 
 function removeAction(ticketId, actionId) {
