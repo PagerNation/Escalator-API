@@ -80,7 +80,7 @@ describe('## Group API', () => {
 
     context('with a valid group', () => {
       beforeEach((done) => {
-        build('group', fixtures.group())
+        build('group', fixtures.group({ users: [user.id] }))
           .then((g) => {
             group = g;
             done();

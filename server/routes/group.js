@@ -14,7 +14,7 @@ router.route('/searchByName/:partialGroupName*?')
   .get(groupCtrl.searchByName);
 
 router.route('/:groupName')
-  .get(validate(paramValidation.byName), groupCtrl.getGroup)
+  .get(validate(paramValidation.byName), groupMiddleware.isGroupMember, groupCtrl.getGroup)
   .put(validate(paramValidation.updateGroup), groupMiddleware.isGroupAdmin, groupCtrl.updateGroup)
   .delete(validate(paramValidation.byName), groupMiddleware.isGroupAdmin, groupCtrl.deleteGroup);
 
