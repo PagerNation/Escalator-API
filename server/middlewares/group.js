@@ -18,11 +18,20 @@ function isAdminOrCurrentUser(req, res, next) {
   res.sendStatus(httpStatus.UNAUTHORIZED);
 }
 
+function isGroupMember(req, res, next) {
+  const users = req.group.users.map(userId => userId.toString());
+  if (_.includes(users, req.user.id)) {
+    return next();
+  }
+  res.sendStatus(httpStatus.UNAUTHORIZED);
+}
+
 function isAdmin(admins, user) {
   return _.includes(admins, user.id) || user.isSysAdmin;
 }
 
 export default {
   isGroupAdmin,
-  isAdminOrCurrentUser
+  isAdminOrCurrentUser,
+  isGroupMember
 };
