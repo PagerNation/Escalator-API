@@ -445,6 +445,56 @@ describe('## Group API', () => {
     });
   });
 
+  describe('# PUT /:groupName/escalationpolicy', () => {
+    let userToken;
+    let group;
+    let ep;
+
+    beforeEach((done) => {
+      buildAndAuth('user', fixtures.user())
+        .then((createdUserAndToken) => {
+          user = createdUserAndToken.user;
+          userToken = createdUserAndToken.token;
+          return build('group', fixtures.group({ admins: [user.id] }));
+        })
+        .then((g) => {
+          group = g;
+          ep = g.escalationPolicy;
+          done();
+        });
+    });
+
+    context('when updating the subscribers and rotation interval', () => {
+      const userId = uuid.user;
+      const updates = {
+        rotationIntervalInDays: 60,
+        subscribers: [
+          {
+            userId,
+            active: false,
+            deactivateDate: null,
+            reactivateDate: null
+          }
+        ]
+      };
+
+      it('should update the escalation policy', (done) => {
+        request(app)
+          .put(`${groupUrl}/${group.name}/escalationpolicy`)
+          .set('Authorization', `Bearer ${userToken}`)
+          .send(updates)
+          .expect(httpStatus.OK)
+          .then((res) => {
+            const newGroupEP = res.body.escalationPolicy;
+            expect(newGroupEP.rotationIntervalInDays).to.eq(updates.rotationIntervalInDays);
+            expect(newGroupEP.pagingIntervalInMinutes).to.eq(ep.pagingIntervalInMinutes);
+            expect(newGroupEP.subscribers[0].userId).to.eq(userId);
+            done();
+          });
+      });
+    });
+  });
+
   describe('# POST /:groupName/escalationPolicy/:userId', () => {
     context('deactivate valid user', () => {
       let userToken;

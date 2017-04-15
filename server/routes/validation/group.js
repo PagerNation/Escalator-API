@@ -49,7 +49,12 @@ export default {
     body: {
       rotationIntervalInDays: Joi.number(),
       pagingIntervalInMinutes: Joi.number(),
-      subscribers: Joi.array().items(Joi.string().hex().length(24))
+      subscribers: Joi.array().items(Joi.object().keys({
+        userId: Joi.string().hex().length(24),
+        active: Joi.boolean(),
+        deactivateDate: Joi.any().allow(Joi.date(), null),
+        reactivateDate: Joi.any().allow(Joi.date(), null)
+      }))
     },
     params: {
       groupName: Joi.string().required()
