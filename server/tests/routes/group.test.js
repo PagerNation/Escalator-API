@@ -470,7 +470,7 @@ describe('## Group API', () => {
         rotationIntervalInDays: 60,
         subscribers: [
           {
-            userId,
+            user: userId,
             active: false,
             deactivateDate: null,
             reactivateDate: null
@@ -488,7 +488,7 @@ describe('## Group API', () => {
             const newGroupEP = res.body.escalationPolicy;
             expect(newGroupEP.rotationIntervalInDays).to.eq(updates.rotationIntervalInDays);
             expect(newGroupEP.pagingIntervalInMinutes).to.eq(ep.pagingIntervalInMinutes);
-            expect(newGroupEP.subscribers[0].userId).to.eq(userId);
+            expect(newGroupEP.subscribers[0].user).to.eq(userId);
             done();
           });
       });
@@ -509,7 +509,7 @@ describe('## Group API', () => {
             user = createdUserAndToken.user;
             userToken = createdUserAndToken.token;
             const subscribers = [
-              { userId: user.id }
+              { user: user.id }
             ];
             const escalationPolicy = fixtures.escalationPolicy({ subscribers });
             return build('group', fixtures.group({ escalationPolicy }));
@@ -552,7 +552,7 @@ describe('## Group API', () => {
             user = createdUserAndToken.user;
             userToken = createdUserAndToken.token;
             const subscribers = [
-              { userId: user.id, active: false, reactivateDate: new Date() }
+              { user: user.id, active: false, reactivateDate: new Date() }
             ];
             const escalationPolicy = fixtures.escalationPolicy({ subscribers });
             return build('group', fixtures.group({ escalationPolicy }));

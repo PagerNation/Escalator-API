@@ -23,8 +23,8 @@ describe('## Group Loader', () => {
       .then((u2) => {
         reactivateUser = u2;
         const subscribers = [
-          { userId: deactivateUser.id, deactivateDate },
-          { userId: reactivateUser.id, reactivateDate, active: false }
+          { user: deactivateUser.id, deactivateDate },
+          { user: reactivateUser.id, reactivateDate, active: false }
         ];
         const escalationPolicy = fixtures.escalationPolicy({ subscribers });
         return build('group', fixtures.group({ escalationPolicy }));

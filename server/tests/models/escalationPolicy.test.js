@@ -11,7 +11,7 @@ describe('## EscalationPolicy: models', () => {
         const subscriber = createdEP.subscribers[0];
         expect(createdEP.rotationIntervalInDays).to.equal(epObj.rotationIntervalInDays);
         expect(createdEP.subscribers.length).to.equal(1);
-        expect(subscriber.userId.toString()).to.equal(epObj.subscribers[0].userId.toString());
+        expect(subscriber.user.toString()).to.equal(epObj.subscribers[0].user.toString());
         expect(subscriber.active).to.equal(epObj.subscribers[0].active);
         expect(createdEP.pagingIntervalInMinutes).to.equal(epObj.pagingIntervalInMinutes);
         done();

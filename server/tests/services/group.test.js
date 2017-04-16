@@ -170,7 +170,7 @@ describe('## Group Service', () => {
           .then((u) => {
             userId = u.id;
             const subscribers = [
-              { userId }
+              { user: userId }
             ];
 
             return build('escalationPolicy', fixtures.escalationPolicy({ subscribers }));
@@ -395,9 +395,9 @@ describe('## Group Service', () => {
   describe('# rotateEscalationPolicy()', () => {
     let group;
     const subscribers = [
-      { userId: '123456789012345678901234' },
-      { userId: '121212121212121212121212' },
-      { userId: '098765432109876543210987' }
+      { user: '123456789012345678901234' },
+      { user: '121212121212121212121212' },
+      { user: '098765432109876543210987' }
     ];
     const escalationPolicy = { subscribers };
     const lastRotated = new Date(2015, 11, 10, 0, 0, 0);
@@ -417,9 +417,9 @@ describe('## Group Service', () => {
         .then((updatedGroup) => {
           const ep = updatedGroup.escalationPolicy;
           expect(ep.subscribers.length).to.eq(subscribers.length);
-          expect(ep.subscribers[0].userId.toString()).to.eq(subscribers[1].userId);
-          expect(ep.subscribers[1].userId.toString()).to.eq(subscribers[2].userId);
-          expect(ep.subscribers[2].userId.toString()).to.eq(subscribers[0].userId);
+          expect(ep.subscribers[0].user.toString()).to.eq(subscribers[1].user);
+          expect(ep.subscribers[1].user.toString()).to.eq(subscribers[2].user);
+          expect(ep.subscribers[2].user.toString()).to.eq(subscribers[0].user);
 
           expect(equalDates(updatedGroup.lastRotated, new Date())).to.eq(true);
 
@@ -579,8 +579,8 @@ describe('## Group Service', () => {
           user1 = results[0];
           user2 = results[1];
           const subscribers = [
-            { userId: user1.id },
-            { userId: user2.id }
+            { user: user1.id },
+            { user: user2.id }
           ];
           const escalationPolicy = fixtures.escalationPolicy({ subscribers });
           return build('group', fixtures.group({ escalationPolicy }));
@@ -601,7 +601,7 @@ describe('## Group Service', () => {
         groupService.scheduleDeactivateUser(group, user1.id, deactivateDate, reactivateDate)
           .then((returnObj) => {
             const subscribers = returnObj.group.escalationPolicy.subscribers;
-            expect(subscribers[0].userId.toString()).to.eq(user1.id.toString());
+            expect(subscribers[0].user.toString()).to.eq(user1.id.toString());
             expect(subscribers[0].active).to.eq(false);
 
             expect(Object.keys(scheduler.scheduledJobs).length).to.eq(scheduledJobsCount + 1);
@@ -624,7 +624,7 @@ describe('## Group Service', () => {
             expect(returnObj.group.name).to.eq(group.name);
 
             const subscribers = returnObj.group.escalationPolicy.subscribers;
-            expect(subscribers[0].userId.toString()).to.eq(user1.id.toString());
+            expect(subscribers[0].user.toString()).to.eq(user1.id.toString());
             expect(subscribers[0].active).to.eq(true);
 
             expect(Object.keys(scheduler.scheduledJobs).length).to.eq(scheduledJobsCount + 1);
@@ -656,8 +656,8 @@ describe('## Group Service', () => {
     context('with immediate reactivation', () => {
       beforeEach((done) => {
         const subscribers = [
-          { userId: user1.id, active: false, deactivateDate: null, reactivateDate: new Date() },
-          { userId: user2.id }
+          { user: user1.id, active: false, deactivateDate: null, reactivateDate: new Date() },
+          { user: user2.id }
         ];
 
         const escalationPolicy = fixtures.escalationPolicy({ subscribers });
@@ -673,7 +673,7 @@ describe('## Group Service', () => {
         groupService.scheduleReactivateUser(group, user1.id)
           .then((returnObj) => {
             const subscribers = returnObj.group.escalationPolicy.subscribers;
-            expect(subscribers[0].userId.toString()).to.eq(user1.id.toString());
+            expect(subscribers[0].user.toString()).to.eq(user1.id.toString());
             expect(subscribers[0].active).to.eq(true);
 
             expect(Object.keys(scheduler.scheduledJobs).length).to.eq(scheduledJobsCount);
@@ -689,8 +689,8 @@ describe('## Group Service', () => {
         reactivateDate.setDate(reactivateDate.getDate() + 2);
 
         const subscribers = [
-          { userId: user1.id, active: false, deactivateDate: null, reactivateDate },
-          { userId: user2.id }
+          { user: user1.id, active: false, deactivateDate: null, reactivateDate },
+          { user: user2.id }
         ];
 
         const escalationPolicy = fixtures.escalationPolicy({ subscribers });
@@ -706,7 +706,7 @@ describe('## Group Service', () => {
         groupService.scheduleReactivateUser(group, user1.id)
           .then((returnObj) => {
             const subscribers = returnObj.group.escalationPolicy.subscribers;
-            expect(subscribers[0].userId.toString()).to.eq(user1.id.toString());
+            expect(subscribers[0].user.toString()).to.eq(user1.id.toString());
             expect(subscribers[0].active).to.eq(false);
 
             expect(Object.keys(scheduler.scheduledJobs).length).to.eq(scheduledJobsCount + 1);
@@ -734,8 +734,8 @@ describe('## Group Service', () => {
           user1 = results[0];
           user2 = results[1];
           const subscribers = [
-            { userId: user1.id, deactivateDate, reactivateDate },
-            { userId: user2.id }
+            { user: user1.id, deactivateDate, reactivateDate },
+            { user: user2.id }
           ];
           const escalationPolicy = fixtures.escalationPolicy({ subscribers });
           return build('group', fixtures.group({ escalationPolicy }));
@@ -750,11 +750,11 @@ describe('## Group Service', () => {
       groupService.deactivateUser(group, user1.id, deactivateDate, reactivateDate)
         .then((resultingGroup) => {
           const subscribers = resultingGroup.escalationPolicy.subscribers;
-          expect(subscribers[0].userId.toString()).to.eq(user1.id.toString());
+          expect(subscribers[0].user.toString()).to.eq(user1.id.toString());
           expect(subscribers[0].deactivateDate).to.eq(null);
           expect(subscribers[0].active).to.eq(false);
 
-          expect(subscribers[1].userId.toString()).to.eq(user2.id.toString());
+          expect(subscribers[1].user.toString()).to.eq(user2.id.toString());
           expect(subscribers[1].deactivateDate).to.eq(null);
           expect(subscribers[1].active).to.eq(true);
 
@@ -779,8 +779,8 @@ describe('## Group Service', () => {
             user1 = results[0];
             user2 = results[1];
             const subscribers = [
-              { userId: user1.id, active: false, reactivateDate },
-              { userId: user2.id }
+              { user: user1.id, active: false, reactivateDate },
+              { user: user2.id }
             ];
             const escalationPolicy = fixtures.escalationPolicy({ subscribers });
             return build('group', fixtures.group({ escalationPolicy }));
@@ -793,19 +793,19 @@ describe('## Group Service', () => {
 
     it('should reactivate the user', (done) => {
       groupService.reactivateUser(group, user1.id)
-          .then((resultingGroup) => {
-            const subscribers = resultingGroup.escalationPolicy.subscribers;
+        .then((resultingGroup) => {
+          const subscribers = resultingGroup.escalationPolicy.subscribers;
 
-            expect(subscribers[0].userId.toString()).to.eq(user1.id.toString());
-            expect(subscribers[0].reactivateDate).to.eq(null);
-            expect(subscribers[0].active).to.eq(true);
+          expect(subscribers[0].user.toString()).to.eq(user1.id.toString());
+          expect(subscribers[0].reactivateDate).to.eq(null);
+          expect(subscribers[0].active).to.eq(true);
 
-            expect(subscribers[1].userId.toString()).to.eq(user2.id.toString());
-            expect(subscribers[1].reactivateDate).to.eq(null);
-            expect(subscribers[1].active).to.eq(true);
-            done();
-          })
-          .catch(err => done(err));
+          expect(subscribers[1].user.toString()).to.eq(user2.id.toString());
+          expect(subscribers[1].reactivateDate).to.eq(null);
+          expect(subscribers[1].active).to.eq(true);
+          done();
+        })
+        .catch(err => done(err));
     });
   });
 });
