@@ -11,7 +11,10 @@ const EscalationPolicySchema = new mongoose.Schema({
   },
   subscribers: {
     type: [{
-      userId: mongoose.Schema.Types.ObjectId,
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      },
       active: {
         type: mongoose.Schema.Types.Boolean,
         default: true
