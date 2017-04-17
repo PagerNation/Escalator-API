@@ -10,7 +10,7 @@ function loginUser(req, res) {
 function signupUser(req, res) {
   authService.signupUser(req.body)
     .then(result => res.json(result))
-    .catch(err => res.send(err.message));
+    .catch(err => res.status(httpStatus.BAD_REQUEST).send(err.message));
 }
 
 export default {
