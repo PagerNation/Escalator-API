@@ -112,6 +112,7 @@ GroupSchema.methods = {
 
       maybeAddUser.then(() => {
         _.remove(this.joinRequests, id => id.toString() === userId);
+        this.markModified('joinRequests');
 
         this.save((err, savedGroup) => {
           if (err) {
