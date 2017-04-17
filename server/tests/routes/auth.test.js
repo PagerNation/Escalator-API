@@ -1,9 +1,8 @@
 import request from 'supertest-as-promised';
 import httpStatus from 'http-status';
 import app from '../../../index';
-import { fixtures, build, buildAndAuth, uuid } from '../../utils/factories';
-import userService from '../../services/user';
-
+import { fixtures, build } from '../../utils/factories';
+import User from '../../models/user';
 
 const authUrl = '/api/v1/auth';
 
@@ -11,8 +10,7 @@ describe('## Auth API', () => {
   let user;
 
   beforeEach((done) => {
-    user = fixtures.user();
-    build('user', user)
+    build('user', fixtures.user())
       .then((userObj) => {
         user = userObj;
         done();
@@ -20,10 +18,9 @@ describe('## Auth API', () => {
   });
 
   describe('# /api/v1/auth/login', () => {
-
     it('logs a user in', (done) => {
       request(app)
-        .post(authUrl + '/login')
+        .post(`${authUrl}/login`)
         .send({
           email: user.email,
           password: 'anything'
@@ -38,7 +35,7 @@ describe('## Auth API', () => {
 
     it('doesn\'t log in a user that doesn\'t exist', (done) => {
       request(app)
-        .post(authUrl + '/login')
+        .post(`${authUrl}/login`)
         .send({
           email: 'email',
           password: 'anything'
@@ -51,7 +48,6 @@ describe('## Auth API', () => {
   });
 
   describe('# /api/v1/auth/signup', () => {
-
     const baseUser = {
       name: 'Jarryd',
       email: 'test@test.com',
@@ -60,7 +56,7 @@ describe('## Auth API', () => {
 
     it('creates a new user', (done) => {
       request(app)
-        .post(authUrl + '/signup')
+        .post(`${authUrl}/signup`)
         .send(baseUser)
         .expect(httpStatus.OK)
         .then((res) => {
@@ -78,9 +74,9 @@ describe('## Auth API', () => {
           });
       });
 
-      it.only('fails if the email already exists', (done) => {
+      it('fails if the email already exists', (done) => {
         request(app)
-          .post(authUrl + '/signup')
+          .post(`${authUrl}/signup`)
           .send({
             name: 'Jarryd1',
             email: baseUser.email,
@@ -88,12 +84,9 @@ describe('## Auth API', () => {
           })
           .expect(httpStatus.BAD_REQUEST)
           .then((res) => {
-            console.log(res);
-            console.log(user);
             done();
           });
       });
     });
   });
-
 });

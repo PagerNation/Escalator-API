@@ -167,8 +167,7 @@ describe('## User Service', () => {
   });
 
   describe('# updateUser()', () => {
-    let savedUserId;
-
+    let savedUser;
     const userObj = fixtures.user();
 
     const updateDetails = {
@@ -178,17 +177,17 @@ describe('## User Service', () => {
     beforeEach((done) => {
       build('user', userObj)
         .then((u) => {
-          savedUserId = u.id;
+          savedUser = u;
           done();
         });
     });
 
     context('when updating name or email', () => {
       it('updates an existing user', (done) => {
-        userService.updateUser(savedUserId, updateDetails)
+        userService.updateUser(savedUser.id, updateDetails)
           .then((user) => {
             expect(user).to.exist;
-            expect(user.id).to.equal(savedUserId);
+            expect(user.id).to.equal(savedUser.id);
             expect(user.name).to.equal(userObj.name);
             expect(user.email).to.equal(updateDetails.email);
             expect(user.auth).to.be.null;
@@ -201,7 +200,7 @@ describe('## User Service', () => {
       });
 
       it('fails to update a user with invalid fields', (done) => {
-        userService.updateUser(savedUserId, { fake: 0 })
+        userService.updateUser(savedUser.id, { fake: 0 })
           .catch((err, user) => {
             expect(err).to.exist;
             expect(err.name).to.equal('ValidationError');
@@ -214,24 +213,24 @@ describe('## User Service', () => {
     context('when updating delays', () => {
       const beginningDelays = [1, 2, 3, 4, 5];
       const endingDelays = [5, 4, 3, 2, 1];
-      let user = {};
+      const user = {};
 
       beforeEach((done) => {
-        userObj.delays = beginningDelays;
-        build('user', userObj)
-          .then((u) => {
-            user = u;
+        savedUser.delays = beginningDelays;
+        savedUser.save((err) => {
+          if (!err) {
             done();
-          });
+          }
+        });
       });
 
       it('should update the delay field of the user', (done) => {
         const updates = {
           delays: endingDelays
         };
-        userService.updateUser(user.id, updates)
+        userService.updateUser(savedUser.id, updates)
           .then((newUser) => {
-            expect(newUser.id).to.equal(user.id);
+            expect(newUser.id).to.equal(savedUser.id);
             expect(newUser.delays[0]).to.equal(endingDelays[0]);
             expect(newUser.delays[1]).to.equal(endingDelays[1]);
             done();
