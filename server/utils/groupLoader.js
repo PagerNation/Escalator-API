@@ -24,7 +24,7 @@ function rescheduleDeactivation() {
           const s = subscribers[j];
           if (s.deactivateDate !== null) {
             schedulePromises.push(groupService.scheduleDeactivateUser(groups[i],
-              s.userId,
+              s.user,
               s.deactivateDate,
               s.reactivateDate));
           }
@@ -44,7 +44,7 @@ function rescheduleReactivation() {
         for (let j = 0; j < subscribers.length; j++) {
           if (subscribers[j].reactivateDate !== null) {
             schedulePromises.push(groupService.scheduleReactivateUser(groups[i],
-              subscribers[j].userId,
+              subscribers[j].user,
               subscribers[j].deactivateDate,
               subscribers[j].reactivateDate));
           }

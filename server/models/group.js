@@ -190,7 +190,7 @@ GroupSchema.statics = {
     return new Promise((resolve, reject) => {
       this.findOne({ name }, (err, group) => {
         _.remove(group.escalationPolicy.subscribers,
-          n => n.userId.toString() === userId.toString());
+          n => n.user.toString() === userId.toString());
         group.markModified('escalationPolicy');
 
         group.save((e, savedGroup) => {

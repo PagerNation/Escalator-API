@@ -100,7 +100,7 @@ function updateEscalationPolicy(groupName, escalationPolicy) {
     rotationIntervalInDays: Joi.number(),
     pagingIntervalInMinutes: Joi.number(),
     subscribers: Joi.array().items(Joi.object().keys({
-      userId: ID_SCHEMA,
+      user: ID_SCHEMA,
       active: Joi.boolean(),
       deactivateDate: Joi.any().allow(Joi.date(), null),
       reactivateDate: Joi.any().allow(Joi.date(), null)
@@ -149,7 +149,7 @@ function rotateEscalationPolicy(group) {
 
 function scheduleDeactivateUser(group, userId, deactivateDate, reactivateDate) {
   const subscribers = group.escalationPolicy.subscribers;
-  const subscriberToOverride = _.find(subscribers, s => s.userId.toString() === userId.toString());
+  const subscriberToOverride = _.find(subscribers, s => s.user.toString() === userId.toString());
   subscriberToOverride.deactivateDate = deactivateDate;
   subscriberToOverride.reactivateDate = reactivateDate;
 
@@ -167,7 +167,7 @@ function scheduleDeactivateUser(group, userId, deactivateDate, reactivateDate) {
 
 function scheduleReactivateUser(group, userId) {
   const subscribers = group.escalationPolicy.subscribers;
-  const toReactivate = _.find(subscribers, s => s.userId.toString() === userId.toString());
+  const toReactivate = _.find(subscribers, s => s.user.toString() === userId.toString());
   const reactivateDate = toReactivate.reactivateDate;
 
   if (reactivateDate <= new Date()) {
@@ -181,7 +181,7 @@ function scheduleReactivateUser(group, userId) {
 
 function deactivateUser(group, userId) {
   const subscribers = group.escalationPolicy.subscribers;
-  const userToDeactivate = _.find(subscribers, s => s.userId.toString() === userId.toString());
+  const userToDeactivate = _.find(subscribers, s => s.user.toString() === userId.toString());
   userToDeactivate.active = false;
   userToDeactivate.deactivateDate = null;
   return updateEscalationPolicy(group.name, { subscribers: morphSubscribers(subscribers) })
@@ -191,7 +191,7 @@ function deactivateUser(group, userId) {
 
 function reactivateUser(group, userId) {
   const subscribers = group.escalationPolicy.subscribers;
-  const userToReactivate = _.find(subscribers, s => s.userId.toString() === userId.toString());
+  const userToReactivate = _.find(subscribers, s => s.user.toString() === userId.toString());
   userToReactivate.active = true;
   userToReactivate.reactivateDate = null;
 
@@ -212,7 +212,7 @@ function morphSubscribers(subscribersArr) {
   const subscribers = subscribersArr;
   for (let i = 0; i < subscribers.length; i++) {
     const s = {};
-    s.userId = subscribers[i].userId.toString();
+    s.user = subscribers[i].user.toString();
     s.active = subscribers[i].active;
     s.deactivateDate = subscribers[i].deactivateDate;
     s.reactivateDate = subscribers[i].reactivateDate;

@@ -12,7 +12,7 @@ function createAlert(ticket) {
   return ticket
     .populate('group')
     .execPopulate()
-    .then(pTicket => pTicket.group.populate('escalationPolicy.subscribers').execPopulate())
+    .then(pTicket => pTicket.group.populate('escalationPolicy.subscribers.user').execPopulate())
     .then(group => generateAllPageRequests(group, ticket))
     .then(pageRequests => sendPageRequestsToQueue(pageRequests))
     .then(() => ticketService.addAction(ticket.id, actionTypes.CREATED));
@@ -23,8 +23,8 @@ function generateAllPageRequests(group, ticket) {
   let currentDelay = 0;
   const title = ticket.metadata.title;
 
-  for (const user of group.escalationPolicy.subscribers) {
-    const userPages = generateUserPageRequests(ticket.id, user, currentDelay, title);
+  for (const subscriber of group.escalationPolicy.subscribers) {
+    const userPages = generateUserPageRequests(ticket.id, subscriber.user, currentDelay, title);
     pageRequests = pageRequests.concat(userPages);
     currentDelay += group.escalationPolicy.pagingIntervalInMinutes;
   }

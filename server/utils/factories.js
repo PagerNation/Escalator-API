@@ -72,7 +72,7 @@ const fixtures = {
       rotationIntervalInDays: escalationPolicy.rotationIntervalInDays || 7,
       pagingIntervalInMinutes: escalationPolicy.pagingIntervalInMinutes || 15,
       subscribers: escalationPolicy.subscribers || [{
-        userId: '57e590a0140ebf1cc48bb1bf',
+        user: '57e590a0140ebf1cc48bb1bf',
         active: true,
         deactivateDate: null,
         reactivateDate: null
