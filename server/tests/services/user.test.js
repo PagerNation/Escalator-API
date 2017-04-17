@@ -489,6 +489,16 @@ describe('## User Service', () => {
           done();
         });
     });
+
+    it('should fail when the same group is added twice', (done) => {
+      userService.addGroupByUserId(user.id, baseGroup.name)
+        .then(() => userService.addGroupByUserId(user.id, baseGroup.name))
+        .then((user) => {
+          expect(user.groups).to.have.length(1);
+          expect(user.groups[0]).to.equal(baseGroup.name);
+          done();
+        });
+    });
   });
 
   describe('# removeGroup()', () => {
