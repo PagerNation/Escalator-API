@@ -87,8 +87,19 @@ function processJoinRequest(group, userId, isAccepted) {
     isAccepted: Joi.boolean().required()
   });
 
+  let tmpGroup;
+
   return JoiHelper.validate({ userId, isAccepted }, schema)
-    .then(v => group.processJoinRequest(v.userId, v.isAccepted));
+    .then(v => group.processJoinRequest(v.userId, v.isAccepted))
+    .then((updatedGroup) => {
+      if (!isAccepted) {
+        tmpGroup = updatedGroup;
+        return;
+      }
+      tmpGroup = updatedGroup;
+      return userService.addGroupByUserId(userId, updatedGroup.name);
+    })
+    .then(() => tmpGroup);
 }
 
 function searchByName(partialGroupName) {
