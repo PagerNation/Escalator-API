@@ -27,7 +27,8 @@ router.route('/:groupName/user')
   .post(validate(paramValidation.addUser), groupMiddleware.isGroupAdmin, groupCtrl.addUser);
 
 router.route('/:groupName/user/:userId')
-  .delete(validate(paramValidation.userById), groupMiddleware.isGroupAdmin, groupCtrl.removeUser);
+  .delete(validate(paramValidation.userById),
+    groupMiddleware.isAdminOrCurrentUser, groupCtrl.removeUser);
 
 router.route('/:groupName/user/:userId/admin')
   .post(validate(paramValidation.userById), groupMiddleware.isGroupAdmin, groupCtrl.addAdmin)
