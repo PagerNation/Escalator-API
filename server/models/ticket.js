@@ -47,11 +47,10 @@ const TicketSchema = new mongoose.Schema({
   pageIds: {
     type: Array,
     default: []
-  },
-  createdAt: {
-    type: Number,
-    default: Date.now()
   }
+},
+{
+  timestamps: true
 });
 
 TicketSchema.virtual('group', {
@@ -121,20 +120,63 @@ TicketSchema.statics = {
     });
   },
 
-  getTicketsByDate(filterOpts) {
+  // I'm 100% sure there is a better way to do this
+  // This gets the most recent ticket action and ticket information
+  // for each group specified in <groups>. If there is no tickets
+  // for a given group it will not return a ticket
+  getMostRecentTickets(groups) {
     return new Promise((resolve, reject) => {
-      const query = this.find()
-        .limit(10)
-        .sort('-createdAt');
+      this.aggregate(
+        [
+          { '$match': {
+            'groupName': { '$in': groups }
+          }},
+          { '$unwind': '$actions'},
+          { '$sort': { 'groupName': 1, 'actions.timestamp': -1 } },
+          { '$group': {
+            '_id': '$groupName',
+            'timestamp': { '$first': '$actions.timestamp' },
+            'user': { '$first': '$actions.user' },
+            'actionTaken': { '$first': '$actions.actionTaken' }
+          }},
+          { $lookup: {from: 'users', localField: 'user', foreignField: '_id', as: 'user'} }
+        ], (err, result) => {
+          if (err) {
+            reject(err);
+          }
+          resolve(result);
+        }
+      );
+    });
+  },
+
+  getTicketsByDate(filterOpts) {
+    this.getMostRecentTickets(_.get(filterOpts, 'groupName'));
+    return new Promise((resolve, reject) => {
+      const query = this.find();
+
+      const limit = _.get(filterOpts, 'limit');
+      if (!_.isNil(limit)) {
+        query.limit(limit);
+      } else {
+        query.limit(10);
+      }
+
+      const sortBy = _.get(filterOpts, 'sortBy');
+      if (!_.isNil(sortBy)) {
+        query.sort(`-${sortBy}`);
+      } else {
+        query.sort('-createdAt');
+      }
 
       const isOpen = _.get(filterOpts, 'isOpen');
       if (!_.isNil(isOpen)) {
         query.where('isOpen').equals(isOpen);
       }
 
-      const groupName = _.get(filterOpts, 'groupName');
-      if (!_.isNil(groupName)) {
-        query.where('groupName').equals(groupName);
+      const groupNames = _.get(filterOpts, 'groupName');
+      if (!_.isNil(groupNames)) {
+        query.where('groupName').in([].concat(groupNames));
       }
 
       const to = _.get(filterOpts, 'to');

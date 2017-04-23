@@ -8,6 +8,9 @@ const router = express.Router();  // eslint-disable-line new-cap
 router.route('/all')
   .get(validate(paramValidation.getTicketsByDate), ticketController.getTicketsByDate);
 
+router.route('/recent')
+  .get(ticketController.getMostRecentTickets);
+
 router.route('/:id')
   .get(validate(paramValidation.byId), ticketController.getById)
   .post(validate(paramValidation.byId), ticketController.close)

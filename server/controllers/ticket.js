@@ -38,11 +38,19 @@ function getTicketsByDate(req, res, next) {
     .catch(e => next(e));
 }
 
+function getMostRecentTickets(req, res, next) {
+  ticketService.getMostRecentTickets(req.query.groups)
+    .then(tickets => Ticket.populate(tickets, 'actions.user'))
+    .then(tickets => res.json(tickets))
+    .catch(e => next(e));
+}
+
 export default {
   create,
   getById,
   update,
   close,
   deleteById,
-  getTicketsByDate
+  getTicketsByDate,
+  getMostRecentTickets
 };

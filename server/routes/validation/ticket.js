@@ -31,8 +31,10 @@ export default {
 
   getTicketsByDate: {
     query: {
+      sortBy: Joi.string(),
+      limit: Joi.number().max(20),
       isOpen: Joi.boolean(),
-      groupName: Joi.string(),
+      groupName: Joi.any().allow(Joi.string(), Joi.array().items(Joi.string())),
       to: Joi.number(),
       from: Joi.number()
     }

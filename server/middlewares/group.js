@@ -20,7 +20,8 @@ function isAdminOrCurrentUser(req, res, next) {
 
 function isGroupMember(req, res, next) {
   const users = req.group.users.map(userId => userId.toString());
-  if (_.includes(users, req.user.id)) {
+  if (_.includes(users, req.user.id)
+    || req.user.isSysAdmin) {
     return next();
   }
   res.sendStatus(httpStatus.UNAUTHORIZED);
