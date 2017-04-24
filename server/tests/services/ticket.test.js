@@ -225,7 +225,7 @@ describe('## Ticket Service', () => {
           expect(groupOneTicket.actionTaken).to.equal(actionTypes.PAGE_SENT);
           expect(groupTwoTicket).to.exist;
           expect(groupTwoTicket.actionTaken).to.equal(actionTypes.PAGE_SENT);
-          done()
+          done();
         })
         .catch(e => done(e));
     });
@@ -236,7 +236,7 @@ describe('## Ticket Service', () => {
           const groupTicket = _.find(tickets, { _id: 'testing' });
 
           expect(groupTicket).to.be.empty;
-          done()
+          done();
         })
         .catch(e => done(e));
     });

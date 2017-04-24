@@ -48,8 +48,7 @@ const TicketSchema = new mongoose.Schema({
     type: Array,
     default: []
   }
-},
-{
+}, {
   timestamps: true
 });
 
@@ -128,24 +127,24 @@ TicketSchema.statics = {
     return new Promise((resolve, reject) => {
       this.aggregate(
         [
-          { '$match': {
-            'groupName': { '$in': groups }
-          }},
-          { '$unwind': '$actions'},
-          { '$sort': { 'groupName': 1, 'actions.timestamp': -1 } },
-          { '$group': {
-            '_id': '$groupName',
-            'timestamp': { '$first': '$actions.timestamp' },
-            'user': { '$first': '$actions.user' },
-            'actionTaken': { '$first': '$actions.actionTaken' }
-          }},
-          { $lookup: {from: 'users', localField: 'user', foreignField: '_id', as: 'user'} }
+          { $match: {
+            groupName: { $in: groups }
+          } },
+          { $unwind: '$actions' },
+          { $sort: { groupName: 1, 'actions.timestamp': -1 } },
+          { $group: {
+            _id: '$groupName',
+            timestamp: { $first: '$actions.timestamp' },
+            user: { $first: '$actions.user' },
+            actionTaken: { $first: '$actions.actionTaken' }
+          } },
+          { $lookup: { from: 'users', localField: 'user', foreignField: '_id', as: 'user' } }
         ], (err, result) => {
-          if (err) {
-            reject(err);
-          }
-          resolve(result);
+        if (err) {
+          reject(err);
         }
+        resolve(result);
+      }
       );
     });
   },
