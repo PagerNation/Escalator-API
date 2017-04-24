@@ -29,6 +29,12 @@ export default {
     }
   },
 
+  getMostRecentTickets: {
+    params: {
+      groups: Joi.array().items(Joi.string())
+    }
+  },
+
   getTicketsByDate: {
     query: {
       sortBy: Joi.string(),

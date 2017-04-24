@@ -9,7 +9,7 @@ router.route('/all')
   .get(validate(paramValidation.getTicketsByDate), ticketController.getTicketsByDate);
 
 router.route('/recent')
-  .get(ticketController.getMostRecentTickets);
+  .get(validate(paramValidation.getMostRecentTickets), ticketController.getMostRecentTickets);
 
 router.route('/:id')
   .get(validate(paramValidation.byId), ticketController.getById)
