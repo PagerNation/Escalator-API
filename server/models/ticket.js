@@ -151,7 +151,6 @@ TicketSchema.statics = {
   },
 
   getTicketsByDate(filterOpts) {
-    this.getMostRecentTickets(_.get(filterOpts, 'groupName'));
     return new Promise((resolve, reject) => {
       const query = this.find();
 

@@ -58,7 +58,7 @@ const fixtures = {
   },
   ticket(ticket = {}) {
     return {
-      groupName: ticket.groupName || 'testGroupName',
+      groupName: ticket.groupName || Faker.lorem.word(),
       metadata: ticket.metadata || {
         title: Faker.lorem.word(),
         description: Faker.hacker.phrase()
