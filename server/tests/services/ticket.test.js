@@ -171,7 +171,7 @@ describe('## Ticket Service', () => {
 
       it('gets all tickets for a given group tickets', (done) => {
         const filters = {
-          groupName: 't'
+          groupNames: ['t']
         };
 
         ticketService.getTicketsByDate(filters)

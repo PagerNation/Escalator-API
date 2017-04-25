@@ -153,7 +153,7 @@ describe('## Ticket APIs', () => {
     });
   });
 
-  describe('# GET /api/v1/ticket/all?isOpen=...&groupName=...&to=...&from=...', () => {
+  describe('# GET /api/v1/ticket/all?isOpen=...&groupNames=...&to=...&from=...', () => {
     beforeEach((done) => {
       const promiseChain = [];
       for (let i = 0; i < 3; i++) {
@@ -214,7 +214,7 @@ describe('## Ticket APIs', () => {
 
       it('gets all tickets for a given group tickets', (done) => {
         request(app)
-          .get(`${basePath}/all?groupName=t`)
+          .get(`${basePath}/all?groupNames=t`)
           .set('Authorization', `Bearer ${token}`)
           .expect(httpStatus.OK)
           .then((res) => {
