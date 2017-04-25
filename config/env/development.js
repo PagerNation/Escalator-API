@@ -17,5 +17,7 @@ export default {
     fromPhone: process.env.PHONE_OUT
   },
   queuePath: process.env.QUEUE_PATH,
-  queueHost: `${process.env.QUEUE_HOST}:${process.env.QUEUE_PORT}`
+  queueHost: `${process.env.QUEUE_HOST}:${process.env.QUEUE_PORT}`,
+  defaultTicketQueryLimit: 10,
+  maximumTicketQueryLimit: 20
 };

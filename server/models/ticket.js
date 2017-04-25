@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import httpStatus from 'http-status';
 import _ from 'lodash';
 import APIError from '../helpers/APIError';
+import config from '../../config/env';
 
 const actionTypes = {
   CREATED: 'CREATED',
@@ -157,7 +158,7 @@ TicketSchema.statics = {
       if (!_.isNil(limit)) {
         query.limit(limit);
       } else {
-        query.limit(10);
+        query.limit(config.defaultTicketQueryLimit);
       }
 
       const sortBy = _.get(filterOpts, 'sortBy');
@@ -172,7 +173,7 @@ TicketSchema.statics = {
         query.where('isOpen').equals(isOpen);
       }
 
-      const groupNames = _.get(filterOpts, 'groupName');
+      const groupNames = _.get(filterOpts, 'groupNames');
       if (!_.isNil(groupNames)) {
         query.where('groupName').in([].concat(groupNames));
       }
