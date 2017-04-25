@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import config from '../../../config/env';
 
 export default {
 
@@ -29,10 +30,18 @@ export default {
     }
   },
 
+  getMostRecentTickets: {
+    params: {
+      groups: Joi.array().items(Joi.string())
+    }
+  },
+
   getTicketsByDate: {
     query: {
+      sortBy: Joi.string(),
+      limit: Joi.number().max(config.maximumTicketQueryLimit),
       isOpen: Joi.boolean(),
-      groupName: Joi.string(),
+      groupNames: Joi.any().allow(Joi.string(), Joi.array().items(Joi.string())),
       to: Joi.number(),
       from: Joi.number()
     }

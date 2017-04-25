@@ -1,4 +1,5 @@
 import httpStatus from 'http-status';
+import _ from 'lodash';
 import ticketService from '../../services/ticket';
 import Ticket, { actionTypes } from '../../models/ticket';
 import { build, fixtures, uuid } from '../../utils/factories';
@@ -170,7 +171,7 @@ describe('## Ticket Service', () => {
 
       it('gets all tickets for a given group tickets', (done) => {
         const filters = {
-          groupName: 't'
+          groupNames: ['t']
         };
 
         ticketService.getTicketsByDate(filters)
@@ -179,6 +180,65 @@ describe('## Ticket Service', () => {
             done();
           });
       });
+    });
+  });
+
+  function createTicketWithActions() {
+    let ticket;
+    return build('ticket', fixtures.ticket())
+      .then((sTicket) => {
+        ticket = sTicket;
+
+        return ticketService.addAction(ticket._id.toString(), actionTypes.CREATED, uuid.user)
+          .then(() =>
+            ticketService.addAction(ticket._id.toString(), actionTypes.CREATED, uuid.user))
+          .then(() =>
+            ticketService.addAction(ticket._id.toString(), actionTypes.PAGE_SENT, uuid.user));
+      })
+      .then(() => ticket);
+  }
+
+  describe('# getMostRecentTickets()', () => {
+    let ticket1;
+    let ticket2;
+
+    beforeEach((done) => {
+      createTicketWithActions()
+        .then((ticket) => {
+          ticket1 = ticket;
+          return createTicketWithActions();
+        })
+        .then((ticket) => {
+          ticket2 = ticket;
+          done();
+        });
+    });
+
+    it('only gets the most recent actions', (done) => {
+      ticketService.getMostRecentTickets([ticket1.groupName, ticket2.groupName])
+        .then((tickets) => {
+          const groupOneTicket = _.find(tickets, { _id: ticket1.groupName });
+          const groupTwoTicket = _.find(tickets, { _id: ticket2.groupName });
+
+          expect(tickets).to.have.length(2);
+          expect(groupOneTicket).to.exist;
+          expect(groupOneTicket.actionTaken).to.equal(actionTypes.PAGE_SENT);
+          expect(groupTwoTicket).to.exist;
+          expect(groupTwoTicket.actionTaken).to.equal(actionTypes.PAGE_SENT);
+          done();
+        })
+        .catch(e => done(e));
+    });
+
+    it('returns an empty list when a group has no tickets', (done) => {
+      ticketService.getMostRecentTickets(['testing'])
+        .then((tickets) => {
+          const groupTicket = _.find(tickets, { _id: 'testing' });
+
+          expect(groupTicket).to.be.empty;
+          done();
+        })
+        .catch(e => done(e));
     });
   });
 

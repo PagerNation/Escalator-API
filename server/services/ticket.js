@@ -59,6 +59,10 @@ function deleteById(id) {
     .then(validatedId => Ticket.delete(validatedId));
 }
 
+function getMostRecentTickets(groups) {
+  return Ticket.getMostRecentTickets(groups);
+}
+
 function getTicketsByDate(filterOpts) {
   return Ticket.getTicketsByDate(filterOpts);
 }
@@ -90,6 +94,7 @@ export default {
   updateTicket,
   close,
   deleteById,
+  getMostRecentTickets,
   getTicketsByDate,
   addAction,
   removeAction
