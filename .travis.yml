@@ -3,6 +3,14 @@ node_js:
   - '6.7'
 services:
   - mongodb
+addons:
+  apt:
+    sources:
+      - mongodb-upstart
+      - mongodb-3.0-precise
+    packages:
+      - mongodb-org-server
+      - mongodb-org-shell
 cache:
   directories:
     - node_modules
@@ -12,11 +20,17 @@ skip_cleanup: true
 
 before_install:
   - openssl aes-256-cbc -K $encrypted_5598d1100971_key -iv $encrypted_5598d1100971_iv -in EscalatorAPI.pem.enc -out EscalatorAPI.pem -d
+  - sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 0C49F3730359A14518585931BC711F9BA15703C6
+  - echo "deb [ arch=amd64 ] http://repo.mongodb.org/apt/ubuntu precise/mongodb-org/3.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.4.list
+  - sudo apt-get update
+  - sudo apt-get install -y mongodb-org-server
 
 before_script:
   - echo -e "Host $DEPLOY_HOST\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   - npm prune
   - chmod +x deploy.sh
+  - until nc -z localhost 27017; do echo Waiting for MongoDB; sleep 1; done
+  - mongo --version
 
 script:
   - npm run ci-lint
