@@ -36,9 +36,10 @@ function updateTicket(id, ticketDetails) {
     .then(validatedDetails => Ticket.findByIdAndUpdate(id, validatedDetails, { new: true }));
 }
 
-function close(id) {
+function close(id, user) {
   return updateTicket(id, { isOpen: false })
-    .then(ticket => cancelFuturePages(ticket.pageIds));
+    .then(ticket => cancelFuturePages(ticket.pageIds))
+    .then(() => addAction(id, actionTypes.ACKNOWLEDGED, user.id));
 }
 
 function cancelFuturePages(pageIds) {

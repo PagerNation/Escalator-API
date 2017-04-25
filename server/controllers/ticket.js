@@ -20,7 +20,7 @@ function update(req, res, next) {
 }
 
 function close(req, res, next) {
-  ticketService.close(req.params.id)
+  ticketService.close(req.params.id, req.user)
     .then(ticket => res.json(ticket))
     .catch(e => next(e));
 }
