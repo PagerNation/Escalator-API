@@ -48,7 +48,7 @@ const fixtures = {
   },
   group(group = {}) {
     return {
-      name: group.name || Faker.lorem.word(),
+      name: group.name || Faker.random.word(),
       users: group.users,
       escalationPolicy: group.escalationPolicy || EscalationPolicy.defaultEscalationPolicy(),
       admins: group.admins || [uuid.user],
@@ -58,7 +58,7 @@ const fixtures = {
   },
   ticket(ticket = {}) {
     return {
-      groupName: ticket.groupName || Faker.lorem.word(),
+      groupName: ticket.groupName || Faker.random.word(),
       metadata: ticket.metadata || {
         title: Faker.lorem.word(),
         description: Faker.hacker.phrase()
