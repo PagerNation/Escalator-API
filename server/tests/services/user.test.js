@@ -490,12 +490,12 @@ describe('## User Service', () => {
         });
     });
 
-    it('should fail when the same group is added twice', (done) => {
+    it('should ignore duplicate groups getting added to a user', (done) => {
       userService.addGroupByUserId(user.id, baseGroup.name)
         .then(() => userService.addGroupByUserId(user.id, baseGroup.name))
-        .then((user) => {
-          expect(user.groups).to.have.length(1);
-          expect(user.groups[0]).to.equal(baseGroup.name);
+        .then((uUser) => {
+          expect(uUser.groups).to.have.length(1);
+          expect(uUser.groups[0]).to.equal(baseGroup.name);
           done();
         });
     });
