@@ -124,7 +124,8 @@ TicketSchema.statics = {
   // This gets the most recent ticket action and ticket information
   // for each group specified in <groups>. If there is no tickets
   // for a given group it will not return a ticket
-  getMostRecentTickets(groups) {
+  getMostRecentTickets(groupNames) {
+    const groups = _.concat([], groupNames);
     return new Promise((resolve, reject) => {
       this.aggregate(
         [
