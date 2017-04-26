@@ -141,7 +141,7 @@ UserSchema.methods = {
   },
 
   addGroup(groupName) {
-    this.groups.push(groupName);
+    this.groups.addToSet(groupName);
     this.markModified('groups');
 
     return new Promise((resolve, reject) => {

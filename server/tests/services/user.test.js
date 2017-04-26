@@ -498,6 +498,16 @@ describe('## User Service', () => {
           done();
         });
     });
+
+    it('should ignore duplicate groups getting added to a user', (done) => {
+      userService.addGroupByUserId(user.id, baseGroup.name)
+        .then(() => userService.addGroupByUserId(user.id, baseGroup.name))
+        .then((uUser) => {
+          expect(uUser.groups).to.have.length(1);
+          expect(uUser.groups[0]).to.equal(baseGroup.name);
+          done();
+        });
+    });
   });
 
   describe('# removeGroup()', () => {
