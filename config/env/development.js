@@ -9,7 +9,8 @@ export default {
   defaultDelay: 10,
   email: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+    password: process.env.EMAIL_PASSWORD,
+    host: process.env.EMAIL_HOST
   },
   twilio: {
     accountSid: process.env.PHONE_SID,
