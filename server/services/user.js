@@ -22,7 +22,15 @@ function createUser(userObject) {
   });
 
   return JoiHelper.validate(userObject, userSchema)
-    .then(validatedUserObject => User.create(validatedUserObject));
+    .then(validatedUserObject => User.create(validatedUserObject))
+    .then((u) => {
+      const defaultDevice = {
+        name: 'Default Email',
+        type: 'email',
+        contactInformation: u.email
+      };
+      return u.addDevice(defaultDevice);
+    });
 }
 
 function getUser(userId) {
