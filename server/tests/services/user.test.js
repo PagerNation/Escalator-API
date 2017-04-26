@@ -22,8 +22,9 @@ describe('## User Service', () => {
             expect(createdUser.isSysAdmin).to.equal(false);
             expect(createdUser.auth).to.be.null;
             expect(createdUser.groups).to.be.empty;
-            expect(createdUser.devices).to.be.empty;
-            expect(createdUser.delays).to.be.empty;
+            expect(createdUser.devices).to.have.length(1);
+            expect(createdUser.devices[0].contactInformation).to.eq(createdUser.email);
+            expect(createdUser.delays).to.have.length(1);
             expect(createdUser.createdAt).to.be.not.null;
             done();
           })
@@ -113,11 +114,13 @@ describe('## User Service', () => {
           expect(user.isSysAdmin).to.equal(false);
           expect(user.auth).to.be.null;
           expect(user.groups).to.be.empty;
-          expect(user.devices).to.be.empty;
-          expect(user.delays).to.be.empty;
+          expect(user.devices).to.have.length(1);
+          expect(user.devices[0].contactInformation).to.eq(user.email);
+          expect(user.delays).to.be.have.length(1);
           expect(user.createdAt).to.be.not.null;
           done();
-        });
+        })
+        .catch(err => done(err));
     });
 
     it('can\'t find user for a given userId', (done) => {
@@ -355,19 +358,22 @@ describe('## User Service', () => {
       userService.removeDevice(user, device.id)
         .then((updatedUser) => {
           expect(updatedUser).to.exist;
-          expect(updatedUser.devices).to.be.empty;
+          expect(updatedUser.devices).to.have.length(1);
+          expect(updatedUser.devices[0].contactInformation).to.eq(updatedUser.email);
           done();
-        });
+        })
+        .catch(err => done(err));
     });
 
     it('should remove a delay from the delays array', (done) => {
       userService.removeDevice(user, device.id)
         .then((savedUser) => {
           expect(savedUser).to.exist;
-          expect(savedUser.devices).to.be.empty;
+          expect(savedUser.devices).to.have.length(1);
           expect(savedUser.delays.length).to.equal(savedUser.devices.length);
           done();
-        });
+        })
+        .catch(err => done(err));
     });
   });
 
@@ -413,8 +419,8 @@ describe('## User Service', () => {
     const device1 = new Device(baseDevice);
     const device2 = new Device(baseDevice);
     const device3 = new Device(baseDevice);
-    const sortOrder = [device1.id, device2.id, device3.id];
-
+    let device4;
+    let sortOrder;
     let user;
 
     before((done) => {
@@ -430,6 +436,8 @@ describe('## User Service', () => {
         .then(() => User.get(user.id))
         .then((receivedUser) => {
           user = receivedUser;
+          device4 = user.devices[3];
+          sortOrder = [device1.id, device2.id, device3.id, device4.id];
           done();
         });
     });
@@ -443,7 +451,8 @@ describe('## User Service', () => {
             expect(userDevices[i].id).to.equal(sortOrder[i]);
           }
           done();
-        });
+        })
+        .catch(err => done(err));
     });
   });
 
