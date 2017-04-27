@@ -1,14 +1,19 @@
 import nodemailer from 'nodemailer';
 import config from '../../config/env';
 
-const emailUser = config.email.user;
-const emailPass = config.email.pass;
+const smtpConfig = {
+  host: config.email.host,
+  auth: {
+    user: config.email.user,
+    pass: config.email.password
+  }
+};
 
-const transporter = nodemailer.createTransport(`smtps://${emailUser}:${emailPass}@smtp.gmail.com`);
+const transporter = nodemailer.createTransport(smtpConfig);
 
 function generateMailOptions(ticket, user, device) {
   return {
-    from: `"Escalator" <${emailUser}>`,
+    from: `"Escalator" <${config.email.user}>`,
     to: `"${user.name}" <${device.contactInformation}>`,
     subject: `🐴 ${ticket.metadata.title} 🐴`,
     text: `${ticket.metadata.description}`,
